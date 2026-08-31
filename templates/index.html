@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Last collected: {{ last_collected }}</p>
+<canvas id="starsChart"></canvas>
+<canvas id="forksChart"></canvas>
+<canvas id="trafficChart"></canvas>
+
+<h2>Activity</h2>
+<div id="activityWindows"></div>
+
+<h2>Historical weekly activity</h2>
+<p>Weekly totals, starting Sunday. Weeks before daily tracking began are a one-time seed; every
+week since is computed from daily collection -- see BOOTSTRAP.md.</p>
+<canvas id="weeklyCommitsChart"></canvas>
+<canvas id="weeklyLinesChart"></canvas>
+
+<h2>Top referrers (last 14 days)</h2>
+<div id="topReferrers"></div>
+
+<h2>Popular content (last 14 days)</h2>
+<div id="topPaths"></div>
+
+<script>
+fetch('data.json')
+  .then(r => r.json())
+  .then(render);
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function render(data) {
+  new Chart(document.getElementById('starsChart'), {
+    type: 'line',
+    data: {
+      labels: data.stars.map(p => p.date),
+      datasets: [{ label: 'Stars', data: data.stars.map(p => p.value), borderColor: cssVar('--color-stars') }]
+    }
+  });
+
+  new Chart(document.getElementById('forksChart'), {
+    type: 'line',
+    data: {
+      labels: data.forks.map(p => p.date),
+      datasets: [{ label: 'Forks', data: data.forks.map(p => p.value), borderColor: cssVar('--color-forks') }]
+    }
+  });
+
+  if (data.traffic.length > 0) {
+    new Chart(document.getElementById('trafficChart'), {
+      type: 'line',
+      data: {
+        labels: data.traffic.map(p => p.date),
+        datasets: [
+          { label: 'Views', data: data.traffic.map(p => p.views), borderColor: cssVar('--color-views') },
+          { label: 'Clones', data: data.traffic.map(p => p.clones), borderColor: cssVar('--color-clones') }
+        ]
+      }
+    });
+  } else {
+    document.getElementById('trafficChart').outerHTML = '<p>No traffic data collected yet.</p>';
+  }
+
+  if (data.activity_weekly.length > 0) {
+    new Chart(document.getElementById('weeklyCommitsChart'), {
+      type: 'bar',
+      data: {
+        labels: data.activity_weekly.map(w => w.week_of),
+        datasets: [{ label: 'Commits per week', data: data.activity_weekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }]
+      }
+    });
+
+    new Chart(document.getElementById('weeklyLinesChart'), {
+      type: 'bar',
+      data: {
+        labels: data.activity_weekly.map(w => w.week_of),
+        datasets: [
+          { label: 'Additions', data: data.activity_weekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
+          { label: 'Deletions', data: data.activity_weekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
+        ]
+      }
+    });
+  } else {
+    document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
+    document.getElementById('weeklyLinesChart').outerHTML = '';
+  }
+
+  renderActivityWindows(data.activity_windows);
+  renderTable('topReferrers', ['Referrer', 'Views', 'Uniques'], data.top_referrers.map(
+    r => [r.referrer, r.count, r.uniques]
+  ));
+  renderTable('topPaths', ['Path', 'Views', 'Uniques'], data.top_paths.map(
+    p => [p.path, p.count, p.uniques]
+  ));
+}
+
+const ACTIVITY_FIELD_LABELS = {
+  issues_opened: 'Issues opened',
+  issues_closed: 'Issues closed',
+  prs_opened: 'PRs opened',
+  prs_merged: 'PRs merged',
+  prs_closed: 'PRs closed',
+  commits: 'Commits',
+  files_changed: 'Files changed',
+  additions: 'Additions',
+  deletions: 'Deletions'
+};
+
+function renderActivityWindows(windows) {
+  const container = document.getElementById('activityWindows');
+  const fields = Object.keys(ACTIVITY_FIELD_LABELS);
+  const header = ['Window', ...fields.map(f => ACTIVITY_FIELD_LABELS[f])];
+  const rows = Object.entries(windows).map(([label, w]) => [label, ...fields.map(f => w[f])]);
+  container.appendChild(buildTable(header, rows));
+}
+
+function renderTable(containerId, header, rows) {
+  const container = document.getElementById(containerId);
+  if (rows.length === 0) {
+    container.innerHTML = '<p>No data collected yet.</p>';
+    return;
+  }
+  container.appendChild(buildTable(header, rows));
+}
+
+function buildTable(header, rows) {
+  const table = document.createElement('table');
+  table.innerHTML = '<thead><tr>' + header.map(h => `<th>${h}</th>`).join('') + '</tr></thead>';
+  const tbody = document.createElement('tbody');
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = row.map(cell => `<td>${cell}</td>`).join('');
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  return table;
+}
+</script>
+{% endblock %}

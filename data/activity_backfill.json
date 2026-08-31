@@ -1,0 +1,16 @@
+[
+  { "week_of": "2026-05-31", "commits": 56, "additions": 28777, "deletions": 18519 },
+  { "week_of": "2026-06-07", "commits": 37, "additions": 36078, "deletions": 34784 },
+  { "week_of": "2026-06-14", "commits": 22, "additions": 13485, "deletions": 1587 },
+  { "week_of": "2026-06-21", "commits": 40, "additions": 16152, "deletions": 7432 },
+  { "week_of": "2026-06-28", "commits": 69, "additions": 117389, "deletions": 138359 },
+  { "week_of": "2026-07-05", "commits": 73, "additions": 59150, "deletions": 19386 },
+  { "week_of": "2026-07-12", "commits": 63, "additions": 30968, "deletions": 10235 },
+  { "week_of": "2026-07-19", "commits": 49, "additions": 20384, "deletions": 2004 },
+  { "week_of": "2026-07-26", "commits": 19, "additions": 94101, "deletions": 2480 },
+  { "week_of": "2026-08-02", "commits": 37, "additions": 20536, "deletions": 2322 },
+  { "week_of": "2026-08-09", "commits": 78, "additions": 26184, "deletions": 3613 },
+  { "week_of": "2026-08-16", "commits": 59, "additions": 69302, "deletions": 15288 },
+  { "week_of": "2026-08-23", "commits": 44, "additions": 69886, "deletions": 2300 },
+  { "week_of": "2026-08-30", "commits": 1, "additions": 26, "deletions": 2 }
+]
