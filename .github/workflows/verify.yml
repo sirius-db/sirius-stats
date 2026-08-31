@@ -1,0 +1,36 @@
+name: Verify pipeline
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "templates/**"
+      - "static/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/verify.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.12"
+
+      # SIRIUS_TRAFFIC_TOKEN is unavailable on PRs from forks -- fetch_metrics.py
+      # already handles that by skipping traffic collection gracefully, so this
+      # still verifies the rest of the pipeline (repo stats, activity, releases).
+      - name: Fetch metrics (not committed)
+        env:
+          SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
+        run: uv run scripts/fetch_metrics.py
+
+      - name: Build site
+        run: uv run scripts/build_site.py
