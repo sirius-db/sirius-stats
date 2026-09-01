@@ -116,10 +116,10 @@ function render(data) {
     c => [c.login, c.commits]
   ));
   renderTable('topReferrers', ['Referrer', 'Views', 'Uniques'], data.top_referrers.map(
-    r => [r.referrer, r.count, r.uniques]
+    r => [referrerCell(r.referrer), r.count, r.uniques]
   ));
   renderTable('topPaths', ['Path', 'Views', 'Uniques'], data.top_paths.map(
-    p => [p.path, p.count, p.uniques]
+    p => [{ text: p.path, href: `https://github.com${p.path}` }, p.count, p.uniques]
   ));
 }
 
@@ -141,6 +141,18 @@ function renderActivityWindows(windows) {
   const header = ['Window', ...fields.map(f => ACTIVITY_FIELD_LABELS[f])];
   const rows = Object.entries(windows).map(([label, w]) => [label, ...fields.map(f => w[f])]);
   container.appendChild(buildTable(header, rows));
+}
+
+// GitHub reports some referrers as bare names (Google, Bing, DuckDuckGo) or app package
+// identifiers (com.linkedin.android), not real domains -- only linkify things that look
+// like an actual domain so we don't produce broken links for those.
+const DOMAIN_LIKE = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i;
+
+function referrerCell(referrer) {
+  if (DOMAIN_LIKE.test(referrer)) {
+    return { text: referrer, href: `https://${referrer}` };
+  }
+  return referrer;
 }
 
 function renderTable(containerId, header, rows) {
@@ -170,7 +182,16 @@ function buildTable(header, rows) {
     const tr = document.createElement('tr');
     for (const cell of row) {
       const td = document.createElement('td');
-      td.textContent = cell;
+      if (cell && typeof cell === 'object' && 'href' in cell) {
+        const a = document.createElement('a');
+        a.href = cell.href;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = cell.text;
+        td.appendChild(a);
+      } else {
+        td.textContent = cell;
+      }
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
