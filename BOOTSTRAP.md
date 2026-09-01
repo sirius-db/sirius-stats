@@ -162,3 +162,12 @@ computed data always overrides the static seed on any overlapping week. So the "
 weekly activity" chart keeps extending on its own from daily collection going forward — there's
 no need to re-export Pulse or hand-edit this file again unless you want to extend the seeded
 history further back than `2026-05-31`.
+
+## 8. Label tracking — no backfill exists, deliberately
+
+Unlike every other metric above, issue/PR label tracking (priority and other) has no backfill
+step and never will, by design — see [DATA.md](DATA.md)'s "known limitations" section. GitHub
+doesn't expose label-change history without walking each issue/PR's Timeline API individually
+(N+1 calls against a repo with hundreds of issues/PRs), which was scoped out as not worth the
+cost (see issue #5's discussion). Label history starts from whenever `collect.yml` first
+collected it and only ever goes forward.

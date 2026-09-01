@@ -1,9 +1,10 @@
 # sirius-stats — agent operating notes
 
-Tracks `sirius-db/sirius`'s stars, forks, traffic, and activity over time via daily GitHub
-Actions collection, publishing a static site to GitHub Pages. See `README.md` for what this is,
-`CONTRIBUTING.md` for the dev workflow, `DATA.md` for the data model, `BOOTSTRAP.md` for one-time
-setup. This file is operating rules only — don't duplicate their content here.
+Tracks `sirius-db/sirius`'s stars, forks, traffic, activity, and issue/PR label trends over time
+via daily GitHub Actions collection, publishing a static site to GitHub Pages. See `README.md`
+for what this is, `CONTRIBUTING.md` for the dev workflow, `DATA.md` for the data model,
+`BOOTSTRAP.md` for one-time setup. This file is operating rules only — don't duplicate their
+content here.
 
 ## Non-negotiable rules
 
@@ -18,13 +19,15 @@ setup. This file is operating rules only — don't duplicate their content here.
   tightly-scoped PR keeps that commit meaningful for future `git blame`.
 - **`verify` is a required status check on `main`** (classic branch protection, not rulesets —
   see `BOOTSTRAP.md` §6 for why and the exact config). It runs `fetch_metrics.py` and
-  `build_site.py` end-to-end on every PR touching the pipeline, without committing or deploying.
+  `build_site.py` end-to-end on every PR to `main` (no path filter — one blocked docs-only PRs
+  permanently, since the check never ran to satisfy the requirement), without committing or
+  deploying.
 
 ## Core dev loop
 
 ```bash
 uv run scripts/fetch_metrics.py   # writes data/snapshots/<today>.json
-uv run scripts/build_site.py      # writes site/index.html and site/data.json
+uv run scripts/build_site.py      # writes site/index.html, site/labels.html, and site/data.json
 cd site && python3 -m http.server 8000   # preview locally -- file:// URLs don't work (CORS)
 ```
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Build the static site/ directory: renders templates/ (Jinja2) using data/snapshots/
-history merged with the one-time stars/forks/traffic backfills and weekly activity seed
-in data/, and copies static/ assets alongside the rendered output.
+"""Build the static site/ directory: renders templates/index.html and templates/labels.html
+(Jinja2) using data/snapshots/ history merged with the one-time stars/forks/traffic
+backfills and weekly activity seed in data/, and copies static/ assets alongside the
+rendered output.
 """
 
 import json
