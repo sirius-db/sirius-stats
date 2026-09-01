@@ -11,13 +11,6 @@ name: Verify pipeline
 
 on:
   pull_request:
-    paths:
-      - "scripts/**"
-      - "templates/**"
-      - "static/**"
-      - "pyproject.toml"
-      - "uv.lock"
-      - ".github/workflows/**"
   workflow_dispatch: {}
 
 permissions:
