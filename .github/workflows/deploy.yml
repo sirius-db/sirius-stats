@@ -1,5 +1,9 @@
 name: Deploy site
 
+# Runs build_site.py to render templates/ + data/ into static HTML, then publishes it
+# to GitHub Pages via the artifact-based deploy actions. Triggers on every push to
+# main, so it picks up new daily snapshots automatically once collect.yml commits them.
+
 on:
   push:
     branches: [main]

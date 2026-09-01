@@ -1,5 +1,10 @@
 name: Verify pipeline
 
+# Runs fetch_metrics.py and build_site.py end-to-end on every PR touching the
+# pipeline, without committing or deploying anything, so a broken script or workflow
+# change fails CI before merge instead of surfacing in production. Required status
+# check on main -- see BOOTSTRAP.md for the branch protection config that enforces it.
+
 on:
   pull_request:
     paths:

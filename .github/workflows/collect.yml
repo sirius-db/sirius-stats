@@ -1,5 +1,10 @@
 name: Collect metrics
 
+# Runs fetch_metrics.py daily to snapshot sirius-db/sirius's stars, forks, traffic,
+# and issue/PR/commit activity, then commits the result to data/snapshots/. This is
+# the only source of truth for anything GitHub doesn't retain long-term (traffic data
+# is dropped after 14 days) -- see README.md and BOOTSTRAP.md for the full picture.
+
 on:
   schedule:
     # 2330 UTC, not 0000 -- GitHub Actions scheduled runs can start late (documented
