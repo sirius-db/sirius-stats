@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Fetch daily metrics for sirius-db/sirius and write a snapshot to data/snapshots/.
 
-Collects repo stats, activity deltas, traffic, and releases for today by default, or
-for a specific past date via --date (see BOOTSTRAP.md for recovering a missed day).
+Collects repo stats, activity deltas, traffic, releases, and open issue/PR labels for
+today by default, or for a specific past date via --date (see BOOTSTRAP.md for
+recovering a missed day). Note: --date backfilling doesn't apply to `labels` -- like
+`repo`, it's a point-in-time snapshot of currently-open items, not reconstructable for
+a past date.
 """
 
 import argparse
@@ -189,6 +192,96 @@ def fetch_activity_metrics(today, token):
     }
 
 
+# Ordered P0 -> P3 (not a set) so severity can be sorted on, not just membership-checked.
+PRIORITY_LABELS = ("! - P0", "! - P1", "! - P2", "! - P3")
+
+
+def fetch_label_metrics(token=None):
+    """Daily rollup of open issue/PR labels -- counts plus a bounded stale top-10.
+
+    Fetches every open issue/PR (with labels) fresh each run, but only persists a small
+    daily-appropriate summary, not the full item list: per-label counts (small, like
+    every other metric in this repo) and the 10 most stale items per category (bounded).
+    The full item list only ever exists transiently here, in memory, during this one
+    collection run -- there's no way to reconstruct "yesterday's full item list" from a
+    snapshot, which is deliberate (see DATA.md for the size/redundancy tradeoff this
+    avoids: storing ~150+ full item records daily forever would be pure git bloat next
+    to every other field in this file).
+    """
+    items = paginate_all(f"/repos/{REPO}/issues?state=open", token)
+
+    priority_counts = {label: {"issues": 0, "prs": 0, "color": None} for label in PRIORITY_LABELS}
+    other_counts = {}
+    priority_candidates = []
+    other_candidates = []
+
+    for item in items:
+        label_objs = item.get("labels", [])
+        if not label_objs:
+            continue
+        labels = [label["name"] for label in label_objs]
+        is_pr = "pull_request" in item
+        entry = {
+            "number": item["number"],
+            "title": item["title"],
+            "url": item["html_url"],
+            "updated_at": item["updated_at"],
+        }
+
+        # Color lives on the count bucket, not a separate structure -- GitHub's real
+        # per-label color (captured fresh every run, since it can change), used to
+        # render a matching dot on the site instead of an arbitrary palette.
+        for label in label_objs:
+            if label["name"] in PRIORITY_LABELS:
+                priority_counts[label["name"]]["color"] = label["color"]
+            else:
+                bucket = other_counts.setdefault(
+                    label["name"], {"issues": 0, "prs": 0, "color": None}
+                )
+                bucket["color"] = label["color"]
+
+        priority_labels_here = [l for l in labels if l in PRIORITY_LABELS]
+        for label in priority_labels_here:
+            priority_counts[label]["prs" if is_pr else "issues"] += 1
+        if priority_labels_here:
+            # An item could in principle carry more than one priority label -- pick the
+            # most severe (lowest P-number) for display and sorting.
+            most_severe = min(priority_labels_here, key=PRIORITY_LABELS.index)
+            priority_candidates.append({**entry, "priority_label": most_severe, "is_pr": is_pr})
+
+        other_labels_here = [l for l in labels if l not in PRIORITY_LABELS]
+        for label in other_labels_here:
+            other_counts[label]["prs" if is_pr else "issues"] += 1
+        if other_labels_here:
+            other_candidates.append({**entry, "labels": other_labels_here, "is_pr": is_pr})
+
+    # P0 first regardless of staleness, then P1, etc. -- staleness only breaks ties
+    # within the same priority level, so the table reads by severity, not just by age.
+    priority_sort_key = lambda e: (PRIORITY_LABELS.index(e["priority_label"]), e["updated_at"])
+    drop_is_pr = lambda e: {k: v for k, v in e.items() if k != "is_pr"}
+    priority_issue_candidates = sorted(
+        (drop_is_pr(e) for e in priority_candidates if not e["is_pr"]), key=priority_sort_key
+    )
+    priority_pr_candidates = sorted(
+        (drop_is_pr(e) for e in priority_candidates if e["is_pr"]), key=priority_sort_key
+    )
+    other_issue_candidates = sorted(
+        (drop_is_pr(e) for e in other_candidates if not e["is_pr"]), key=lambda e: e["updated_at"]
+    )
+    other_pr_candidates = sorted(
+        (drop_is_pr(e) for e in other_candidates if e["is_pr"]), key=lambda e: e["updated_at"]
+    )
+
+    return {
+        "priority_counts": priority_counts,
+        "other_counts": other_counts,
+        "priority_issues_stale_top10": priority_issue_candidates[:10],
+        "priority_prs_stale_top10": priority_pr_candidates[:10],
+        "other_issues_stale_top10": other_issue_candidates[:10],
+        "other_prs_stale_top10": other_pr_candidates[:10],
+    }
+
+
 def fetch_releases(token=None):
     releases, _ = api_get(f"/repos/{REPO}/releases", token)
     entries = []
@@ -230,6 +323,7 @@ def main():
         "collected_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "repo": fetch_repo_metrics(traffic_token),
         "activity": fetch_activity_metrics(target_date, traffic_token),
+        "labels": fetch_label_metrics(traffic_token),
         "traffic": {
             "as_of_date": None,
             "views": None,
