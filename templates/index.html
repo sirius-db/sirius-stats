@@ -24,9 +24,9 @@ Diagram, not a burndown -- there's no sprint deadline to burn down to). Collecti
 history builds up from here forward.</p>
 <label for="priorityWindow">Window: </label>
 <select id="priorityWindow">
-  <option value="7">7 days</option>
-  <option value="30" selected>30 days</option>
-  <option value="90">90 days</option>
+  <option value="7">last 7 snapshots</option>
+  <option value="30" selected>last 30 snapshots</option>
+  <option value="90">last 90 snapshots</option>
 </select>
 <h3>Open issues</h3>
 <canvas id="priorityIssuesChart"></canvas>
@@ -72,10 +72,6 @@ fetch('data.json')
     p.textContent = `Failed to load stats data: ${err.message}`;
     document.body.prepend(p);
   });
-
-function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
 
 function render(data) {
   new Chart(document.getElementById('starsChart'), {
@@ -148,14 +144,7 @@ function render(data) {
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
   const labelColors = data.labels.label_colors;
-  const labelCell = name => {
-    // Priority labels always appear in priority_counts, even with zero open items
-    // that day, so their color can be null (never captured) -- fall back the same
-    // way cfdDatasets() does. Other labels only ever appear here with count > 0,
-    // so their color is always captured; no fallback exists or is needed for those.
-    const color = labelColors[name] ? `#${labelColors[name]}` : PRIORITY_COLOR_FALLBACK[name];
-    return { text: name, dotColor: color };
-  };
+  const labelCell = name => ({ text: name, dotColor: labelColorOf(labelColors, name) });
 
   renderTable('priorityIssuesStale', ['#', 'Priority', 'Title', 'Updated'], data.labels.priority_issues_stale_top10.map(
     it => [{ text: `#${it.number}`, href: it.url }, labelCell(it.priority_label), it.title, it.updated_at.slice(0, 10)]
@@ -184,23 +173,12 @@ function render(data) {
 }
 
 const PRIORITY_LABELS = ['! - P0', '! - P1', '! - P2', '! - P3'];
-// Fallback only -- matches sirius-db/sirius's colors as of when this was written
-// (verified against `gh api repos/sirius-db/sirius/labels`). Used only if a priority
-// label currently has zero open issues/PRs, so fetch_metrics.py never captured its
-// color that day (label_colors[label] stays null in that case).
-const PRIORITY_COLOR_FALLBACK = {
-  '! - P0': '#b60205',
-  '! - P1': '#d93f0b',
-  '! - P2': '#fbca04',
-  '! - P3': '#9198a1'
-};
 
 function cfdDatasets(history, labelColors) {
   // Chart.js stacks the first dataset at the bottom -- P0 first means P0 sits right on
   // the x-axis, which reads better in practice: P0 should be close to 0.
   return PRIORITY_LABELS.map(label => {
-    const fromData = labelColors[label] ? `#${labelColors[label]}` : null;
-    const color = fromData || PRIORITY_COLOR_FALLBACK[label];
+    const color = labelColorOf(labelColors, label);
     return {
       label,
       data: history.map(h => h[label] || 0),
@@ -252,11 +230,6 @@ function renderPriorityCharts(labelsData) {
   document.getElementById('priorityWindow').dispatchEvent(new Event('change'));
 }
 
-// Cycled across however many of the top 10 non-priority labels there are -- unlike
-// priority labels, "other" labels aren't fixed in advance, so there's no dedicated CSS
-// variable per label (same palette approach as labels.html's full-label chart).
-const OTHER_LABEL_PALETTE = ['#3a7bd5', '#2ecc71', '#e74c3c', '#f0a500', '#9b59b6', '#1abc9c', '#e67e22', '#34495e', '#16a085', '#8e44ad'];
-
 function renderOtherTop10Chart(labelsData) {
   const history = labelsData.other_history;
   if (history.length === 0) {
@@ -275,8 +248,8 @@ function renderOtherTop10Chart(labelsData) {
       datasets: topLabels.map((name, i) => ({
         label: name,
         data: history.map(h => h[name] || 0),
-        backgroundColor: OTHER_LABEL_PALETTE[i % OTHER_LABEL_PALETTE.length],
-        borderColor: OTHER_LABEL_PALETTE[i % OTHER_LABEL_PALETTE.length],
+        backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+        borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
         fill: true
       }))
     },
@@ -325,64 +298,7 @@ function renderTable(containerId, header, rows) {
   container.appendChild(buildTable(header, rows));
 }
 
-function buildTable(header, rows) {
-  const table = document.createElement('table');
-
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  for (const h of header) {
-    const th = document.createElement('th');
-    th.textContent = h;
-    headRow.appendChild(th);
-  }
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement('tbody');
-  for (const row of rows) {
-    const tr = document.createElement('tr');
-    for (const cell of row) {
-      const td = document.createElement('td');
-      const items = Array.isArray(cell) ? cell : [cell];
-      for (const item of items) {
-        td.appendChild(buildCellItem(item));
-      }
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-  }
-  table.appendChild(tbody);
-  return table;
-}
-
-// A cell (or one entry in a multi-label cell) can be a plain value, {text, href} for a
-// link, {text, dotColor} for a small colored dot next to a label name (so its color is
-// recognizable at a glance without needing to read GitHub's own styling), or both.
-// Only wrap in the .label-item span when there's a dot to show -- plain cells (dates,
-// numbers, links with no dot) render exactly as before, no extra inline-flex wrapper.
-function buildCellItem(item) {
-  const hasDot = item && typeof item === 'object' && 'dotColor' in item;
-  const hasHref = item && typeof item === 'object' && 'href' in item;
-  const text = item && typeof item === 'object' && 'text' in item ? item.text : item;
-
-  const textNode = hasHref
-    ? Object.assign(document.createElement('a'), {
-        href: item.href, target: '_blank', rel: 'noopener noreferrer', textContent: text
-      })
-    : document.createTextNode(text);
-
-  if (!hasDot) {
-    return textNode;
-  }
-
-  const wrapper = document.createElement('span');
-  wrapper.className = 'label-item';
-  const dot = document.createElement('span');
-  dot.className = 'label-dot';
-  dot.style.backgroundColor = item.dotColor;
-  wrapper.appendChild(dot);
-  wrapper.appendChild(textNode);
-  return wrapper;
-}
+// buildTable() and buildCellItem() live in static/shared.js -- loaded by base.html,
+// shared with labels.html.
 </script>
 {% endblock %}

@@ -27,20 +27,14 @@ fetch('data.json')
     document.body.prepend(p);
   });
 
-function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-// A fixed color palette cycled across however many labels exist -- unlike priority
-// labels, the set of "other" labels isn't fixed in advance, so there's no dedicated
-// CSS variable per label.
-const PALETTE = ['#3a7bd5', '#2ecc71', '#e74c3c', '#f0a500', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
-
 function render(data) {
   const history = data.labels.other_history;
   if (history.length === 0) {
     document.getElementById('allLabelsChart').outerHTML = '<p>No label data collected yet.</p>';
   } else {
+    // Every entry already has every label as a key (padded to 0 where absent) --
+    // build_site.py's other_history guarantees this, so any single entry's keys work
+    // as the full label set, not just history[0]'s.
     const labelNames = Object.keys(history[0]).filter(k => k !== 'date');
     new Chart(document.getElementById('allLabelsChart'), {
       type: 'line',
@@ -49,8 +43,8 @@ function render(data) {
         datasets: labelNames.map((name, i) => ({
           label: name,
           data: history.map(h => h[name] || 0),
-          backgroundColor: PALETTE[i % PALETTE.length],
-          borderColor: PALETTE[i % PALETTE.length],
+          backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+          borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
           fill: true
         }))
       },
@@ -65,83 +59,19 @@ function render(data) {
     return;
   }
   const labelColors = data.labels.label_colors;
-  // Priority labels always appear in priority_counts, even with zero open items that
-  // day, so their color can be null (never captured that day) -- fall back to
-  // GitHub's known values. Other labels only ever appear here with count > 0, so
-  // their color is always captured; no fallback exists or is needed for those.
-  const PRIORITY_COLOR_FALLBACK = {
-    '! - P0': 'b60205', '! - P1': 'd93f0b', '! - P2': 'fbca04', '! - P3': '9198a1'
-  };
   container.appendChild(buildTable(['Label', 'Open count'], entries.map(
     ([label, count]) => [
       {
         text: label,
         href: `https://github.com/sirius-db/sirius/issues?q=${encodeURIComponent(`is:open label:"${label}"`)}`,
-        dotColor: `#${labelColors[label] || PRIORITY_COLOR_FALLBACK[label]}`
+        dotColor: labelColorOf(labelColors, label)
       },
       count
     ]
   )));
 }
 
-function buildTable(header, rows) {
-  const table = document.createElement('table');
-
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  for (const h of header) {
-    const th = document.createElement('th');
-    th.textContent = h;
-    headRow.appendChild(th);
-  }
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement('tbody');
-  for (const row of rows) {
-    const tr = document.createElement('tr');
-    for (const cell of row) {
-      const td = document.createElement('td');
-      const items = Array.isArray(cell) ? cell : [cell];
-      for (const item of items) {
-        td.appendChild(buildCellItem(item));
-      }
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-  }
-  table.appendChild(tbody);
-  return table;
-}
-
-// A cell (or one entry in a multi-label cell) can be a plain value, {text, href} for a
-// link, {text, dotColor} for a small colored dot next to a label name (so its color is
-// recognizable at a glance without needing to read GitHub's own styling), or both.
-// Only wrap in the .label-item span when there's a dot to show -- plain cells (dates,
-// numbers, links with no dot) render exactly as before, no extra inline-flex wrapper.
-function buildCellItem(item) {
-  const hasDot = item && typeof item === 'object' && 'dotColor' in item;
-  const hasHref = item && typeof item === 'object' && 'href' in item;
-  const text = item && typeof item === 'object' && 'text' in item ? item.text : item;
-
-  const textNode = hasHref
-    ? Object.assign(document.createElement('a'), {
-        href: item.href, target: '_blank', rel: 'noopener noreferrer', textContent: text
-      })
-    : document.createTextNode(text);
-
-  if (!hasDot) {
-    return textNode;
-  }
-
-  const wrapper = document.createElement('span');
-  wrapper.className = 'label-item';
-  const dot = document.createElement('span');
-  dot.className = 'label-dot';
-  dot.style.backgroundColor = item.dotColor;
-  wrapper.appendChild(dot);
-  wrapper.appendChild(textNode);
-  return wrapper;
-}
+// buildTable(), buildCellItem(), cssVar(), LABEL_PALETTE, and labelColorOf() live in
+// static/shared.js -- loaded by base.html, shared with index.html.
 </script>
 {% endblock %}
