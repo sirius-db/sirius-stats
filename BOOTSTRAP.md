@@ -100,30 +100,52 @@ What's actually recoverable for a missed day, and why:
   timestamps regardless of when you run them, so rerunning those two also repairs this gap for
   stars/forks specifically.
 
-## 6. Branch protection push token
+## 6. Branch protection on `main`
 
-Once `main` requires a pull request before merging, `collect.yml`'s daily automated commit can
-no longer push using the default `GITHUB_TOKEN` — that push would be rejected the same as any
-other direct push. It needs a personal access token belonging to an account on the ruleset's
-bypass list instead:
+`main` uses **classic branch protection** (Settings → Branches → Branch protection rules in the
+GitHub UI, or `gh api repos/sirius-db/sirius-stats/branches/main/protection`) — matching the
+convention `sirius-db/sirius` itself uses, rather than the newer rulesets system. Configured via
+`PUT /repos/{owner}/{repo}/branches/main/protection` with:
+
+- **Required pull request reviews** — a PR is required before merging, with
+  `required_approving_review_count: 0` (no minimum approvals enforced; this repo has one active
+  reviewer, so requiring self-approval added no real protection).
+- **Required status checks** — the `verify` check (from `.github/workflows/verify.yml`'s `verify`
+  job) must pass. `strict: false` (the branch doesn't need to be re-synced with `main` before
+  merging).
+- **`enforce_admins: false`** — repository admins can push directly to `main`, bypassing the PR
+  requirement. This is classic protection's only bypass mechanism (unlike rulesets, there's no
+  per-user bypass list) — it's what lets the PAT-authenticated automated push through, at the
+  cost of applying to every admin, not just the PAT's owner specifically.
+- **`allow_force_pushes: false`**, **`allow_deletions: false`** — force pushes and branch
+  deletion are blocked.
+
+Merge method is enforced separately, at the **repository** level, not in branch protection at
+all — classic branch protection has no merge-method setting (`allowed_merge_methods` is a
+rulesets-only feature). `sirius-stats` has `allow_squash_merge: true`, `allow_merge_commit:
+false`, `allow_rebase_merge: false` (Settings → General → Pull Requests), enforcing squash-only.
+
+### Push token for the automated collection commit
+
+Once `main` requires a pull request, `collect.yml`'s daily automated commit can no longer push
+using the default `GITHUB_TOKEN` — that push would be rejected the same as any other direct
+push. It needs a personal access token belonging to a repository admin instead, since
+`enforce_admins: false` is what lets that push bypass the PR requirement:
 
 1. Create a fine-grained PAT scoped to `sirius-db/sirius-stats` only (a different repo/purpose
    than `SIRIUS_TRAFFIC_TOKEN`, which targets `sirius-db/sirius`) with **Contents: Read and
-   write**.
+   write**, owned by a repository admin account.
 2. Add it as a repo secret in `sirius-stats` named `COLLECT_PUSH_TOKEN`.
-3. Add that PAT's owner to the `main` ruleset's bypass list (Settings → Rules → Rulesets), so the
-   push it authenticates isn't blocked by the required-PR rule.
 
 `collect.yml` passes this token to `actions/checkout`, which configures the git remote's
 credentials with it, so the later `git push` in the "Commit snapshot" step authenticates as the
 PAT's owner automatically.
 
-**Known tradeoff**: the bypass list entry is a full GitHub account, not something scoped to "only
-this automated push" -- GitHub has no narrower bypass mechanism. Whoever owns this PAT can also
-push directly to `main` themselves, bypassing the PR requirement for their own changes too. Keep
-that in mind if this token's ownership ever changes -- it's effectively a standing admin bypass,
-not just a collection-script credential. Rotate it by generating a new PAT, updating the secret,
-and updating the bypass list to match if the owner changes.
+**Known tradeoff**: since classic protection's only bypass mechanism is the blanket
+`enforce_admins` toggle, *any* repository admin (not just the PAT's owner) can push directly to
+`main`, bypassing the PR requirement for their own changes too — there's no way to scope the
+bypass to only the automated push. Rotate the PAT by generating a new one (owned by any
+repository admin) and updating the secret.
 
 ## 7. Historical weekly activity seed
 
