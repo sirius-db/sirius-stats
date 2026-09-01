@@ -3,7 +3,8 @@
 <p>Last collected: {{ last_collected }}</p>
 <canvas id="starsChart"></canvas>
 <canvas id="forksChart"></canvas>
-<canvas id="trafficChart"></canvas>
+<canvas id="viewsChart"></canvas>
+<canvas id="clonesChart"></canvas>
 
 <h2>Activity</h2>
 <div id="activityWindows"></div>
@@ -59,18 +60,30 @@ function render(data) {
   });
 
   if (data.traffic.length > 0) {
-    new Chart(document.getElementById('trafficChart'), {
+    new Chart(document.getElementById('viewsChart'), {
       type: 'line',
       data: {
         labels: data.traffic.map(p => p.date),
         datasets: [
           { label: 'Views', data: data.traffic.map(p => p.views), borderColor: cssVar('--color-views') },
-          { label: 'Clones', data: data.traffic.map(p => p.clones), borderColor: cssVar('--color-clones') }
+          { label: 'Unique views', data: data.traffic.map(p => p.unique_views), borderColor: cssVar('--color-views'), borderDash: [5, 5] }
+        ]
+      }
+    });
+
+    new Chart(document.getElementById('clonesChart'), {
+      type: 'line',
+      data: {
+        labels: data.traffic.map(p => p.date),
+        datasets: [
+          { label: 'Clones', data: data.traffic.map(p => p.clones), borderColor: cssVar('--color-clones') },
+          { label: 'Unique clones', data: data.traffic.map(p => p.unique_clones), borderColor: cssVar('--color-clones'), borderDash: [5, 5] }
         ]
       }
     });
   } else {
-    document.getElementById('trafficChart').outerHTML = '<p>No traffic data collected yet.</p>';
+    document.getElementById('viewsChart').outerHTML = '<p>No traffic data collected yet.</p>';
+    document.getElementById('clonesChart').outerHTML = '';
   }
 
   if (data.activity_weekly.length > 0) {

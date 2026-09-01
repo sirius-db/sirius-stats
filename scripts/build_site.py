@@ -84,7 +84,9 @@ def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, acti
         traffic_by_date[s["traffic"]["as_of_date"]] = {
             "date": s["traffic"]["as_of_date"],
             "views": s["traffic"]["views"],
+            "unique_views": s["traffic"]["unique_views"],
             "clones": s["traffic"]["clones"],
+            "unique_clones": s["traffic"]["unique_clones"],
         }
     traffic = [traffic_by_date[d] for d in sorted(traffic_by_date)]
 
