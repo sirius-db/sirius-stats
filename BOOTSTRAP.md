@@ -100,7 +100,32 @@ What's actually recoverable for a missed day, and why:
   timestamps regardless of when you run them, so rerunning those two also repairs this gap for
   stars/forks specifically.
 
-## 6. Historical weekly activity seed
+## 6. Branch protection push token
+
+Once `main` requires a pull request before merging, `collect.yml`'s daily automated commit can
+no longer push using the default `GITHUB_TOKEN` — that push would be rejected the same as any
+other direct push. It needs a personal access token belonging to an account on the ruleset's
+bypass list instead:
+
+1. Create a fine-grained PAT scoped to `sirius-db/sirius-stats` only (a different repo/purpose
+   than `SIRIUS_TRAFFIC_TOKEN`, which targets `sirius-db/sirius`) with **Contents: Read and
+   write**.
+2. Add it as a repo secret in `sirius-stats` named `COLLECT_PUSH_TOKEN`.
+3. Add that PAT's owner to the `main` ruleset's bypass list (Settings → Rules → Rulesets), so the
+   push it authenticates isn't blocked by the required-PR rule.
+
+`collect.yml` passes this token to `actions/checkout`, which configures the git remote's
+credentials with it, so the later `git push` in the "Commit snapshot" step authenticates as the
+PAT's owner automatically.
+
+**Known tradeoff**: the bypass list entry is a full GitHub account, not something scoped to "only
+this automated push" -- GitHub has no narrower bypass mechanism. Whoever owns this PAT can also
+push directly to `main` themselves, bypassing the PR requirement for their own changes too. Keep
+that in mind if this token's ownership ever changes -- it's effectively a standing admin bypass,
+not just a collection-script credential. Rotate it by generating a new PAT, updating the secret,
+and updating the bypass list to match if the owner changes.
+
+## 7. Historical weekly activity seed
 
 Daily issue/PR/commit activity tracking only goes back to whenever `collect.yml` first ran.
 `data/activity_backfill.json` is a one-time, manually-seeded array of `{week_of, commits,

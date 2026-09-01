@@ -16,6 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          # Default GITHUB_TOKEN can't push once main requires a PR -- this PAT's
+          # user is on the ruleset's bypass list. See BOOTSTRAP.md.
+          token: ${{ secrets.COLLECT_PUSH_TOKEN }}
 
       - uses: astral-sh/setup-uv@v10.0.1
         with:
