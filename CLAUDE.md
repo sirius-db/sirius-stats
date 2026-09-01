@@ -39,8 +39,8 @@ to verify a change instead of looking for it in the repo.
    reading the diff alone. This repo has a history of subtle data-shape bugs (duplicate points at
    backfill/snapshot boundaries, dropped fields on merge, stale docstrings) that only surfaced by
    actually running the pipeline and checking output.
-3. If the change touches `README.md`, `CONTRIBUTING.md`, `BOOTSTRAP.md`, or `DATA.md`, check the
-   other three for now-stale or now-contradictory statements — this repo has had a real instance
-   of two docs directly contradicting each other after an edit to only one.
+3. If the change touches `README.md`, `CONTRIBUTING.md`, `CLAUDE.md`, `BOOTSTRAP.md`, or
+   `DATA.md`, check the other four for now-stale or now-contradictory statements — this repo has
+   had a real instance of two docs directly contradicting each other after an edit to only one.
 4. Never commit or push without explicit instruction in that message — this repo follows the
    same read-only-by-default posture as the user's global instructions.
