@@ -65,12 +65,19 @@ function render(data) {
     return;
   }
   const labelColors = data.labels.label_colors;
+  // Priority labels always appear in priority_counts, even with zero open items that
+  // day, so their color can be null (never captured that day) -- fall back to
+  // GitHub's known values. Other labels only ever appear here with count > 0, so
+  // their color is always captured; no fallback exists or is needed for those.
+  const PRIORITY_COLOR_FALLBACK = {
+    '! - P0': 'b60205', '! - P1': 'd93f0b', '! - P2': 'fbca04', '! - P3': '9198a1'
+  };
   container.appendChild(buildTable(['Label', 'Open count'], entries.map(
     ([label, count]) => [
       {
         text: label,
         href: `https://github.com/sirius-db/sirius/issues?q=${encodeURIComponent(`is:open label:"${label}"`)}`,
-        dotColor: `#${labelColors[label]}`
+        dotColor: `#${labelColors[label] || PRIORITY_COLOR_FALLBACK[label]}`
       },
       count
     ]

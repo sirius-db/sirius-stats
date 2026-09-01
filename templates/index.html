@@ -148,7 +148,14 @@ function render(data) {
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
   const labelColors = data.labels.label_colors;
-  const labelCell = name => ({ text: name, dotColor: `#${labelColors[name]}` });
+  const labelCell = name => {
+    // Priority labels always appear in priority_counts, even with zero open items
+    // that day, so their color can be null (never captured) -- fall back the same
+    // way cfdDatasets() does. Other labels only ever appear here with count > 0,
+    // so their color is always captured; no fallback exists or is needed for those.
+    const color = labelColors[name] ? `#${labelColors[name]}` : PRIORITY_COLOR_FALLBACK[name];
+    return { text: name, dotColor: color };
+  };
 
   renderTable('priorityIssuesStale', ['#', 'Priority', 'Title', 'Updated'], data.labels.priority_issues_stale_top10.map(
     it => [{ text: `#${it.number}`, href: it.url }, labelCell(it.priority_label), it.title, it.updated_at.slice(0, 10)]
