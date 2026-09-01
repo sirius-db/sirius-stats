@@ -92,6 +92,7 @@ def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, acti
 
     activity_windows = build_activity_windows(snapshots)
     activity_weekly = build_activity_weekly(snapshots, activity_backfill)
+    labels = build_label_data(snapshots)
 
     latest_traffic = next(
         (s["traffic"] for s in reversed(snapshots) if s["traffic"]["views"] is not None),
@@ -106,8 +107,89 @@ def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, acti
         "traffic": traffic,
         "activity_windows": activity_windows,
         "activity_weekly": activity_weekly,
+        "labels": labels,
         "top_referrers": top_referrers,
         "top_paths": top_paths,
+    }
+
+
+def build_label_data(snapshots):
+    """Merge each day's label count rollup into history; pass the latest day's stale
+    top-10 tables straight through.
+
+    fetch_metrics.py already does the priority/other classification and stale ranking
+    at collection time (see fetch_label_metrics()) -- there's no full item list here to
+    reprocess, only the small daily counts and the already-bounded top-10s.
+    """
+    priority_issues_history = []
+    priority_prs_history = []
+    other_counts_by_date = {}
+    latest_date = None
+    latest_labels_data = None
+
+    for s in snapshots:
+        labels_data = s.get("labels")
+        if not labels_data:
+            continue
+        snapshot_date = s["date"]
+
+        priority_issue_counts = {
+            label: counts["issues"] for label, counts in labels_data["priority_counts"].items()
+        }
+        priority_pr_counts = {
+            label: counts["prs"] for label, counts in labels_data["priority_counts"].items()
+        }
+        priority_issues_history.append({"date": snapshot_date, **priority_issue_counts})
+        priority_prs_history.append({"date": snapshot_date, **priority_pr_counts})
+        other_counts_by_date[snapshot_date] = labels_data["other_counts"]
+
+        # Snapshots are already in date order (load_snapshots() sorts by filename), so
+        # the last one processed is the latest.
+        latest_date = snapshot_date
+        latest_labels_data = labels_data
+
+    def total(counts):
+        return counts["issues"] + counts["prs"]
+
+    all_other_labels = sorted(
+        {label for counts in other_counts_by_date.values() for label in counts}
+    )
+    other_history = [
+        {
+            "date": d,
+            **{
+                label: total(other_counts_by_date[d][label])
+                for label in all_other_labels
+                if label in other_counts_by_date[d]
+            },
+        }
+        for d in sorted(other_counts_by_date)
+    ]
+
+    all_labels_current = {}
+    label_colors = {}
+    if latest_labels_data:
+        for label, counts in latest_labels_data["priority_counts"].items():
+            all_labels_current[label] = total(counts)
+            label_colors[label] = counts["color"]
+        for label, counts in latest_labels_data["other_counts"].items():
+            all_labels_current[label] = total(counts)
+            label_colors[label] = counts["color"]
+        all_labels_current = dict(
+            sorted(all_labels_current.items(), key=lambda kv: kv[1], reverse=True)
+        )
+
+    return {
+        "as_of_date": latest_date,
+        "priority_issues_history": priority_issues_history,
+        "priority_prs_history": priority_prs_history,
+        "other_history": other_history,
+        "priority_issues_stale_top10": latest_labels_data["priority_issues_stale_top10"] if latest_labels_data else [],
+        "priority_prs_stale_top10": latest_labels_data["priority_prs_stale_top10"] if latest_labels_data else [],
+        "other_issues_stale_top10": latest_labels_data["other_issues_stale_top10"] if latest_labels_data else [],
+        "other_prs_stale_top10": latest_labels_data["other_prs_stale_top10"] if latest_labels_data else [],
+        "all_labels_current": all_labels_current,
+        "label_colors": label_colors,
     }
 
 
@@ -191,12 +273,14 @@ def main():
         shutil.copytree(STATIC_DIR, SITE_DIR / "static", dirs_exist_ok=True)
 
     env = Environment(loader=FileSystemLoader(TEMPLATES_DIR), autoescape=True)
-    template = env.get_template("index.html")
     last_collected = snapshots[-1]["collected_at"] if snapshots else "never"
-    html = template.render(last_collected=last_collected, logo_path=find_logo())
-    (SITE_DIR / "index.html").write_text(html)
+    render_kwargs = {"last_collected": last_collected, "logo_path": find_logo()}
 
-    print(f"wrote {SITE_DIR / 'index.html'} and {SITE_DIR / 'data.json'}")
+    for page in ("index.html", "labels.html"):
+        html = env.get_template(page).render(**render_kwargs)
+        (SITE_DIR / page).write_text(html)
+
+    print(f"wrote {SITE_DIR / 'index.html'}, {SITE_DIR / 'labels.html'}, and {SITE_DIR / 'data.json'}")
 
 
 if __name__ == "__main__":
