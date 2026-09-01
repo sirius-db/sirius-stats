@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Last collected: {{ last_collected }}</p>
+<canvas id="starsChart"></canvas>
+<canvas id="forksChart"></canvas>
+<canvas id="viewsChart"></canvas>
+<canvas id="clonesChart"></canvas>
+
+<h2>Activity</h2>
+<div id="activityWindows"></div>
+
+<h3>Top committers (last 7 days)</h3>
+<div id="topCommitters"></div>
+
+<h2>Historical weekly activity</h2>
+<p>Weekly totals, starting Sunday. Weeks before daily tracking began are a one-time seed; every
+week since is computed from daily collection -- see BOOTSTRAP.md.</p>
+<canvas id="weeklyCommitsChart"></canvas>
+<canvas id="weeklyLinesChart"></canvas>
+
+<h2>Top referrers (last 14 days)</h2>
+<div id="topReferrers"></div>
+
+<h2>Popular content (last 14 days)</h2>
+<div id="topPaths"></div>
+
+<script>
+fetch('data.json')
+  .then(r => {
+    if (!r.ok) throw new Error(`data.json returned ${r.status}`);
+    return r.json();
+  })
+  .then(render)
+  .catch(err => {
+    const p = document.createElement('p');
+    p.style.color = 'var(--color-clones)';
+    p.textContent = `Failed to load stats data: ${err.message}`;
+    document.body.prepend(p);
+  });
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function render(data) {
+  new Chart(document.getElementById('starsChart'), {
+    type: 'line',
+    data: {
+      labels: data.stars.map(p => p.date),
+      datasets: [{ label: 'Stars', data: data.stars.map(p => p.value), borderColor: cssVar('--color-stars') }]
+    }
+  });
+
+  new Chart(document.getElementById('forksChart'), {
+    type: 'line',
+    data: {
+      labels: data.forks.map(p => p.date),
+      datasets: [{ label: 'Forks', data: data.forks.map(p => p.value), borderColor: cssVar('--color-forks') }]
+    }
+  });
+
+  if (data.traffic.length > 0) {
+    new Chart(document.getElementById('viewsChart'), {
+      type: 'line',
+      data: {
+        labels: data.traffic.map(p => p.date),
+        datasets: [
+          { label: 'Views', data: data.traffic.map(p => p.views), borderColor: cssVar('--color-views') },
+          { label: 'Unique views', data: data.traffic.map(p => p.unique_views), borderColor: cssVar('--color-views'), borderDash: [5, 5] }
+        ]
+      }
+    });
+
+    new Chart(document.getElementById('clonesChart'), {
+      type: 'line',
+      data: {
+        labels: data.traffic.map(p => p.date),
+        datasets: [
+          { label: 'Clones', data: data.traffic.map(p => p.clones), borderColor: cssVar('--color-clones') },
+          { label: 'Unique clones', data: data.traffic.map(p => p.unique_clones), borderColor: cssVar('--color-clones'), borderDash: [5, 5] }
+        ]
+      }
+    });
+  } else {
+    document.getElementById('viewsChart').outerHTML = '<p>No traffic data collected yet.</p>';
+    document.getElementById('clonesChart').outerHTML = '';
+  }
+
+  if (data.activity_weekly.length > 0) {
+    new Chart(document.getElementById('weeklyCommitsChart'), {
+      type: 'bar',
+      data: {
+        labels: data.activity_weekly.map(w => w.week_of),
+        datasets: [{ label: 'Commits per week', data: data.activity_weekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }]
+      }
+    });
+
+    new Chart(document.getElementById('weeklyLinesChart'), {
+      type: 'bar',
+      data: {
+        labels: data.activity_weekly.map(w => w.week_of),
+        datasets: [
+          { label: 'Additions', data: data.activity_weekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
+          { label: 'Deletions', data: data.activity_weekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
+        ]
+      }
+    });
+  } else {
+    document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
+    document.getElementById('weeklyLinesChart').outerHTML = '';
+  }
+
+  renderActivityWindows(data.activity_windows);
+  const weekCommitters = data.activity_windows['7d'] ? data.activity_windows['7d'].top_committers : [];
+  renderTable('topCommitters', ['Login', 'Commits'], weekCommitters.map(
+    c => [c.login, c.commits]
+  ));
+  renderTable('topReferrers', ['Referrer', 'Views', 'Uniques'], data.top_referrers.map(
+    r => [referrerCell(r.referrer), r.count, r.uniques]
+  ));
+  renderTable('topPaths', ['Path', 'Views', 'Uniques'], data.top_paths.map(
+    p => [{ text: p.path, href: `https://github.com${p.path}` }, p.count, p.uniques]
+  ));
+}
+
+const ACTIVITY_FIELD_LABELS = {
+  issues_opened: 'Issues opened',
+  issues_closed: 'Issues closed',
+  prs_opened: 'PRs opened',
+  prs_merged: 'PRs merged',
+  prs_closed: 'PRs closed',
+  commits: 'Commits',
+  files_changed: 'Files changed',
+  additions: 'Additions',
+  deletions: 'Deletions'
+};
+
+function renderActivityWindows(windows) {
+  const container = document.getElementById('activityWindows');
+  const fields = Object.keys(ACTIVITY_FIELD_LABELS);
+  const header = ['Window', ...fields.map(f => ACTIVITY_FIELD_LABELS[f])];
+  const rows = Object.entries(windows).map(([label, w]) => [label, ...fields.map(f => w[f])]);
+  container.appendChild(buildTable(header, rows));
+}
+
+// GitHub reports some referrers as bare names (Google, Bing, DuckDuckGo) or app package
+// identifiers (com.linkedin.android), not real domains -- only linkify things that look
+// like an actual domain so we don't produce broken links for those.
+const DOMAIN_LIKE = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i;
+
+function referrerCell(referrer) {
+  if (DOMAIN_LIKE.test(referrer)) {
+    return { text: referrer, href: `https://${referrer}` };
+  }
+  return referrer;
+}
+
+function renderTable(containerId, header, rows) {
+  const container = document.getElementById(containerId);
+  if (rows.length === 0) {
+    container.innerHTML = '<p>No data collected yet.</p>';
+    return;
+  }
+  container.appendChild(buildTable(header, rows));
+}
+
+function buildTable(header, rows) {
+  const table = document.createElement('table');
+
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for (const h of header) {
+    const th = document.createElement('th');
+    th.textContent = h;
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for (const row of rows) {
+    const tr = document.createElement('tr');
+    for (const cell of row) {
+      const td = document.createElement('td');
+      if (cell && typeof cell === 'object' && 'href' in cell) {
+        const a = document.createElement('a');
+        a.href = cell.href;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = cell.text;
+        td.appendChild(a);
+      } else {
+        td.textContent = cell;
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  return table;
+}
+</script>
+{% endblock %}

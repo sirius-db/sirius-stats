@@ -1,0 +1,38 @@
+name: Deploy site
+
+# Runs build_site.py to render templates/ + data/ into static HTML, then publishes it
+# to GitHub Pages via the artifact-based deploy actions. Triggers on every push to
+# main, so it picks up new daily snapshots automatically once collect.yml commits them.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          python-version: "3.12"
+
+      - name: Build site
+        run: uv run scripts/build_site.py
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,45 @@
+name: Verify pipeline
+
+# Runs fetch_metrics.py and build_site.py end-to-end on every PR touching the
+# pipeline, without committing or deploying anything, so a broken script or workflow
+# change fails CI before merge instead of surfacing in production. Required status
+# check on main -- see BOOTSTRAP.md for the branch protection config that enforces it.
+# **NOTE:** This does run on PRs from forks, but repo secrets (SIRIUS_TRAFFIC_TOKEN)
+# aren't exposed to them, so a fork PR only gets partial coverage (no traffic
+# collection -- see the Fetch metrics step below). Push branches to origin directly,
+# not a fork, to get full verification coverage before merging.
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "templates/**"
+      - "static/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/**"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          python-version: "3.12"
+
+      # SIRIUS_TRAFFIC_TOKEN is unavailable on PRs from forks -- fetch_metrics.py
+      # already handles that by skipping traffic collection gracefully, so this
+      # still verifies the rest of the pipeline (repo stats, activity, releases).
+      - name: Fetch metrics (not committed)
+        env:
+          SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
+        run: uv run scripts/fetch_metrics.py
+
+      - name: Build site
+        run: uv run scripts/build_site.py

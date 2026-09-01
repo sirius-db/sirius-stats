@@ -1,0 +1,56 @@
+name: Collect metrics
+
+# Runs fetch_metrics.py daily to snapshot sirius-db/sirius's stars, forks, traffic,
+# and issue/PR/commit activity, then commits the result to data/snapshots/. This is
+# the only source of truth for anything GitHub doesn't retain long-term (traffic data
+# is dropped after 14 days) -- see README.md and BOOTSTRAP.md for the full picture.
+
+on:
+  schedule:
+    # 2330 UTC, not 0000 -- GitHub Actions scheduled runs can start late (documented
+    # queue delay/jitter), so 0000 risks slipping into the next calendar day. 2330
+    # leaves enough buffer that the run still lands within the intended UTC day.
+    - cron: "30 23 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  # Prevents a manual workflow_dispatch run from racing the scheduled run's git push --
+  # queues instead of canceling, so a manual run never causes a scheduled snapshot to
+  # be silently dropped.
+  group: collect-metrics
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # Default GITHUB_TOKEN can't push once main requires a PR -- this PAT's
+          # owner is a repo admin, and enforce_admins is off, so the push bypasses
+          # the PR requirement. See BOOTSTRAP.md.
+          token: ${{ secrets.COLLECT_PUSH_TOKEN }}
+
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          python-version: "3.12"
+
+      - name: Fetch metrics
+        env:
+          SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
+        run: uv run scripts/fetch_metrics.py
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/snapshots/
+          if git diff --cached --quiet; then
+            echo "no changes to commit"
+            exit 0
+          fi
+          git commit -m "chore: add snapshot for $(date -u +%Y-%m-%d)"
+          git push
