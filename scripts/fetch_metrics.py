@@ -26,6 +26,21 @@ def api_get(path, token=None):
     return json.loads(body), link_header
 
 
+def paginate_all(path, token=None):
+    """Follow Link headers to collect every item across all pages."""
+    items = []
+    next_path = f"{path}{'&' if '?' in path else '?'}per_page=100"
+    while next_path:
+        page_items, link_header = api_get(next_path, token)
+        items.extend(page_items)
+        next_path = None
+        for part in link_header.split(","):
+            if 'rel="next"' in part:
+                url = part.split(";")[0].strip().strip("<>")
+                next_path = url[len(API_ROOT):]
+    return items
+
+
 def count_via_pagination(path, token=None):
     """Count total items across paginated results using per_page=1 and the Link header's last page."""
     items, link_header = api_get(f"{path}{'&' if '?' in path else '?'}per_page=1", token)
@@ -135,9 +150,7 @@ def fetch_activity_metrics(today, token):
 
     day_start = f"{today}T00:00:00Z"
     day_end = f"{today}T23:59:59Z"
-    commits, _ = api_get(
-        f"/repos/{REPO}/commits?since={day_start}&until={day_end}&per_page=100", token
-    )
+    commits = paginate_all(f"/repos/{REPO}/commits?since={day_start}&until={day_end}", token)
 
     files_changed = 0
     additions = 0

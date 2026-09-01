@@ -11,6 +11,13 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  # Prevents a manual workflow_dispatch run from racing the scheduled run's git push --
+  # queues instead of canceling, so a manual run never causes a scheduled snapshot to
+  # be silently dropped.
+  group: collect-metrics
+  cancel-in-progress: false
+
 jobs:
   collect:
     runs-on: ubuntu-latest

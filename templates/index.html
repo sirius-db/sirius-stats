@@ -8,6 +8,9 @@
 <h2>Activity</h2>
 <div id="activityWindows"></div>
 
+<h3>Top committers (last 7 days)</h3>
+<div id="topCommitters"></div>
+
 <h2>Historical weekly activity</h2>
 <p>Weekly totals, starting Sunday. Weeks before daily tracking began are a one-time seed; every
 week since is computed from daily collection -- see BOOTSTRAP.md.</p>
@@ -22,8 +25,17 @@ week since is computed from daily collection -- see BOOTSTRAP.md.</p>
 
 <script>
 fetch('data.json')
-  .then(r => r.json())
-  .then(render);
+  .then(r => {
+    if (!r.ok) throw new Error(`data.json returned ${r.status}`);
+    return r.json();
+  })
+  .then(render)
+  .catch(err => {
+    const p = document.createElement('p');
+    p.style.color = 'var(--color-clones)';
+    p.textContent = `Failed to load stats data: ${err.message}`;
+    document.body.prepend(p);
+  });
 
 function cssVar(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -86,6 +98,10 @@ function render(data) {
   }
 
   renderActivityWindows(data.activity_windows);
+  const weekCommitters = data.activity_windows['7d'] ? data.activity_windows['7d'].top_committers : [];
+  renderTable('topCommitters', ['Login', 'Commits'], weekCommitters.map(
+    c => [c.login, c.commits]
+  ));
   renderTable('topReferrers', ['Referrer', 'Views', 'Uniques'], data.top_referrers.map(
     r => [r.referrer, r.count, r.uniques]
   ));
@@ -125,11 +141,25 @@ function renderTable(containerId, header, rows) {
 
 function buildTable(header, rows) {
   const table = document.createElement('table');
-  table.innerHTML = '<thead><tr>' + header.map(h => `<th>${h}</th>`).join('') + '</tr></thead>';
+
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for (const h of header) {
+    const th = document.createElement('th');
+    th.textContent = h;
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
   const tbody = document.createElement('tbody');
   for (const row of rows) {
     const tr = document.createElement('tr');
-    tr.innerHTML = row.map(cell => `<td>${cell}</td>`).join('');
+    for (const cell of row) {
+      const td = document.createElement('td');
+      td.textContent = cell;
+      tr.appendChild(td);
+    }
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);

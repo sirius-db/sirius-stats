@@ -8,7 +8,7 @@ on:
       - "static/**"
       - "pyproject.toml"
       - "uv.lock"
-      - ".github/workflows/verify.yml"
+      - ".github/workflows/**"
   workflow_dispatch: {}
 
 permissions:
