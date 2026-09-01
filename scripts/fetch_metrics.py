@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Fetch daily metrics for sirius-db/sirius and write a snapshot to data/snapshots/."""
+"""Fetch daily metrics for sirius-db/sirius and write a snapshot to data/snapshots/.
+
+Collects repo stats, activity deltas, traffic, and releases for today by default, or
+for a specific past date via --date (see BOOTSTRAP.md for recovering a missed day).
+"""
 
 import argparse
 import json

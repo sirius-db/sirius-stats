@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Build the static site/ directory from data/snapshots/ and data/stars_backfill.json."""
+"""Build the static site/ directory: renders templates/ (Jinja2) using data/snapshots/
+history merged with the one-time stars/forks/traffic backfills and weekly activity seed
+in data/, and copies static/ assets alongside the rendered output.
+"""
 
 import json
 import shutil

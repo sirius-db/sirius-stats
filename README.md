@@ -19,6 +19,14 @@ snapshot and commits it to `main`, then publishes a static site from the accumul
 - **`.github/workflows/deploy.yml`** runs on every push to `main` and on manual
   `workflow_dispatch`. It runs `scripts/build_site.py` to produce `site/`, then publishes it via
   the GitHub Pages artifact-based deploy actions.
+- **`.github/workflows/verify.yml`** runs on PRs to `main` that touch the pipeline (`scripts/**`,
+  `templates/**`, `static/**`, `pyproject.toml`, `uv.lock`, `.github/workflows/**`) and on manual
+  `workflow_dispatch`. It runs `scripts/fetch_metrics.py` then `scripts/build_site.py`, without
+  making a commit, so a broken change fails CI before merge. `verify` is a required check to
+  merge to `main`.
+  - **NOTE:** This does run on PRs from forks, but repo secrets (`SIRIUS_TRAFFIC_TOKEN`) aren't
+    exposed to them, so a fork PR only gets partial coverage (no traffic collection). Push
+    branches to `origin` directly, not a fork, for full verification coverage before merging.
 
 ## Dependencies
 

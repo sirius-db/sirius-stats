@@ -4,6 +4,10 @@ name: Verify pipeline
 # pipeline, without committing or deploying anything, so a broken script or workflow
 # change fails CI before merge instead of surfacing in production. Required status
 # check on main -- see BOOTSTRAP.md for the branch protection config that enforces it.
+# **NOTE:** This does run on PRs from forks, but repo secrets (SIRIUS_TRAFFIC_TOKEN)
+# aren't exposed to them, so a fork PR only gets partial coverage (no traffic
+# collection -- see the Fetch metrics step below). Push branches to origin directly,
+# not a fork, to get full verification coverage before merging.
 
 on:
   pull_request:
