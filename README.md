@@ -101,3 +101,9 @@ strings, so most visual changes don't touch any `.py` file:
 See [BOOTSTRAP.md](BOOTSTRAP.md) for the star-history backfill, the traffic token secret, the
 traffic history backfill, and the historical weekly activity seed — all one-time setup steps
 outside the recurring workflows.
+
+## Data model
+
+See [DATA.md](DATA.md) for the full schema of everything under `data/`, the merge rules
+`build_site.py` applies to combine them, and the recommended entry point (`site/data.json`) for
+any historical analysis or search over the collected data.
