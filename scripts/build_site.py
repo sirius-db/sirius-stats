@@ -152,6 +152,10 @@ def build_label_data(snapshots):
     def total(counts):
         return counts["issues"] + counts["prs"]
 
+    # Every entry gets every label ever seen, defaulting to 0 -- not just the labels
+    # present on that specific day. A label that first appears on day 3 still needs a
+    # key (0) on days 1-2, or a client-side chart deriving its series from day 1 alone
+    # would never plot that label at all (real bug, caught in PR #7 review).
     all_other_labels = sorted(
         {label for counts in other_counts_by_date.values() for label in counts}
     )
@@ -159,9 +163,8 @@ def build_label_data(snapshots):
         {
             "date": d,
             **{
-                label: total(other_counts_by_date[d][label])
+                label: total(other_counts_by_date[d][label]) if label in other_counts_by_date[d] else 0
                 for label in all_other_labels
-                if label in other_counts_by_date[d]
             },
         }
         for d in sorted(other_counts_by_date)

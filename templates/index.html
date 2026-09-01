@@ -33,11 +33,11 @@ history builds up from here forward.</p>
 <h3>Open PRs</h3>
 <canvas id="priorityPrsChart"></canvas>
 
-<h3>Most stale priority issues</h3>
+<h3>Priority backlog issues (oldest per level, P0 first)</h3>
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="priorityIssuesStale"></div>
 
-<h3>Most stale priority PRs</h3>
+<h3>Priority backlog PRs (oldest per level, P0 first)</h3>
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="priorityPrsStale"></div>
 
@@ -177,22 +177,23 @@ function render(data) {
 }
 
 const PRIORITY_LABELS = ['! - P0', '! - P1', '! - P2', '! - P3'];
-// Hardcoded to exactly match sirius-db/sirius's own label colors (verified against
-// `gh api repos/sirius-db/sirius/labels`) -- not routed through a CSS custom property,
-// since these are meant to always match GitHub exactly, not be freely re-themeable the
-// way --color-stars etc. are.
-const PRIORITY_COLORS = {
+// Fallback only -- matches sirius-db/sirius's colors as of when this was written
+// (verified against `gh api repos/sirius-db/sirius/labels`). Used only if a priority
+// label currently has zero open issues/PRs, so fetch_metrics.py never captured its
+// color that day (label_colors[label] stays null in that case).
+const PRIORITY_COLOR_FALLBACK = {
   '! - P0': '#b60205',
   '! - P1': '#d93f0b',
   '! - P2': '#fbca04',
   '! - P3': '#9198a1'
 };
 
-function cfdDatasets(history) {
+function cfdDatasets(history, labelColors) {
   // Chart.js stacks the first dataset at the bottom -- P0 first means P0 sits right on
   // the x-axis, which reads better in practice: P0 should be close to 0.
   return PRIORITY_LABELS.map(label => {
-    const color = PRIORITY_COLORS[label];
+    const fromData = labelColors[label] ? `#${labelColors[label]}` : null;
+    const color = fromData || PRIORITY_COLOR_FALLBACK[label];
     return {
       label,
       data: history.map(h => h[label] || 0),
@@ -206,6 +207,7 @@ function cfdDatasets(history) {
 function renderPriorityCharts(labelsData) {
   const issuesHistory = labelsData.priority_issues_history;
   const prsHistory = labelsData.priority_prs_history;
+  const labelColors = labelsData.label_colors;
 
   if (issuesHistory.length === 0) {
     document.getElementById('priorityIssuesChart').outerHTML = '<p>No label data collected yet.</p>';
@@ -215,13 +217,13 @@ function renderPriorityCharts(labelsData) {
 
   const issuesChart = new Chart(document.getElementById('priorityIssuesChart'), {
     type: 'line',
-    data: { labels: issuesHistory.map(h => h.date), datasets: cfdDatasets(issuesHistory) },
+    data: { labels: issuesHistory.map(h => h.date), datasets: cfdDatasets(issuesHistory, labelColors) },
     options: { scales: { y: { stacked: true } } }
   });
 
   const prsChart = new Chart(document.getElementById('priorityPrsChart'), {
     type: 'line',
-    data: { labels: prsHistory.map(h => h.date), datasets: cfdDatasets(prsHistory) },
+    data: { labels: prsHistory.map(h => h.date), datasets: cfdDatasets(prsHistory, labelColors) },
     options: { scales: { y: { stacked: true } } }
   });
 
@@ -231,11 +233,11 @@ function renderPriorityCharts(labelsData) {
     const prsWindow = prsHistory.slice(-days);
 
     issuesChart.data.labels = issuesWindow.map(h => h.date);
-    issuesChart.data.datasets = cfdDatasets(issuesWindow);
+    issuesChart.data.datasets = cfdDatasets(issuesWindow, labelColors);
     issuesChart.update();
 
     prsChart.data.labels = prsWindow.map(h => h.date);
-    prsChart.data.datasets = cfdDatasets(prsWindow);
+    prsChart.data.datasets = cfdDatasets(prsWindow, labelColors);
     prsChart.update();
   });
 
