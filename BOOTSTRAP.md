@@ -69,9 +69,38 @@ uv run scripts/backfill_traffic.py     # writes data/traffic_backfill.json
 ```
 
 Review and commit the generated file. `build_site.py` merges it into the traffic time series,
-with live-collected days taking precedence over backfilled ones on any overlapping date.
+with live-collected days taking precedence over backfilled ones on any overlapping date. Safe to
+rerun any time (e.g. to catch up after a missed `collect.yml` run) — it merges into the existing
+file rather than overwriting it, so a day already captured isn't lost just because it's since
+rolled out of GitHub's 14-day window.
 
-## 5. Historical weekly activity seed
+## 5. Recovering a missed collection day
+
+If `collect.yml` doesn't run on some day (e.g. it was stuck behind an unapproved fork-PR check),
+that day isn't necessarily lost. Two commands, run after the fact, recover most of it:
+
+```bash
+export SIRIUS_TRAFFIC_TOKEN=...                          # same token as above
+uv run scripts/backfill_traffic.py                       # re-catches traffic if still in the 14-day window
+uv run scripts/fetch_metrics.py --date 2026-08-31         # backfills that day's activity + traffic
+```
+
+What's actually recoverable for a missed day, and why:
+
+- **`activity`** (issues/PRs opened/closed/merged, commits, additions/deletions) — fully
+  recoverable. It comes from GitHub's Search API and commit history, both queryable for any past
+  date, not just "today" — `--date` just points the same queries at a specific day instead.
+- **`traffic`** — recoverable as long as the day is still within GitHub's rolling 14-day window
+  at the time you run the backfill.
+- **`repo`** (stars, forks, watchers, open issues/PRs, contributors) and **`releases`** — **not**
+  recoverable for the missed day specifically. These are point-in-time gauges with no historical
+  API, so a `--date`-backfilled snapshot's `repo`/`releases` fields reflect whatever they are
+  *when you run the backfill*, not what they were on the missed day. `stars` and `forks` are the
+  one exception — `backfill_stars.py`/`backfill_forks.py` reconstruct those from event creation
+  timestamps regardless of when you run them, so rerunning those two also repairs this gap for
+  stars/forks specifically.
+
+## 6. Historical weekly activity seed
 
 Daily issue/PR/commit activity tracking only goes back to whenever `collect.yml` first ran.
 `data/activity_backfill.json` is a one-time, manually-seeded array of `{week_of, commits,

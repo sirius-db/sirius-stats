@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fetch daily metrics for sirius-db/sirius and write a snapshot to data/snapshots/."""
 
+import argparse
 import json
 import os
 import urllib.parse
@@ -70,14 +71,32 @@ def latest_complete_day(daily_breakdown):
     return latest["timestamp"][:10], latest["count"], latest["uniques"]
 
 
-def fetch_traffic_metrics(token):
+def day_entry(daily_breakdown, target_date):
+    """Exact-match lookup for --date backfills, instead of always picking the latest day."""
+    for entry in daily_breakdown:
+        if entry["timestamp"][:10] == target_date:
+            return target_date, entry["count"], entry["uniques"]
+    return None, 0, 0
+
+
+def fetch_traffic_metrics(token, target_date=None):
     views, _ = api_get(f"/repos/{REPO}/traffic/views", token)
     clones, _ = api_get(f"/repos/{REPO}/traffic/clones", token)
     referrers, _ = api_get(f"/repos/{REPO}/traffic/popular/referrers", token)
     paths, _ = api_get(f"/repos/{REPO}/traffic/popular/paths", token)
 
-    views_date, views_count, views_uniques = latest_complete_day(views["views"])
-    clones_date, clones_count, clones_uniques = latest_complete_day(clones["clones"])
+    if target_date:
+        views_date, views_count, views_uniques = day_entry(views["views"], target_date)
+        clones_date, clones_count, clones_uniques = day_entry(clones["clones"], target_date)
+        if views_date is None and clones_date is None:
+            print(
+                f"WARNING: {target_date} is no longer in GitHub's 14-day traffic window -- "
+                "traffic fields will be zeroed. Use traffic_backfill.json for this day instead "
+                "if it was captured before rolling out of the window."
+            )
+    else:
+        views_date, views_count, views_uniques = latest_complete_day(views["views"])
+        clones_date, clones_count, clones_uniques = latest_complete_day(clones["clones"])
 
     return {
         # The day these views/clones counts actually cover -- one day behind the
@@ -168,15 +187,31 @@ def fetch_releases(token=None):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--date",
+        help=(
+            "Backfill a specific past date (YYYY-MM-DD) instead of today. Only "
+            "`activity` (issues/PRs/commits) and `traffic` (if still within GitHub's "
+            "14-day window) can be reconstructed for a past date -- `repo` and "
+            "`releases` are point-in-time and will reflect current values, not the "
+            "target date's."
+        ),
+    )
+    args = parser.parse_args()
+
     traffic_token = os.environ.get("SIRIUS_TRAFFIC_TOKEN")
     now = datetime.now(timezone.utc)
-    today = now.strftime("%Y-%m-%d")
+    target_date = args.date or now.strftime("%Y-%m-%d")
+
+    if args.date:
+        print(f"Backfilling {args.date} -- repo/releases fields will reflect today's values")
 
     snapshot = {
-        "date": today,
+        "date": target_date,
         "collected_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "repo": fetch_repo_metrics(traffic_token),
-        "activity": fetch_activity_metrics(today, traffic_token),
+        "activity": fetch_activity_metrics(target_date, traffic_token),
         "traffic": {
             "as_of_date": None,
             "views": None,
@@ -190,12 +225,12 @@ def main():
     }
 
     if traffic_token:
-        snapshot["traffic"] = fetch_traffic_metrics(traffic_token)
+        snapshot["traffic"] = fetch_traffic_metrics(traffic_token, target_date=args.date)
     else:
         print("SIRIUS_TRAFFIC_TOKEN not set, skipping traffic collection")
 
     SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = SNAPSHOTS_DIR / f"{today}.json"
+    out_path = SNAPSHOTS_DIR / f"{target_date}.json"
     out_path.write_text(json.dumps(snapshot, indent=2) + "\n")
     print(f"wrote {out_path}")
 

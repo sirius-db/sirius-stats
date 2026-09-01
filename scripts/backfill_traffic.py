@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-time bootstrap: seed data/traffic_backfill.json from the live traffic API.
+"""Bootstrap/backfill: seed or refresh data/traffic_backfill.json from the live traffic API.
 
 Not run by any workflow. See BOOTSTRAP.md for usage. Requires SIRIUS_TRAFFIC_TOKEN
 (a push-scoped token for sirius-db/sirius -- same one collect.yml uses).
@@ -7,7 +7,10 @@ Not run by any workflow. See BOOTSTRAP.md for usage. Requires SIRIUS_TRAFFIC_TOK
 /traffic/views and /traffic/clones always return a 14-day daily breakdown, but
 fetch_metrics.py's recurring collection only keeps the latest complete day from each
 call (see latest_complete_day() there) -- this script instead keeps every day the API
-returns, giving up to 14 days of real history in one shot.
+returns. Safe to rerun any time (e.g. to catch up after a missed collect.yml run): it
+merges into the existing file rather than overwriting it, so days that have already
+rolled out of GitHub's 14-day window aren't lost just because the window has since
+shifted forward.
 """
 
 import json
@@ -39,22 +42,28 @@ def main():
     views_by_day = {v["timestamp"][:10]: v for v in views}
     clones_by_day = {c["timestamp"][:10]: c for c in clones}
 
-    history = []
+    existing = {entry["date"]: entry for entry in _load_existing()}
+
     for day in sorted(set(views_by_day) | set(clones_by_day)):
         v = views_by_day.get(day, {"count": 0, "uniques": 0})
         c = clones_by_day.get(day, {"count": 0, "uniques": 0})
-        history.append(
-            {
-                "date": day,
-                "views": v["count"],
-                "unique_views": v["uniques"],
-                "clones": c["count"],
-                "unique_clones": c["uniques"],
-            }
-        )
+        existing[day] = {
+            "date": day,
+            "views": v["count"],
+            "unique_views": v["uniques"],
+            "clones": c["count"],
+            "unique_clones": c["uniques"],
+        }
 
+    history = [existing[day] for day in sorted(existing)]
     OUT_PATH.write_text(json.dumps(history, indent=2) + "\n")
     print(f"wrote {OUT_PATH} ({len(history)} days)")
+
+
+def _load_existing():
+    if OUT_PATH.exists():
+        return json.loads(OUT_PATH.read_text())
+    return []
 
 
 if __name__ == "__main__":
