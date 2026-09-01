@@ -18,6 +18,41 @@ week since is computed from daily collection -- see BOOTSTRAP.md.</p>
 <canvas id="weeklyCommitsChart"></canvas>
 <canvas id="weeklyLinesChart"></canvas>
 
+<h2>Backlog priority</h2>
+<p>Tracks how many open issues/PRs carry each priority label over time (a Cumulative Flow
+Diagram, not a burndown -- there's no sprint deadline to burn down to). Collection is recent, so
+history builds up from here forward.</p>
+<label for="priorityWindow">Window: </label>
+<select id="priorityWindow">
+  <option value="7">last 7 snapshots</option>
+  <option value="30" selected>last 30 snapshots</option>
+  <option value="90">last 90 snapshots</option>
+</select>
+<h3>Open issues</h3>
+<canvas id="priorityIssuesChart"></canvas>
+<h3>Open PRs</h3>
+<canvas id="priorityPrsChart"></canvas>
+
+<h3>Priority backlog issues (oldest per level, P0 first)</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="priorityIssuesStale"></div>
+
+<h3>Priority backlog PRs (oldest per level, P0 first)</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="priorityPrsStale"></div>
+
+<h2>Other labels</h2>
+<p>Everything that isn't a priority label. <a href="labels.html">View all labels &rarr;</a></p>
+<h3>Top 10 labels</h3>
+<canvas id="otherTop10Chart"></canvas>
+<h3>Most stale issues</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="otherIssuesStale"></div>
+
+<h3>Most stale PRs</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="otherPrsStale"></div>
+
 <h2>Top referrers (last 14 days)</h2>
 <div id="topReferrers"></div>
 
@@ -37,10 +72,6 @@ fetch('data.json')
     p.textContent = `Failed to load stats data: ${err.message}`;
     document.body.prepend(p);
   });
-
-function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
 
 function render(data) {
   new Chart(document.getElementById('starsChart'), {
@@ -110,6 +141,24 @@ function render(data) {
     document.getElementById('weeklyLinesChart').outerHTML = '';
   }
 
+  renderPriorityCharts(data.labels);
+  renderOtherTop10Chart(data.labels);
+  const labelColors = data.labels.label_colors;
+  const labelCell = name => ({ text: name, dotColor: labelColorOf(labelColors, name) });
+
+  renderTable('priorityIssuesStale', ['#', 'Priority', 'Title', 'Updated'], data.labels.priority_issues_stale_top10.map(
+    it => [{ text: `#${it.number}`, href: it.url }, labelCell(it.priority_label), it.title, it.updated_at.slice(0, 10)]
+  ));
+  renderTable('priorityPrsStale', ['#', 'Priority', 'Title', 'Updated'], data.labels.priority_prs_stale_top10.map(
+    it => [{ text: `#${it.number}`, href: it.url }, labelCell(it.priority_label), it.title, it.updated_at.slice(0, 10)]
+  ));
+  renderTable('otherIssuesStale', ['#', 'Labels', 'Title', 'Updated'], data.labels.other_issues_stale_top10.map(
+    it => [{ text: `#${it.number}`, href: it.url }, it.labels.map(labelCell), it.title, it.updated_at.slice(0, 10)]
+  ));
+  renderTable('otherPrsStale', ['#', 'Labels', 'Title', 'Updated'], data.labels.other_prs_stale_top10.map(
+    it => [{ text: `#${it.number}`, href: it.url }, it.labels.map(labelCell), it.title, it.updated_at.slice(0, 10)]
+  ));
+
   renderActivityWindows(data.activity_windows);
   const weekCommitters = data.activity_windows['7d'] ? data.activity_windows['7d'].top_committers : [];
   renderTable('topCommitters', ['Login', 'Commits'], weekCommitters.map(
@@ -121,6 +170,91 @@ function render(data) {
   renderTable('topPaths', ['Path', 'Views', 'Uniques'], data.top_paths.map(
     p => [{ text: p.path, href: `https://github.com${p.path}` }, p.count, p.uniques]
   ));
+}
+
+const PRIORITY_LABELS = ['! - P0', '! - P1', '! - P2', '! - P3'];
+
+function cfdDatasets(history, labelColors) {
+  // Chart.js stacks the first dataset at the bottom -- P0 first means P0 sits right on
+  // the x-axis, which reads better in practice: P0 should be close to 0.
+  return PRIORITY_LABELS.map(label => {
+    const color = labelColorOf(labelColors, label);
+    return {
+      label,
+      data: history.map(h => h[label] || 0),
+      backgroundColor: color + '99', // translucent fill so stacked bands stay distinguishable
+      borderColor: color,
+      fill: true
+    };
+  });
+}
+
+function renderPriorityCharts(labelsData) {
+  const issuesHistory = labelsData.priority_issues_history;
+  const prsHistory = labelsData.priority_prs_history;
+  const labelColors = labelsData.label_colors;
+
+  if (issuesHistory.length === 0) {
+    document.getElementById('priorityIssuesChart').outerHTML = '<p>No label data collected yet.</p>';
+    document.getElementById('priorityPrsChart').outerHTML = '';
+    return;
+  }
+
+  const issuesChart = new Chart(document.getElementById('priorityIssuesChart'), {
+    type: 'line',
+    data: { labels: issuesHistory.map(h => h.date), datasets: cfdDatasets(issuesHistory, labelColors) },
+    options: { scales: { y: { stacked: true } } }
+  });
+
+  const prsChart = new Chart(document.getElementById('priorityPrsChart'), {
+    type: 'line',
+    data: { labels: prsHistory.map(h => h.date), datasets: cfdDatasets(prsHistory, labelColors) },
+    options: { scales: { y: { stacked: true } } }
+  });
+
+  document.getElementById('priorityWindow').addEventListener('change', e => {
+    const days = parseInt(e.target.value, 10);
+    const issuesWindow = issuesHistory.slice(-days);
+    const prsWindow = prsHistory.slice(-days);
+
+    issuesChart.data.labels = issuesWindow.map(h => h.date);
+    issuesChart.data.datasets = cfdDatasets(issuesWindow, labelColors);
+    issuesChart.update();
+
+    prsChart.data.labels = prsWindow.map(h => h.date);
+    prsChart.data.datasets = cfdDatasets(prsWindow, labelColors);
+    prsChart.update();
+  });
+
+  // Apply the default 30-day window on first render, same as the <select>'s default.
+  document.getElementById('priorityWindow').dispatchEvent(new Event('change'));
+}
+
+function renderOtherTop10Chart(labelsData) {
+  const history = labelsData.other_history;
+  if (history.length === 0) {
+    document.getElementById('otherTop10Chart').outerHTML = '<p>No label data collected yet.</p>';
+    return;
+  }
+
+  const topLabels = Object.keys(labelsData.all_labels_current)
+    .filter(name => !PRIORITY_LABELS.includes(name))
+    .slice(0, 10);
+
+  new Chart(document.getElementById('otherTop10Chart'), {
+    type: 'line',
+    data: {
+      labels: history.map(h => h.date),
+      datasets: topLabels.map((name, i) => ({
+        label: name,
+        data: history.map(h => h[name] || 0),
+        backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+        borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+        fill: true
+      }))
+    },
+    options: { scales: { y: { stacked: true } } }
+  });
 }
 
 const ACTIVITY_FIELD_LABELS = {
@@ -164,40 +298,7 @@ function renderTable(containerId, header, rows) {
   container.appendChild(buildTable(header, rows));
 }
 
-function buildTable(header, rows) {
-  const table = document.createElement('table');
-
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  for (const h of header) {
-    const th = document.createElement('th');
-    th.textContent = h;
-    headRow.appendChild(th);
-  }
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement('tbody');
-  for (const row of rows) {
-    const tr = document.createElement('tr');
-    for (const cell of row) {
-      const td = document.createElement('td');
-      if (cell && typeof cell === 'object' && 'href' in cell) {
-        const a = document.createElement('a');
-        a.href = cell.href;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.textContent = cell.text;
-        td.appendChild(a);
-      } else {
-        td.textContent = cell;
-      }
-      tr.appendChild(td);
-    }
-    tbody.appendChild(tr);
-  }
-  table.appendChild(tbody);
-  return table;
-}
+// buildTable() and buildCellItem() live in static/shared.js -- loaded by base.html,
+// shared with labels.html.
 </script>
 {% endblock %}

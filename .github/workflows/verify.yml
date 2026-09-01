@@ -1,9 +1,11 @@
 name: Verify pipeline
 
-# Runs fetch_metrics.py and build_site.py end-to-end on every PR touching the
-# pipeline, without committing or deploying anything, so a broken script or workflow
-# change fails CI before merge instead of surfacing in production. Required status
-# check on main -- see BOOTSTRAP.md for the branch protection config that enforces it.
+# Runs fetch_metrics.py and build_site.py end-to-end on every PR to main, without
+# committing or deploying anything, so a broken script or workflow change fails CI
+# before merge instead of surfacing in production. No path filter -- verify is a
+# required status check, and a path-filtered trigger left docs-only PRs permanently
+# blocked (never matched, so the check never ran). See BOOTSTRAP.md for the branch
+# protection config that enforces the required check.
 # **NOTE:** This does run on PRs from forks, but repo secrets (SIRIUS_TRAFFIC_TOKEN)
 # aren't exposed to them, so a fork PR only gets partial coverage (no traffic
 # collection -- see the Fetch metrics step below). Push branches to origin directly,

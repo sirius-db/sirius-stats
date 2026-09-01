@@ -39,13 +39,27 @@ it locally rather than looking for it in the repo.
   },
   "activity_weekly": [{"week_of": "...", "commits": 0, "additions": 0, "deletions": 0}],
   "top_referrers": [{"referrer": "...", "count": 0, "uniques": 0}],
-  "top_paths": [{"path": "...", "count": 0, "uniques": 0}]
+  "top_paths": [{"path": "...", "count": 0, "uniques": 0}],
+  "labels": {
+    "as_of_date": "...",
+    "priority_issues_history": [{"date": "...", "! - P0": 0, "! - P1": 0, "! - P2": 0, "! - P3": 0}],
+    "priority_prs_history": [{"date": "...", "! - P0": 0, "! - P1": 0, "! - P2": 0, "! - P3": 0}],
+    "other_history": [{"date": "...", "bug": 0, "...": "one key per non-priority label ever seen"}],
+    "priority_issues_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P1"}],
+    "priority_prs_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P1"}],
+    "other_issues_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "labels": ["..."]}],
+    "other_prs_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "labels": ["..."]}],
+    "all_labels_current": {"bug": 0, "...": "every label -> current open count, sorted descending"},
+    "label_colors": {"! - P0": "b60205", "bug": "d73a4a", "...": "every label -> GitHub's real hex color, no #"}
+  }
 }
 ```
 
-`activity_windows` and `top_referrers`/`top_paths` are always the *latest* computed values, not
-history -- there's no historical time series of "what the 7d window looked like last week." If
-you need that, you'd compute it yourself from the raw daily snapshots (below).
+`activity_windows`, `top_referrers`/`top_paths`, and everything under `labels` except the two
+`*_history` arrays are always the *latest* computed values, not history -- there's no historical
+time series of "what the 7d window looked like last week" or "who was in the stale top-10 a month
+ago." If you need that, you'd compute it yourself from the raw daily snapshots (below). The two
+`*_history` arrays (and `other_history`) are real day-by-day series, same as `stars`/`forks`.
 
 ## Raw source files
 
@@ -74,6 +88,14 @@ collected per day at `2330 UTC` (see `.github/workflows/collect.yml`).
     "top_referrers": [{"referrer": "github.com", "count": 741, "uniques": 61}],
     "top_paths": [{"path": "/sirius-db/sirius", "count": 1146, "uniques": 295}]
   },
+  "labels": {
+    "priority_counts": {"! - P0": {"issues": 0, "prs": 3, "color": "b60205"}, "! - P1": "...", "! - P2": "...", "! - P3": "..."},
+    "other_counts": {"dependencies": {"issues": 0, "prs": 5, "color": "0366d6"}, "...": "one key per non-priority label seen today"},
+    "priority_issues_stale_top10": [{"number": 727, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P2"}],
+    "priority_prs_stale_top10": [{"number": 1548, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P0"}],
+    "other_issues_stale_top10": [{"number": 557, "title": "...", "url": "...", "updated_at": "...", "labels": ["duckdb"]}],
+    "other_prs_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "labels": ["..."]}]
+  },
   "releases": []
 }
 ```
@@ -94,6 +116,21 @@ Field semantics that aren't obvious from the shape alone:
   small). `traffic.views`/`clones`/etc. describe `as_of_date`, not `date`.
 - **`traffic.top_referrers`/`top_paths`** are GitHub's own current top-10 snapshot over its
   trailing 14-day window, not a delta -- there's no "today's referrers" to sum across days.
+- **`labels.*`** is a point-in-time gauge, same as `repo.*` -- and deliberately small. Every open
+  issue/PR (with labels) is fetched fresh each run to compute this, but the full item list is
+  never persisted, only: per-label counts, and the 10 most stale items per category (priority vs.
+  other). Classification and stale ranking happen in `fetch_metrics.py`'s `fetch_label_metrics()`
+  at collection time -- unlike most of this file's fields, there's no raw-vs-derived split here,
+  because the raw full item list only exists transiently in memory during that one run and can
+  never be reconstructed from a snapshot afterward. This is a deliberate tradeoff: storing
+  ~150+ full item records (title, URL, timestamp) every day forever would be pure git bloat next
+  to every other field here, which is why only bounded/aggregated data is kept. Not
+  `--date`-backfillable, for the same reason `repo.*` isn't.
+- **`priority_counts.*.color`/`other_counts.*.color`** is GitHub's actual hex color for that
+  label (no leading `#`), captured fresh every run from the same API response -- not hardcoded,
+  so it stays correct if a label's color is ever changed on GitHub. Lives on the count bucket
+  itself rather than a separate structure, matching how `priority_counts` and `other_counts` are
+  otherwise shaped the same way.
 
 ### `data/stars_backfill.json`, `data/forks_backfill.json` -- one-time historical seed
 
@@ -147,3 +184,7 @@ export from GitHub's Pulse graph (see `BOOTSTRAP.md` §7 if you need to extend i
   historical record of what a given window looked like on a past date. If that's ever needed,
   it'd have to be computed from `data/snapshots/` directly (each snapshot's `activity` field is a
   real daily delta, so this is possible, just not precomputed anywhere today).
+- `labels` history only exists from whenever `fetch_label_metrics()` shipped forward -- there's
+  no way to reconstruct past label states retroactively (unlike stars/forks, label changes aren't
+  exposed via a creation-timestamp-style API without walking each issue/PR's Timeline API
+  individually, which is a real N+1 cost -- see issue #5 for the tradeoff discussion).

@@ -14,15 +14,16 @@ exactly what `uv` is for.
 
 ```bash
 uv run scripts/fetch_metrics.py   # writes data/snapshots/<today>.json
-uv run scripts/build_site.py      # writes site/index.html and site/data.json
+uv run scripts/build_site.py      # writes site/index.html, site/labels.html, and site/data.json
 ```
 
 `fetch_metrics.py` collects repo stats (stars, forks, watchers, open issues/PRs, contributors),
 same-day activity deltas (issues/PRs opened/closed/merged, commits, files changed,
-additions/deletions, top committers), and release download counts — all unauthenticated, though
-the activity deltas use the GitHub Search API which has a lower unauthenticated rate limit, so
-setting `SIRIUS_TRAFFIC_TOKEN` (see [BOOTSTRAP.md](BOOTSTRAP.md)) speeds this up too even though
-it's not required for activity.
+additions/deletions, top committers), open issue/PR label counts (priority and other, split by
+issue/PR, with GitHub's real label colors), and release download counts — all unauthenticated,
+though the activity deltas use the GitHub Search API which has a lower unauthenticated rate
+limit, so setting `SIRIUS_TRAFFIC_TOKEN` (see [BOOTSTRAP.md](BOOTSTRAP.md)) speeds this up too
+even though it's not required for activity.
 
 Traffic stats (`views`/`clones`/top referrers/popular content) require a `SIRIUS_TRAFFIC_TOKEN`
 env var with push access to `sirius-db/sirius` — see [BOOTSTRAP.md](BOOTSTRAP.md). Without it,
@@ -36,6 +37,10 @@ lags `date` by under a day (collection runs at `2330 UTC` specifically to keep t
 `build_site.py` rolls up each day's activity deltas into 24h/3d/7d/1mo windows by summing the
 trailing N daily snapshots — there's no separate query per window, so a missed collection day
 just means one fewer data point in that window rather than a gap.
+
+Label tracking is point-in-time-forward-only, same as `repo.*` — there's no retroactive history
+before whenever collection first ran, and no `--date` backfill for it either. See
+[DATA.md](DATA.md) for why (would need an N+1 walk of every issue/PR's Timeline API).
 
 See [DATA.md](DATA.md) for the full schema of everything under `data/` and the merge rules
 `build_site.py` applies to combine them.

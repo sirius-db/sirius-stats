@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}All labels -- sirius-db/sirius stats{% endblock %}
+{% block content %}
+<p><a href="index.html">&larr; Back to dashboard</a></p>
+<h1>All labels</h1>
+<p>Every non-priority label seen on an open issue/PR, and how its count has changed since
+collection began -- see the dashboard for the priority (<code>! - PX</code>) breakdown.</p>
+
+<canvas id="allLabelsChart"></canvas>
+
+<h2>Current label counts</h2>
+<p>Includes priority labels too, alongside everything above -- this table is every label, not
+just the non-priority ones the chart covers.</p>
+<div id="allLabelsTable"></div>
+
+<script>
+fetch('data.json')
+  .then(r => {
+    if (!r.ok) throw new Error(`data.json returned ${r.status}`);
+    return r.json();
+  })
+  .then(render)
+  .catch(err => {
+    const p = document.createElement('p');
+    p.style.color = 'var(--color-clones)';
+    p.textContent = `Failed to load stats data: ${err.message}`;
+    document.body.prepend(p);
+  });
+
+function render(data) {
+  const history = data.labels.other_history;
+  if (history.length === 0) {
+    document.getElementById('allLabelsChart').outerHTML = '<p>No label data collected yet.</p>';
+  } else {
+    // Every entry already has every label as a key (padded to 0 where absent) --
+    // build_site.py's other_history guarantees this, so any single entry's keys work
+    // as the full label set, not just history[0]'s.
+    const labelNames = Object.keys(history[0]).filter(k => k !== 'date');
+    new Chart(document.getElementById('allLabelsChart'), {
+      type: 'line',
+      data: {
+        labels: history.map(h => h.date),
+        datasets: labelNames.map((name, i) => ({
+          label: name,
+          data: history.map(h => h[name] || 0),
+          backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+          borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+          fill: true
+        }))
+      },
+      options: { scales: { y: { stacked: true } } }
+    });
+  }
+
+  const container = document.getElementById('allLabelsTable');
+  const entries = Object.entries(data.labels.all_labels_current);
+  if (entries.length === 0) {
+    container.innerHTML = '<p>No label data collected yet.</p>';
+    return;
+  }
+  const labelColors = data.labels.label_colors;
+  container.appendChild(buildTable(['Label', 'Open count'], entries.map(
+    ([label, count]) => [
+      {
+        text: label,
+        href: `https://github.com/sirius-db/sirius/issues?q=${encodeURIComponent(`is:open label:"${label}"`)}`,
+        dotColor: labelColorOf(labelColors, label)
+      },
+      count
+    ]
+  )));
+}
+
+// buildTable(), buildCellItem(), cssVar(), LABEL_PALETTE, and labelColorOf() live in
+// static/shared.js -- loaded by base.html, shared with index.html.
+</script>
+{% endblock %}

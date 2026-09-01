@@ -2,7 +2,8 @@
 
 Tracks how [sirius-db/sirius](https://github.com/sirius-db/sirius) evolves over time — stars,
 forks, traffic (including referrers and popular content), day-to-day issue/PR/commit activity,
-and (eventually) release download counts.
+open issue/PR label trends (priority and other, with stale-item drill-down), and (eventually)
+release download counts.
 
 GitHub's own Insights tab and traffic API only retain a rolling window (traffic data is dropped
 after 14 days), so anything not collected is gone permanently. This repo collects a daily
