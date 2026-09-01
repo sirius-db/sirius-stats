@@ -1,0 +1,141 @@
+{
+  "date": "2026-08-31",
+  "collected_at": "2026-09-01T14:30:32Z",
+  "repo": {
+    "stars": 1056,
+    "forks": 121,
+    "watchers": 13,
+    "open_issues": 112,
+    "open_prs": 107,
+    "contributors": 43
+  },
+  "activity": {
+    "issues_opened": 0,
+    "issues_closed": 0,
+    "prs_opened": 5,
+    "prs_merged": 1,
+    "prs_closed": 1,
+    "commits": 1,
+    "files_changed": 3,
+    "additions": 26,
+    "deletions": 2,
+    "top_committers": [
+      {
+        "login": "mike-wendt",
+        "commits": 1
+      }
+    ]
+  },
+  "traffic": {
+    "as_of_date": "2026-08-31",
+    "views": 384,
+    "unique_views": 77,
+    "clones": 112,
+    "unique_clones": 40,
+    "top_referrers": [
+      {
+        "referrer": "github.com",
+        "count": 741,
+        "uniques": 61
+      },
+      {
+        "referrer": "Google",
+        "count": 344,
+        "uniques": 126
+      },
+      {
+        "referrer": "sirius-db.com",
+        "count": 138,
+        "uniques": 40
+      },
+      {
+        "referrer": "teams.public.onecdn.static.microsoft",
+        "count": 36,
+        "uniques": 8
+      },
+      {
+        "referrer": "linkedin.com",
+        "count": 15,
+        "uniques": 11
+      },
+      {
+        "referrer": "Bing",
+        "count": 9,
+        "uniques": 4
+      },
+      {
+        "referrer": "com.linkedin.android",
+        "count": 4,
+        "uniques": 1
+      },
+      {
+        "referrer": "DuckDuckGo",
+        "count": 3,
+        "uniques": 3
+      },
+      {
+        "referrer": "developer.nvidia.com",
+        "count": 3,
+        "uniques": 3
+      },
+      {
+        "referrer": "t.co",
+        "count": 3,
+        "uniques": 1
+      }
+    ],
+    "top_paths": [
+      {
+        "path": "/sirius-db/sirius",
+        "count": 1146,
+        "uniques": 295
+      },
+      {
+        "path": "/sirius-db/sirius/pulls",
+        "count": 758,
+        "uniques": 40
+      },
+      {
+        "path": "/sirius-db/sirius/stargazers",
+        "count": 197,
+        "uniques": 3
+      },
+      {
+        "path": "/sirius-db/sirius/commits/dev",
+        "count": 188,
+        "uniques": 31
+      },
+      {
+        "path": "/sirius-db/sirius/issues",
+        "count": 155,
+        "uniques": 34
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1524",
+        "count": 135,
+        "uniques": 12
+      },
+      {
+        "path": "/sirius-db/sirius/pulls/Jedi18",
+        "count": 90,
+        "uniques": 3
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1425",
+        "count": 88,
+        "uniques": 9
+      },
+      {
+        "path": "/sirius-db/sirius/pulls/kevkrist",
+        "count": 84,
+        "uniques": 5
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1606",
+        "count": 73,
+        "uniques": 9
+      }
+    ]
+  },
+  "releases": []
+}
