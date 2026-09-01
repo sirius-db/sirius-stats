@@ -47,12 +47,27 @@ def load_json_if_exists(path):
     return []
 
 
-def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, activity_backfill):
-    stars = [{"date": p["date"], "value": p["stars"]} for p in stars_backfill]
-    stars += [{"date": s["date"], "value": s["repo"]["stars"]} for s in snapshots]
+def merge_point_series(backfill, backfill_key, snapshots, snapshot_value_fn):
+    """Merge a backfill series with live snapshots, deduped by date.
 
-    forks = [{"date": p["date"], "value": p["forks"]} for p in forks_backfill]
-    forks += [{"date": s["date"], "value": s["repo"]["forks"]} for s in snapshots]
+    Live snapshot values win on any date that appears in both -- same pattern as the
+    traffic merge below. Needed because a backfill's last day and a snapshot's first
+    day can land on the same date (observed with stars: both landed on 2026-08-31),
+    which would otherwise produce a duplicate point in the chart.
+    """
+    by_date = {p["date"]: {"date": p["date"], "value": p[backfill_key]} for p in backfill}
+    for s in snapshots:
+        by_date[s["date"]] = {"date": s["date"], "value": snapshot_value_fn(s)}
+    return [by_date[d] for d in sorted(by_date)]
+
+
+def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, activity_backfill):
+    stars = merge_point_series(
+        stars_backfill, "stars", snapshots, lambda s: s["repo"]["stars"]
+    )
+    forks = merge_point_series(
+        forks_backfill, "forks", snapshots, lambda s: s["repo"]["forks"]
+    )
 
     # traffic["as_of_date"] is the last complete day GitHub had aggregated at collection
     # time (collect.yml runs at 2330 UTC, so this is usually still one day behind
