@@ -32,7 +32,7 @@ traffic fields in the snapshot stay `null` and the traffic chart/tables on the s
 `traffic.views`/`clones` come from the most recent *complete* day in GitHub's own daily
 breakdown, recorded as `traffic.as_of_date` — not the snapshot's own `date`. GitHub doesn't
 finish aggregating a day's traffic until sometime after that day ends, so `as_of_date` normally
-lags `date` by under a day (collection runs at `2330 UTC` specifically to keep that lag small).
+lags `date` by under a day (collection targets `2300 UTC` specifically to keep that lag small).
 
 `build_site.py` rolls up each day's activity deltas into 24h/3d/7d/1mo windows by summing the
 trailing N daily snapshots — there's no separate query per window, so a missed collection day

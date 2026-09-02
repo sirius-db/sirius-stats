@@ -74,7 +74,7 @@ def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, acti
     )
 
     # traffic["as_of_date"] is the last complete day GitHub had aggregated at collection
-    # time (collect.yml runs at 2330 UTC, so this is usually still one day behind
+    # time (collect.yml targets 2300 UTC, so this is usually still one day behind
     # s["date"]) -- use it for the x-axis so the chart reflects the day the counts
     # actually cover.
     traffic_by_date = {p["date"]: p for p in traffic_backfill}

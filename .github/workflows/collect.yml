@@ -1,16 +1,24 @@
 name: Collect metrics
 
-# Runs fetch_metrics.py daily to snapshot sirius-db/sirius's stars, forks, traffic,
-# and issue/PR/commit activity, then commits the result to data/snapshots/. This is
-# the only source of truth for anything GitHub doesn't retain long-term (traffic data
-# is dropped after 14 days) -- see README.md and BOOTSTRAP.md for the full picture.
+# Runs fetch_metrics.py once per UTC day to snapshot sirius-db/sirius's stars, forks,
+# traffic, and issue/PR/commit activity, then commits the result to data/snapshots/.
+# This is the only source of truth for anything GitHub doesn't retain long-term
+# (traffic data is dropped after 14 days) -- see README.md and BOOTSTRAP.md for the
+# full picture.
 
 on:
   schedule:
-    # 2330 UTC, not 0000 -- GitHub Actions scheduled runs can start late (documented
-    # queue delay/jitter), so 0000 risks slipping into the next calendar day. 2330
-    # leaves enough buffer that the run still lands within the intended UTC day.
-    - cron: "30 23 * * *"
+    # Fires every 15 min across a window (2300-0159 UTC) instead of once at a fixed
+    # time -- GitHub Actions scheduled runs have no timing guarantee and can be
+    # delayed or dropped under load (see docs.github.com/actions, "schedule" event).
+    # The "Gate" step below turns most of these into a no-op; only the first firing
+    # in the window that finds no snapshot for the current UTC day actually collects.
+    # Window starts at 2300 (not earlier) so the common case -- first firing succeeds
+    # right away -- still lands close to day-end, same as the old fixed 2330 schedule;
+    # it only extends *later*, past midnight, to catch the kind of multi-hour delay
+    # that GitHub's scheduler can introduce under load.
+    - cron: "*/15 23 * * *"
+    - cron: "*/15 0-1 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -34,16 +42,38 @@ jobs:
           # the PR requirement. See BOOTSTRAP.md.
           token: ${{ secrets.COLLECT_PUSH_TOKEN }}
 
+      - name: Gate
+        id: gate
+        # workflow_dispatch always runs. A schedule-triggered run only proceeds if
+        # today's UTC snapshot doesn't already exist -- the first firing in the
+        # window to find one missing collects it; every firing after that (same day
+        # or a manual run that already covered today) is a fast no-op.
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          today="$(date -u +%Y-%m-%d)"
+          if [ -f "data/snapshots/${today}.json" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "data/snapshots/${today}.json already exists, skipping"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: astral-sh/setup-uv@v10.0.1
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: "3.12"
 
       - name: Fetch metrics
+        if: steps.gate.outputs.run == 'true'
         env:
           SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
         run: uv run scripts/fetch_metrics.py
 
       - name: Commit snapshot
+        if: steps.gate.outputs.run == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
