@@ -1,16 +1,25 @@
 name: Collect metrics
 
-# Runs fetch_metrics.py daily to snapshot sirius-db/sirius's stars, forks, traffic,
-# and issue/PR/commit activity, then commits the result to data/snapshots/. This is
-# the only source of truth for anything GitHub doesn't retain long-term (traffic data
-# is dropped after 14 days) -- see README.md and BOOTSTRAP.md for the full picture.
+# Runs fetch_metrics.py once per UTC day to snapshot sirius-db/sirius's stars, forks,
+# traffic, and issue/PR/commit activity, then commits the result to data/snapshots/.
+# This is the only source of truth for anything GitHub doesn't retain long-term
+# (traffic data is dropped after 14 days) -- see README.md and BOOTSTRAP.md for the
+# full picture.
 
 on:
   schedule:
-    # 2330 UTC, not 0000 -- GitHub Actions scheduled runs can start late (documented
-    # queue delay/jitter), so 0000 risks slipping into the next calendar day. 2330
-    # leaves enough buffer that the run still lands within the intended UTC day.
-    - cron: "30 23 * * *"
+    # Fires hourly across a window (2300-0159 UTC) instead of once at a fixed time --
+    # GitHub Actions scheduled runs have no timing guarantee and can be delayed or
+    # dropped under load (see docs.github.com/actions, "schedule" event). The "Gate"
+    # step below turns most of these into a no-op; only the first firing in the window
+    # that finds no snapshot for the current UTC day actually collects. Window starts
+    # at 2300 (not earlier) so the common case -- first firing succeeds right away --
+    # still lands close to day-end, same as the old fixed 2330 schedule; it only
+    # extends *later*, past midnight, to catch a multi-hour delay. 3 firings (not
+    # more) is a starting guess, not a calibrated number -- see #12 for the plan to
+    # tune this once we have real data on how often/how late firings actually land.
+    - cron: "0 23 * * *"
+    - cron: "0 0-1 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -26,6 +35,10 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    # Bounds how long a hung run (e.g. stuck on a GitHub API rate-limit backoff) can
+    # occupy the queue -- cancel-in-progress: false means every later firing in the
+    # window waits behind it, so an unbounded run could silently eat the whole window.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
         with:
@@ -34,16 +47,72 @@ jobs:
           # the PR requirement. See BOOTSTRAP.md.
           token: ${{ secrets.COLLECT_PUSH_TOKEN }}
 
+      - name: Gate
+        id: gate
+        # workflow_dispatch always runs, targeting today (no --date, same as before).
+        # A schedule-triggered run's target date depends on which cron entry fired:
+        # the 2300 entry is still filling in *today* (the day about to end); the
+        # 0000-0159 entries exist only to catch a run from the 2300 entry that got
+        # delayed past midnight, so they target *yesterday*, not the new "today" --
+        # otherwise a run that crosses midnight would silently orphan the day it was
+        # meant to cover and instead write a near-empty snapshot for the new day (the
+        # exact bug this workflow exists to prevent, just moved one step over). Only
+        # proceeds if that target date's snapshot doesn't already exist.
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "target=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$SCHEDULE" = "0 23 * * *" ]; then
+            target="$(date -u +%Y-%m-%d)"
+            crossed_midnight=false
+          else
+            target="$(date -u -d yesterday +%Y-%m-%d)"
+            crossed_midnight=true
+          fi
+          if [ -f "data/snapshots/${target}.json" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "data/snapshots/${target}.json already exists, skipping"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "target=${target}" >> "$GITHUB_OUTPUT"
+            if [ "$crossed_midnight" = true ]; then
+              # Data-quality signal for #12: we're only here because the 2300 firing
+              # (and possibly 0000) didn't produce a snapshot, so this run is
+              # collecting ${target}'s activity/traffic later than intended. Rare
+              # occasional lateness is expected and fine; if this warning shows up
+              # often in the Actions run history, that's the signal the native
+              # schedule: retry approach isn't holding and it's time to move to an
+              # externally-triggered dispatch instead.
+              echo "::warning::Collecting ${target} from a run that fired after 2359 UTC (schedule: ${SCHEDULE}) -- see issue #12"
+            fi
+          fi
+
       - uses: astral-sh/setup-uv@v10.0.1
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: "3.12"
 
       - name: Fetch metrics
+        if: steps.gate.outputs.run == 'true'
         env:
           SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
-        run: uv run scripts/fetch_metrics.py
+          TARGET_DATE: ${{ steps.gate.outputs.target }}
+        run: |
+          if [ -n "$TARGET_DATE" ]; then
+            uv run scripts/fetch_metrics.py --date "$TARGET_DATE"
+          else
+            uv run scripts/fetch_metrics.py
+          fi
 
       - name: Commit snapshot
+        if: steps.gate.outputs.run == 'true'
+        env:
+          TARGET_DATE: ${{ steps.gate.outputs.target }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -52,5 +121,5 @@ jobs:
             echo "no changes to commit"
             exit 0
           fi
-          git commit -m "chore: add snapshot for $(date -u +%Y-%m-%d)"
+          git commit -m "chore: add snapshot for ${TARGET_DATE:-$(date -u +%Y-%m-%d)}"
           git push

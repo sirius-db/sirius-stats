@@ -66,7 +66,7 @@ ago." If you need that, you'd compute it yourself from the raw daily snapshots (
 ### `data/snapshots/<YYYY-MM-DD>.json` -- one file per day, committed by `collect.yml`
 
 The only files with real point-in-time daily granularity for every field. One snapshot is
-collected per day at `2330 UTC` (see `.github/workflows/collect.yml`).
+collected per day, targeting `2300 UTC` (see `.github/workflows/collect.yml`).
 
 ```json
 {
@@ -112,8 +112,8 @@ Field semantics that aren't obvious from the shape alone:
   --date` uses to backfill a missed day.
 - **`traffic.as_of_date`** is the real key for traffic data, **not** the snapshot's own `date`.
   GitHub doesn't finish aggregating a day's traffic until after that day ends, so `as_of_date`
-  normally lags `date` by under a day (collection runs at `2330 UTC` specifically to keep that lag
-  small). `traffic.views`/`clones`/etc. describe `as_of_date`, not `date`.
+  normally lags `date` by under a day (collection targets `2300 UTC` specifically to keep that
+  lag small). `traffic.views`/`clones`/etc. describe `as_of_date`, not `date`.
 - **`traffic.top_referrers`/`top_paths`** are GitHub's own current top-10 snapshot over its
   trailing 14-day window, not a delta -- there's no "today's referrers" to sum across days.
 - **`labels.*`** is a point-in-time gauge, same as `repo.*` -- and deliberately small. Every open

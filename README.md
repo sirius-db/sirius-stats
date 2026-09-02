@@ -12,10 +12,16 @@ snapshot and commits it to `main`, then publishes a static site from the accumul
 
 ## How it works
 
-- **`.github/workflows/collect.yml`** runs daily at `2330 UTC`, not `0000` -- global-team
-  neutrality, plus buffer against GitHub Actions scheduling jitter (see `collect.yml` for the
-  jitter rationale in detail) -- and on manual `workflow_dispatch`. Runs
-  `scripts/fetch_metrics.py`, commits any new snapshot to `data/snapshots/`.
+- **`.github/workflows/collect.yml`** fires hourly across a `2300-0159 UTC` window (plus manual
+  `workflow_dispatch`) instead of once at a fixed time -- GitHub Actions scheduled runs have no
+  timing guarantee and can be delayed or dropped, so the window gives the collector multiple
+  chances to succeed each day. The window starts at `2300` (not earlier) so the normal case --
+  first firing succeeds right away -- still lands close to day-end; it only extends later to catch
+  a multi-hour scheduler delay. Each firing checks whether its target day's snapshot already
+  exists and skips if so, so only the first successful firing per day actually runs
+  `scripts/fetch_metrics.py` and commits to `data/snapshots/`; a firing after `2359 UTC` that
+  does collect logs a `::warning::` so we can tell whether the 3-firing window is actually
+  earning its keep (see #12) -- see `collect.yml` for the gating logic in detail.
 - **`.github/workflows/deploy.yml`** runs on every push to `main` and on manual
   `workflow_dispatch`. Runs `scripts/build_site.py`, publishes the result to GitHub Pages.
 - **`.github/workflows/verify.yml`** runs on every PR to `main` and on manual

@@ -82,11 +82,11 @@ def latest_complete_day(daily_breakdown):
     /traffic/views and /traffic/clones return both a 14-day rolling total (top-level
     count/uniques) and a per-day breakdown -- we want a single day's real count, not the
     rolling total, so activity/traffic stay on the same 1-day-granularity model. We can't
-    assume "today" is already aggregated: collect.yml runs at 2330 UTC specifically to
+    assume "today" is already aggregated: collect.yml targets 2300 UTC specifically to
     give GitHub most of the day to finish aggregating before we grab it, but that's not
     a guarantee -- aggregation can still lag. Taking whichever entry is most recent
-    handles both cases: usually that's "today" given the 2330 UTC run time, but it falls
-    back to "yesterday" if today's entry isn't aggregated yet.
+    handles both cases: usually that's "today" given the 2300 UTC target run time, but it
+    falls back to "yesterday" if today's entry isn't aggregated yet.
     """
     if not daily_breakdown:
         return None, 0, 0
