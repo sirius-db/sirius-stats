@@ -8,17 +8,18 @@ name: Collect metrics
 
 on:
   schedule:
-    # Fires every 30 min across a window (2300-0159 UTC) instead of once at a fixed
-    # time -- GitHub Actions scheduled runs have no timing guarantee and can be
-    # delayed or dropped under load (see docs.github.com/actions, "schedule" event).
-    # The "Gate" step below turns most of these into a no-op; only the first firing
-    # in the window that finds no snapshot for the current UTC day actually collects.
-    # Window starts at 2300 (not earlier) so the common case -- first firing succeeds
-    # right away -- still lands close to day-end, same as the old fixed 2330 schedule;
-    # it only extends *later*, past midnight, to catch the kind of multi-hour delay
-    # that GitHub's scheduler can introduce under load.
-    - cron: "*/30 23 * * *"
-    - cron: "*/30 0-1 * * *"
+    # Fires hourly across a window (2300-0159 UTC) instead of once at a fixed time --
+    # GitHub Actions scheduled runs have no timing guarantee and can be delayed or
+    # dropped under load (see docs.github.com/actions, "schedule" event). The "Gate"
+    # step below turns most of these into a no-op; only the first firing in the window
+    # that finds no snapshot for the current UTC day actually collects. Window starts
+    # at 2300 (not earlier) so the common case -- first firing succeeds right away --
+    # still lands close to day-end, same as the old fixed 2330 schedule; it only
+    # extends *later*, past midnight, to catch a multi-hour delay. 3 firings (not
+    # more) is a starting guess, not a calibrated number -- see #12 for the plan to
+    # tune this once we have real data on how often/how late firings actually land.
+    - cron: "0 23 * * *"
+    - cron: "0 0-1 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -66,10 +67,12 @@ jobs:
             echo "target=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ "$SCHEDULE" = "*/30 23 * * *" ]; then
+          if [ "$SCHEDULE" = "0 23 * * *" ]; then
             target="$(date -u +%Y-%m-%d)"
+            crossed_midnight=false
           else
             target="$(date -u -d yesterday +%Y-%m-%d)"
+            crossed_midnight=true
           fi
           if [ -f "data/snapshots/${target}.json" ]; then
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -77,6 +80,16 @@ jobs:
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "target=${target}" >> "$GITHUB_OUTPUT"
+            if [ "$crossed_midnight" = true ]; then
+              # Data-quality signal for #12: we're only here because the 2300 firing
+              # (and possibly 0000) didn't produce a snapshot, so this run is
+              # collecting ${target}'s activity/traffic later than intended. Rare
+              # occasional lateness is expected and fine; if this warning shows up
+              # often in the Actions run history, that's the signal the native
+              # schedule: retry approach isn't holding and it's time to move to an
+              # externally-triggered dispatch instead.
+              echo "::warning::Collecting ${target} from a run that fired after 2359 UTC (schedule: ${SCHEDULE}) -- see issue #12"
+            fi
           fi
 
       - uses: astral-sh/setup-uv@v10.0.1
