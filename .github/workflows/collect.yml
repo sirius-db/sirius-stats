@@ -8,7 +8,7 @@ name: Collect metrics
 
 on:
   schedule:
-    # Fires every 15 min across a window (2300-0159 UTC) instead of once at a fixed
+    # Fires every 30 min across a window (2300-0159 UTC) instead of once at a fixed
     # time -- GitHub Actions scheduled runs have no timing guarantee and can be
     # delayed or dropped under load (see docs.github.com/actions, "schedule" event).
     # The "Gate" step below turns most of these into a no-op; only the first firing
@@ -17,8 +17,8 @@ on:
     # right away -- still lands close to day-end, same as the old fixed 2330 schedule;
     # it only extends *later*, past midnight, to catch the kind of multi-hour delay
     # that GitHub's scheduler can introduce under load.
-    - cron: "*/15 23 * * *"
-    - cron: "*/15 0-1 * * *"
+    - cron: "*/30 23 * * *"
+    - cron: "*/30 0-1 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -66,7 +66,7 @@ jobs:
             echo "target=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ "$SCHEDULE" = "*/15 23 * * *" ]; then
+          if [ "$SCHEDULE" = "*/30 23 * * *" ]; then
             target="$(date -u +%Y-%m-%d)"
           else
             target="$(date -u -d yesterday +%Y-%m-%d)"

@@ -12,7 +12,7 @@ snapshot and commits it to `main`, then publishes a static site from the accumul
 
 ## How it works
 
-- **`.github/workflows/collect.yml`** fires every 15 min across a `2300-0159 UTC` window (plus
+- **`.github/workflows/collect.yml`** fires every 30 min across a `2300-0159 UTC` window (plus
   manual `workflow_dispatch`) instead of once at a fixed time -- GitHub Actions scheduled runs
   have no timing guarantee and can be delayed or dropped, so the window gives the collector
   multiple chances to succeed each day. The window starts at `2300` (not earlier) so the normal
