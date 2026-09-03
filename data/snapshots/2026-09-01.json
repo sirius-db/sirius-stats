@@ -12,7 +12,7 @@
   "activity": {
     "issues_opened": 0,
     "issues_closed": 0,
-    "prs_opened": 0,
+    "prs_opened": 2,
     "prs_merged": 0,
     "prs_closed": 0,
     "commits": 0,
