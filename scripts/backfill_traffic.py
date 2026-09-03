@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 """Bootstrap/backfill: seed or refresh data/traffic_backfill.json from the live traffic API.
 
-Not run by any workflow. See BOOTSTRAP.md for usage. Requires SIRIUS_TRAFFIC_TOKEN
-(a push-scoped token for sirius-db/sirius -- same one collect.yml uses).
+One-time historical seed for the pre-launch days (before 2026-08-31) that predate
+collect.yml's daily collection and so have no data/snapshots/<date>.json to patch --
+not run by any workflow, see BOOTSTRAP.md for manual usage. For days that *do* have a
+snapshot file, refresh_traffic.py (run automatically by collect.yml, see #14) is the
+one that keeps their traffic in sync instead. Requires SIRIUS_TRAFFIC_TOKEN (a
+push-scoped token for sirius-db/sirius -- same one collect.yml uses).
 
 /traffic/views and /traffic/clones always return a 14-day daily breakdown, but
 fetch_metrics.py's recurring collection only keeps the latest complete day from each
 call (see latest_complete_day() there) -- this script instead keeps every day the API
-returns. Safe to rerun any time (e.g. to catch up after a missed collect.yml run): it
-merges into the existing file rather than overwriting it, so days that have already
-rolled out of GitHub's 14-day window aren't lost just because the window has since
-shifted forward.
+returns. Safe to rerun any time you need to extend or re-verify the pre-launch history
+(not for post-launch catch-up -- that's refresh_traffic.py's job, see above): it merges
+into the existing file rather than overwriting it, so days that have already rolled out
+of GitHub's 14-day window aren't lost just because the window has since shifted forward.
 """
 
 import json

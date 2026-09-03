@@ -73,13 +73,18 @@ def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, acti
         forks_backfill, "forks", snapshots, lambda s: s["repo"]["forks"]
     )
 
-    # traffic["as_of_date"] is the last complete day GitHub had aggregated at collection
-    # time (collect.yml targets 2300 UTC, so this is usually still one day behind
-    # s["date"]) -- use it for the x-axis so the chart reflects the day the counts
-    # actually cover.
+    # traffic["as_of_date"] is the day GitHub had actually aggregated at collection time,
+    # which can be null (not yet published) even for a fully-elapsed s["date"] until
+    # refresh_traffic.py patches it in on a later run -- use as_of_date for the x-axis so
+    # the chart reflects the day the counts actually cover, not when they were captured.
     traffic_by_date = {p["date"]: p for p in traffic_backfill}
     for s in snapshots:
-        if s["traffic"]["views"] is None:
+        # as_of_date, not views, is the real null signal -- day_entry()/
+        # latest_complete_day() return (None, 0, 0) when GitHub hasn't aggregated a
+        # day's traffic yet (its rolling breakdown can legitimately lag more than a
+        # day), so views is 0, not None, in that case. Keying traffic_by_date by a
+        # None date crashes the later sorted() call.
+        if s["traffic"]["as_of_date"] is None:
             continue
         # Live collection wins over backfill on an overlapping date.
         traffic_by_date[s["traffic"]["as_of_date"]] = {
@@ -95,8 +100,11 @@ def build_data(snapshots, stars_backfill, forks_backfill, traffic_backfill, acti
     activity_weekly = build_activity_weekly(snapshots, activity_backfill)
     labels = build_label_data(snapshots)
 
+    # as_of_date, not views, is the real null signal here too (see the identical
+    # comment above) -- without this, latest_traffic always resolves to the newest
+    # snapshot regardless of whether its traffic is actually valid.
     latest_traffic = next(
-        (s["traffic"] for s in reversed(snapshots) if s["traffic"]["views"] is not None),
+        (s["traffic"] for s in reversed(snapshots) if s["traffic"]["as_of_date"] is not None),
         None,
     )
     top_referrers = latest_traffic["top_referrers"] if latest_traffic else []

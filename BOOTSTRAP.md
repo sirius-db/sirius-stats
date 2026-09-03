@@ -68,21 +68,26 @@ export SIRIUS_TRAFFIC_TOKEN=...        # same token as the repo secret above
 uv run scripts/backfill_traffic.py     # writes data/traffic_backfill.json
 ```
 
-Review and commit the generated file. `build_site.py` merges it into the traffic time series,
-with live-collected days taking precedence over backfilled ones on any overlapping date. Safe to
-rerun any time (e.g. to catch up after a missed `collect.yml` run) — it merges into the existing
-file rather than overwriting it, so a day already captured isn't lost just because it's since
-rolled out of GitHub's 14-day window.
+Review and commit the generated file. This is a **one-time seed** for the pre-launch days
+(before 2026-08-31) that predate `collect.yml`'s daily collection and so have no
+`data/snapshots/<date>.json` to patch. It's not run by any workflow and doesn't need rerunning
+for anything after launch — `scripts/refresh_traffic.py` (run automatically by `collect.yml` on
+every firing) is what keeps post-launch snapshots' traffic in sync going forward, including
+picking up a day whose traffic GitHub hadn't published yet at collection time.
 
-## 5. Recovering a missed collection day
+## 5. Recovering a collection gap older than 7 days
 
-If `collect.yml` doesn't run on some day (e.g. it was stuck behind an unapproved fork-PR check),
-that day isn't necessarily lost. Two commands, run after the fact, recover most of it:
+`collect.yml` self-recovers automatically for most gaps: every firing scans the last 7 days for
+any missing snapshot and collects all of them in one run, so a delayed or dropped firing doesn't
+need manual intervention. Manual recovery is only needed if a gap has fallen behind that 7-day
+catch-up window — `collect.yml`'s Gate step logs an `::error::` annotation naming any day that's
+about to age out unrecovered, so this should be rare and visible when it happens, not silent.
+
+If you do need to manually recover an old day, one command:
 
 ```bash
 export SIRIUS_TRAFFIC_TOKEN=...                          # same token as above
-uv run scripts/backfill_traffic.py                       # re-catches traffic if still in the 14-day window
-uv run scripts/fetch_metrics.py --date 2026-08-31         # backfills that day's activity + traffic
+uv run scripts/fetch_metrics.py --date 2026-08-31        # backfills that day's activity + traffic
 ```
 
 What's actually recoverable for a missed day, and why:
