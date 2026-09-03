@@ -3,9 +3,10 @@
 
 Collects repo stats, activity deltas, traffic, releases, and open issue/PR labels for
 today by default, or for a specific past date via --date (see BOOTSTRAP.md for
-recovering a missed day). Note: --date backfilling doesn't apply to `labels` -- like
-`repo`, it's a point-in-time snapshot of currently-open items, not reconstructable for
-a past date.
+recovering a missed day). collect.yml always passes --date -- it only ever finalizes
+already fully-elapsed days, never today; the no-argument default here is for manual/
+local use. Note: --date backfilling doesn't apply to `labels` -- like `repo`, it's a
+point-in-time snapshot of currently-open items, not reconstructable for a past date.
 """
 
 import argparse
@@ -81,12 +82,12 @@ def latest_complete_day(daily_breakdown):
 
     /traffic/views and /traffic/clones return both a 14-day rolling total (top-level
     count/uniques) and a per-day breakdown -- we want a single day's real count, not the
-    rolling total, so activity/traffic stay on the same 1-day-granularity model. We can't
-    assume "today" is already aggregated: collect.yml targets 2300 UTC specifically to
-    give GitHub most of the day to finish aggregating before we grab it, but that's not
-    a guarantee -- aggregation can still lag. Taking whichever entry is most recent
-    handles both cases: usually that's "today" given the 2300 UTC target run time, but it
-    falls back to "yesterday" if today's entry isn't aggregated yet.
+    rolling total, so activity/traffic stay on the same 1-day-granularity model. Only used
+    when running this script with no --date (a live, current-moment run, e.g. manual local
+    testing) -- collect.yml itself always passes --date now (it only ever finalizes
+    already-fully-elapsed days, never "today"), so day_entry() below is what it actually
+    uses. GitHub's traffic aggregation isn't guaranteed to have caught up even for a
+    fully-elapsed day; scripts/refresh_traffic.py is what patches that gap after the fact.
     """
     if not daily_breakdown:
         return None, 0, 0

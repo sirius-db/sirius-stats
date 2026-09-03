@@ -65,8 +65,10 @@ ago." If you need that, you'd compute it yourself from the raw daily snapshots (
 
 ### `data/snapshots/<YYYY-MM-DD>.json` -- one file per day, committed by `collect.yml`
 
-The only files with real point-in-time daily granularity for every field. One snapshot is
-collected per day, targeting `2300 UTC` (see `.github/workflows/collect.yml`).
+The only files with real point-in-time daily granularity for every field. `collect.yml` runs
+once daily and never collects the current, still-in-progress day -- it only finalizes
+fully-elapsed days, catching up every day missing within the last 7 days in one run so a
+backlog from a missed firing actually closes (see `.github/workflows/collect.yml`).
 
 ```json
 {
@@ -111,9 +113,12 @@ Field semantics that aren't obvious from the shape alone:
   API and commit history, since those retain full history -- this is what `fetch_metrics.py
   --date` uses to backfill a missed day.
 - **`traffic.as_of_date`** is the real key for traffic data, **not** the snapshot's own `date`.
-  GitHub doesn't finish aggregating a day's traffic until after that day ends, so `as_of_date`
-  normally lags `date` by under a day (collection targets `2300 UTC` specifically to keep that
-  lag small). `traffic.views`/`clones`/etc. describe `as_of_date`, not `date`.
+  GitHub's traffic aggregation can lag its rolling window by more than a day, so a snapshot can
+  be written with `as_of_date: null` (and `views`/`clones` at `0`) if GitHub hasn't published
+  that day yet. `scripts/refresh_traffic.py` patches the file in place with the real values on a
+  later `collect.yml` run, and keeps re-checking every date still within GitHub's 14-day
+  breakdown (not just once) since GitHub can also revise a day's numbers after first publishing
+  them. `traffic.views`/`clones`/etc. describe `as_of_date`, not `date`.
 - **`traffic.top_referrers`/`top_paths`** are GitHub's own current top-10 snapshot over its
   trailing 14-day window, not a delta -- there's no "today's referrers" to sum across days.
 - **`labels.*`** is a point-in-time gauge, same as `repo.*` -- and deliberately small. Every open
@@ -177,7 +182,11 @@ export from GitHub's Pulse graph (see `BOOTSTRAP.md` §7 if you need to extend i
 - No historical data exists for `repo.*` fields (stars/forks/watchers/open issues/PRs/
   contributors) on any date without an actual snapshot from that day, except stars and forks
   specifically (reconstructable via the backfill scripts at any time, since they're derived from
-  event timestamps rather than a point-in-time gauge).
+  event timestamps rather than a point-in-time gauge). This includes `collect.yml`'s own
+  multi-day catch-up: if it falls behind and recovers several missing days in one firing,
+  `repo.*` and `labels.*` on every one of those days will reflect the collection moment's
+  current values, not that day's real ones -- only `activity` and `traffic` are genuinely
+  accurate for each backfilled day.
 - Traffic history beyond what's been captured in `traffic_backfill.json` + `data/snapshots/` is
   permanently gone -- GitHub's API only exposes a trailing 14-day window, full stop.
 - `activity_windows` in `site/data.json` reflects only the current moment -- there's no committed

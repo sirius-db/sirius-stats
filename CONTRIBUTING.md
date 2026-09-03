@@ -29,10 +29,13 @@ Traffic stats (`views`/`clones`/top referrers/popular content) require a `SIRIUS
 env var with push access to `sirius-db/sirius` — see [BOOTSTRAP.md](BOOTSTRAP.md). Without it,
 traffic fields in the snapshot stay `null` and the traffic chart/tables on the site are omitted.
 
-`traffic.views`/`clones` come from the most recent *complete* day in GitHub's own daily
-breakdown, recorded as `traffic.as_of_date` — not the snapshot's own `date`. GitHub doesn't
-finish aggregating a day's traffic until sometime after that day ends, so `as_of_date` normally
-lags `date` by under a day (collection targets `2300 UTC` specifically to keep that lag small).
+`traffic.views`/`clones` are recorded against `traffic.as_of_date`, which can differ from the
+snapshot's own `date` — GitHub's traffic aggregation can lag its own rolling window by more than
+a day, so a snapshot can be collected before GitHub has published that day's traffic yet.
+`as_of_date` stays `null` (and `views`/`clones` stay `0`) until `scripts/refresh_traffic.py`
+patches the file in place with the real numbers on a later `collect.yml` run — it keeps checking
+every day a date is still within GitHub's 14-day breakdown, not just once, since GitHub can also
+revise a day's numbers after first publishing them.
 
 `build_site.py` rolls up each day's activity deltas into 24h/3d/7d/1mo windows by summing the
 trailing N daily snapshots — there's no separate query per window, so a missed collection day
