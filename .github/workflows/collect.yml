@@ -65,7 +65,7 @@ jobs:
           fi
 
           targets=""
-          for i in 1 2 3 4 5 6 7; do
+          for i in 7 6 5 4 3 2 1; do
             d="$(date -u -d "$i days ago" +%Y-%m-%d)"
             if [ ! -f "data/snapshots/${d}.json" ]; then
               targets="${targets}${d} "

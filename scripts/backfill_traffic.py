@@ -11,10 +11,10 @@ push-scoped token for sirius-db/sirius -- same one collect.yml uses).
 /traffic/views and /traffic/clones always return a 14-day daily breakdown, but
 fetch_metrics.py's recurring collection only keeps the latest complete day from each
 call (see latest_complete_day() there) -- this script instead keeps every day the API
-returns. Safe to rerun any time (e.g. to catch up after a missed collect.yml run): it
-merges into the existing file rather than overwriting it, so days that have already
-rolled out of GitHub's 14-day window aren't lost just because the window has since
-shifted forward.
+returns. Safe to rerun any time you need to extend or re-verify the pre-launch history
+(not for post-launch catch-up -- that's refresh_traffic.py's job, see above): it merges
+into the existing file rather than overwriting it, so days that have already rolled out
+of GitHub's 14-day window aren't lost just because the window has since shifted forward.
 """
 
 import json

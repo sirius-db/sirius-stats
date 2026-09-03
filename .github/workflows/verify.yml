@@ -38,3 +38,10 @@ jobs:
 
       - name: Build site
         run: uv run scripts/build_site.py
+
+      # Same fork-token caveat as Fetch metrics above -- exits cleanly without a
+      # token, still verifies the script itself runs.
+      - name: Refresh traffic (not committed)
+        env:
+          SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
+        run: uv run scripts/refresh_traffic.py
