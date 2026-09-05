@@ -34,7 +34,7 @@ it locally rather than looking for it in the repo.
   "forks": [{"date": "...", "value": 0}],
   "traffic": [{"date": "...", "views": 0, "unique_views": 0, "clones": 0, "unique_clones": 0}],
   "activity_windows": {
-    "24h": {"issues_opened": 0, "...": "...", "top_committers": [{"login": "...", "commits": 0}]},
+    "24h": {"issues_opened": 0, "...": "...", "top_committers": [{"login": "...", "commits": 0, "is_user": true}]},
     "3d": "...", "7d": "...", "1mo": "..."
   },
   "activity_weekly": [{"week_of": "...", "commits": 0, "additions": 0, "deletions": 0}],
@@ -82,7 +82,7 @@ backlog from a missed firing actually closes (see `.github/workflows/collect.yml
     "issues_opened": 0, "issues_closed": 0,
     "prs_opened": 5, "prs_merged": 1, "prs_closed": 1,
     "commits": 1, "files_changed": 3, "additions": 26, "deletions": 2,
-    "top_committers": [{"login": "mike-wendt", "commits": 1}]
+    "top_committers": [{"login": "mike-wendt", "commits": 1, "is_user": true}]
   },
   "traffic": {
     "as_of_date": "2026-08-31",
@@ -112,6 +112,10 @@ Field semantics that aren't obvious from the shape alone:
   *that day*), not a running total. Fully reconstructable for any past date via the GitHub Search
   API and commit history, since those retain full history -- this is what `fetch_metrics.py
   --date` uses to backfill a missed day.
+- **`activity.top_committers[].is_user`** is `false` when a commit isn't linked to a GitHub
+  account, in which case `login` falls back to the raw git author name instead of a real
+  username -- the site only links `is_user: true` entries to a profile, since linking a raw name
+  could 404 or, worse, point at an unrelated real user whose username happens to match.
 - **`traffic.as_of_date`** is the real key for traffic data, **not** the snapshot's own `date`.
   GitHub's traffic aggregation can lag its rolling window by more than a day, so a snapshot can
   be written with `as_of_date: null` (and `views`/`clones` at `0`) if GitHub hasn't published

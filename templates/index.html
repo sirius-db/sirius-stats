@@ -164,7 +164,9 @@ function render(data) {
   renderActivityWindows(data.activity_windows);
   const weekCommitters = data.activity_windows['7d'] ? data.activity_windows['7d'].top_committers : [];
   renderTable('topCommitters', ['Login', 'Commits'], weekCommitters.map(
-    c => [c.login, c.commits]
+    // is_user false means this is a raw git author name, not a real GitHub login --
+    // not safe to link (could 404, or hit an unrelated user's profile by coincidence).
+    c => [c.is_user === false ? c.login : { text: c.login, href: `https://github.com/${c.login}` }, c.commits]
   ));
   renderTable('topReferrers', ['Referrer', 'Views', 'Uniques'], data.top_referrers.map(
     r => [referrerCell(r.referrer), r.count, r.uniques]
