@@ -127,6 +127,6 @@ jobs:
             echo "no changes to commit"
             exit 0
           fi
-          dates="$(git diff --cached --name-only -- data/snapshots/ | sed -E 's#.*/([0-9-]+)\.json#\1#' | sort -u | tr '\n' ' ')"
+          dates="$(git diff --cached --name-only -- data/snapshots/ | sed -E 's#.*/([0-9-]+)\.json#\1#' | sort -u | paste -sd' ' -)"
           git commit -m "chore: update collected data (${dates})"
           git push
