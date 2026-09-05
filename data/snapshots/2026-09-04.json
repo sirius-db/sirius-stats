@@ -1,30 +1,25 @@
 {
-  "date": "2026-09-03",
-  "collected_at": "2026-09-04T04:58:43Z",
+  "date": "2026-09-04",
+  "collected_at": "2026-09-05T04:51:17Z",
   "repo": {
     "stars": 1061,
     "forks": 122,
     "watchers": 13,
-    "open_issues": 117,
-    "open_prs": 114,
+    "open_issues": 119,
+    "open_prs": 115,
     "contributors": 43
   },
   "activity": {
-    "issues_opened": 0,
+    "issues_opened": 2,
     "issues_closed": 0,
-    "prs_opened": 11,
-    "prs_merged": 1,
+    "prs_opened": 2,
+    "prs_merged": 0,
     "prs_closed": 0,
-    "commits": 1,
-    "files_changed": 9,
-    "additions": 201,
-    "deletions": 183,
-    "top_committers": [
-      {
-        "login": "mbrobbel",
-        "commits": 1
-      }
-    ]
+    "commits": 0,
+    "files_changed": 0,
+    "additions": 0,
+    "deletions": 0,
+    "top_committers": []
   },
   "labels": {
     "priority_counts": {
@@ -50,20 +45,25 @@
       }
     },
     "other_counts": {
-      "starrocks": {
-        "issues": 14,
-        "prs": 2,
-        "color": "327D8C"
-      },
       "dependencies": {
         "issues": 0,
-        "prs": 5,
+        "prs": 6,
         "color": "0366d6"
       },
       "rust": {
         "issues": 0,
-        "prs": 4,
+        "prs": 5,
         "color": "000000"
+      },
+      "enhancement": {
+        "issues": 23,
+        "prs": 1,
+        "color": "a2eeef"
+      },
+      "starrocks": {
+        "issues": 14,
+        "prs": 2,
+        "color": "327D8C"
       },
       "github_actions": {
         "issues": 0,
@@ -84,11 +84,6 @@
         "issues": 8,
         "prs": 0,
         "color": "d73a4a"
-      },
-      "enhancement": {
-        "issues": 22,
-        "prs": 1,
-        "color": "a2eeef"
       },
       "IO": {
         "issues": 6,
@@ -479,55 +474,65 @@
           "dependencies",
           "rust"
         ]
+      },
+      {
+        "number": 1722,
+        "title": "build(deps): bump mysql_async from 0.37.0 to 0.37.1 in /experimental/starrocks",
+        "url": "https://github.com/sirius-db/sirius/pull/1722",
+        "updated_at": "2026-09-04T18:06:24Z",
+        "labels": [
+          "dependencies",
+          "rust"
+        ]
       }
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-03",
-    "views": 473,
-    "unique_views": 92,
-    "clones": 378,
-    "unique_clones": 63,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 713,
+        "count": 677,
         "uniques": 64
       },
       {
         "referrer": "Google",
-        "count": 326,
-        "uniques": 134
+        "count": 353,
+        "uniques": 144
       },
       {
         "referrer": "sirius-db.com",
-        "count": 133,
-        "uniques": 41
+        "count": 172,
+        "uniques": 48
       },
       {
         "referrer": "Bing",
-        "count": 15,
-        "uniques": 5
+        "count": 16,
+        "uniques": 6
       },
       {
         "referrer": "linkedin.com",
         "count": 14,
-        "uniques": 11
+        "uniques": 10
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 9,
-        "uniques": 5
+        "count": 7,
+        "uniques": 4
+      },
+      {
+        "referrer": "pages.cs.wisc.edu",
+        "count": 4,
+        "uniques": 3
       },
       {
         "referrer": "chatgpt.com",
         "count": 4,
         "uniques": 2
-      },
-      {
-        "referrer": "com.linkedin.android",
-        "count": 4,
-        "uniques": 1
       },
       {
         "referrer": "DuckDuckGo",
@@ -543,48 +548,48 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 1096,
-        "uniques": 317
+        "count": 1119,
+        "uniques": 342
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 576,
-        "uniques": 43
+        "count": 522,
+        "uniques": 45
       },
       {
         "path": "/sirius-db/sirius/stargazers",
-        "count": 172,
+        "count": 170,
         "uniques": 3
       },
       {
         "path": "/sirius-db/sirius/commits/dev",
-        "count": 130,
+        "count": 131,
         "uniques": 23
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 122,
-        "uniques": 36
+        "count": 123,
+        "uniques": 35
       },
       {
         "path": "/sirius-db/sirius/pull/1524",
-        "count": 108,
-        "uniques": 12
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1425",
-        "count": 77,
-        "uniques": 9
+        "count": 99,
+        "uniques": 14
       },
       {
         "path": "/sirius-db/sirius/pull/1606",
-        "count": 72,
+        "count": 71,
         "uniques": 8
       },
       {
-        "path": "/sirius-db/sirius/pulls/Jedi18",
-        "count": 64,
-        "uniques": 2
+        "path": "/sirius-db/sirius/pull/1425",
+        "count": 69,
+        "uniques": 8
+      },
+      {
+        "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
+        "count": 61,
+        "uniques": 30
       },
       {
         "path": "/sirius-db/sirius/pull/1663",
