@@ -170,24 +170,11 @@ def fetch_activity_metrics(today, token):
         additions += stats.get("additions", 0)
         deletions += stats.get("deletions", 0)
         files_changed += len(detail.get("files", []))
-        author = commit.get("author")
-        # A real GitHub login only exists when the commit is linked to an account --
-        # otherwise this falls back to the raw git author name, which isn't safe to
-        # link to github.com/<name> (could 404, or worse, hit an unrelated real
-        # user's profile). is_user tracks which case we're in.
-        if author:
-            login, is_user = author["login"], True
-        else:
-            login, is_user = commit["commit"]["author"]["name"], False
-        if login not in committer_counts:
-            committer_counts[login] = {"commits": 0, "is_user": is_user}
-        committer_counts[login]["commits"] += 1
+        login = (commit.get("author") or {}).get("login") or commit["commit"]["author"]["name"]
+        committer_counts[login] = committer_counts.get(login, 0) + 1
 
     top_committers = sorted(
-        (
-            {"login": login, "commits": v["commits"], "is_user": v["is_user"]}
-            for login, v in committer_counts.items()
-        ),
+        ({"login": login, "commits": count} for login, count in committer_counts.items()),
         key=lambda c: c["commits"],
         reverse=True,
     )

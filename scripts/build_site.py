@@ -251,20 +251,10 @@ def build_activity_windows(snapshots):
                 totals[field] += activity.get(field, 0)
             for committer in activity.get("top_committers", []):
                 login = committer["login"]
-                if login not in committer_counts:
-                    # Older snapshots predate the is_user field -- default True
-                    # (linkable) rather than False, since every committer actually
-                    # seen in this project's history so far has been a real login;
-                    # only a snapshot collected after this field shipped can ever
-                    # correctly mark one False.
-                    committer_counts[login] = {"commits": 0, "is_user": committer.get("is_user", True)}
-                committer_counts[login]["commits"] += committer["commits"]
+                committer_counts[login] = committer_counts.get(login, 0) + committer["commits"]
 
         top_committers = sorted(
-            (
-                {"login": login, "commits": v["commits"], "is_user": v["is_user"]}
-                for login, v in committer_counts.items()
-            ),
+            ({"login": login, "commits": count} for login, count in committer_counts.items()),
             key=lambda c: c["commits"],
             reverse=True,
         )[:10]
