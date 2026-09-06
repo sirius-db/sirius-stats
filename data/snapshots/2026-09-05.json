@@ -1,25 +1,30 @@
 {
-  "date": "2026-09-04",
-  "collected_at": "2026-09-05T04:51:17Z",
+  "date": "2026-09-05",
+  "collected_at": "2026-09-06T04:58:44Z",
   "repo": {
     "stars": 1061,
-    "forks": 122,
+    "forks": 121,
     "watchers": 13,
     "open_issues": 119,
-    "open_prs": 115,
+    "open_prs": 114,
     "contributors": 43
   },
   "activity": {
-    "issues_opened": 2,
+    "issues_opened": 0,
     "issues_closed": 0,
-    "prs_opened": 2,
-    "prs_merged": 0,
+    "prs_opened": 0,
+    "prs_merged": 1,
     "prs_closed": 0,
-    "commits": 0,
-    "files_changed": 0,
-    "additions": 0,
-    "deletions": 0,
-    "top_committers": []
+    "commits": 1,
+    "files_changed": 5,
+    "additions": 5,
+    "deletions": 5,
+    "top_committers": [
+      {
+        "login": "mbrobbel",
+        "commits": 1
+      }
+    ]
   },
   "labels": {
     "priority_counts": {
@@ -488,21 +493,21 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-04",
-    "views": 281,
-    "unique_views": 48,
-    "clones": 286,
-    "unique_clones": 41,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 677,
-        "uniques": 64
+        "count": 578,
+        "uniques": 61
       },
       {
         "referrer": "Google",
-        "count": 353,
-        "uniques": 144
+        "count": 332,
+        "uniques": 146
       },
       {
         "referrer": "sirius-db.com",
@@ -511,13 +516,13 @@
       },
       {
         "referrer": "Bing",
-        "count": 16,
+        "count": 17,
         "uniques": 6
       },
       {
         "referrer": "linkedin.com",
-        "count": 14,
-        "uniques": 10
+        "count": 12,
+        "uniques": 9
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
@@ -548,48 +553,48 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 1119,
-        "uniques": 342
+        "count": 1062,
+        "uniques": 335
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 522,
-        "uniques": 45
+        "count": 448,
+        "uniques": 46
       },
       {
         "path": "/sirius-db/sirius/stargazers",
-        "count": 170,
+        "count": 163,
         "uniques": 3
       },
       {
-        "path": "/sirius-db/sirius/commits/dev",
-        "count": 131,
-        "uniques": 23
+        "path": "/sirius-db/sirius/issues",
+        "count": 122,
+        "uniques": 33
       },
       {
-        "path": "/sirius-db/sirius/issues",
-        "count": 123,
-        "uniques": 35
+        "path": "/sirius-db/sirius/commits/dev",
+        "count": 120,
+        "uniques": 25
       },
       {
         "path": "/sirius-db/sirius/pull/1524",
-        "count": 99,
-        "uniques": 14
+        "count": 82,
+        "uniques": 16
       },
       {
         "path": "/sirius-db/sirius/pull/1606",
-        "count": 71,
-        "uniques": 8
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1425",
-        "count": 69,
+        "count": 65,
         "uniques": 8
       },
       {
         "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
-        "count": 61,
+        "count": 64,
         "uniques": 30
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1425",
+        "count": 62,
+        "uniques": 9
       },
       {
         "path": "/sirius-db/sirius/pull/1663",
