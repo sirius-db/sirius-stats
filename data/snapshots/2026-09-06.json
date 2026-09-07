@@ -1,6 +1,6 @@
 {
-  "date": "2026-09-05",
-  "collected_at": "2026-09-06T04:58:44Z",
+  "date": "2026-09-06",
+  "collected_at": "2026-09-07T05:05:42Z",
   "repo": {
     "stars": 1061,
     "forks": 121,
@@ -13,18 +13,13 @@
     "issues_opened": 0,
     "issues_closed": 0,
     "prs_opened": 0,
-    "prs_merged": 1,
+    "prs_merged": 0,
     "prs_closed": 0,
-    "commits": 1,
-    "files_changed": 5,
-    "additions": 5,
-    "deletions": 5,
-    "top_committers": [
-      {
-        "login": "mbrobbel",
-        "commits": 1
-      }
-    ]
+    "commits": 0,
+    "files_changed": 0,
+    "additions": 0,
+    "deletions": 0,
+    "top_committers": []
   },
   "labels": {
     "priority_counts": {
@@ -493,31 +488,31 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-05",
-    "views": 162,
-    "unique_views": 25,
-    "clones": 107,
-    "unique_clones": 54,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 578,
-        "uniques": 61
+        "count": 596,
+        "uniques": 66
       },
       {
         "referrer": "Google",
         "count": 332,
-        "uniques": 146
+        "uniques": 145
       },
       {
         "referrer": "sirius-db.com",
-        "count": 172,
-        "uniques": 48
+        "count": 171,
+        "uniques": 47
       },
       {
         "referrer": "Bing",
-        "count": 17,
-        "uniques": 6
+        "count": 18,
+        "uniques": 7
       },
       {
         "referrer": "linkedin.com",
@@ -530,71 +525,71 @@
         "uniques": 4
       },
       {
-        "referrer": "pages.cs.wisc.edu",
-        "count": 4,
-        "uniques": 3
-      },
-      {
         "referrer": "chatgpt.com",
         "count": 4,
         "uniques": 2
       },
       {
-        "referrer": "DuckDuckGo",
+        "referrer": "developer.nvidia.com",
         "count": 3,
         "uniques": 3
       },
       {
-        "referrer": "developer.nvidia.com",
+        "referrer": "pages.cs.wisc.edu",
         "count": 3,
-        "uniques": 3
+        "uniques": 2
+      },
+      {
+        "referrer": "DuckDuckGo",
+        "count": 2,
+        "uniques": 2
       }
     ],
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 1062,
-        "uniques": 335
+        "count": 1028,
+        "uniques": 331
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 448,
+        "count": 436,
         "uniques": 46
       },
       {
         "path": "/sirius-db/sirius/stargazers",
-        "count": 163,
+        "count": 160,
         "uniques": 3
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 122,
-        "uniques": 33
+        "count": 121,
+        "uniques": 32
       },
       {
         "path": "/sirius-db/sirius/commits/dev",
-        "count": 120,
+        "count": 117,
         "uniques": 25
       },
       {
         "path": "/sirius-db/sirius/pull/1524",
-        "count": 82,
-        "uniques": 16
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1606",
-        "count": 65,
-        "uniques": 8
-      },
-      {
-        "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
-        "count": 64,
-        "uniques": 30
+        "count": 74,
+        "uniques": 17
       },
       {
         "path": "/sirius-db/sirius/pull/1425",
-        "count": 62,
+        "count": 67,
         "uniques": 9
+      },
+      {
+        "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
+        "count": 65,
+        "uniques": 31
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1606",
+        "count": 63,
+        "uniques": 8
       },
       {
         "path": "/sirius-db/sirius/pull/1663",
