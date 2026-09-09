@@ -1,25 +1,42 @@
 {
-  "date": "2026-09-07",
-  "collected_at": "2026-09-08T05:03:13Z",
+  "date": "2026-09-08",
+  "collected_at": "2026-09-09T05:02:22Z",
   "repo": {
     "stars": 1061,
     "forks": 121,
     "watchers": 13,
-    "open_issues": 119,
-    "open_prs": 117,
-    "contributors": 43
+    "open_issues": 121,
+    "open_prs": 115,
+    "contributors": 44
   },
   "activity": {
-    "issues_opened": 0,
+    "issues_opened": 2,
     "issues_closed": 0,
-    "prs_opened": 3,
-    "prs_merged": 0,
+    "prs_opened": 2,
+    "prs_merged": 4,
     "prs_closed": 0,
-    "commits": 0,
-    "files_changed": 0,
-    "additions": 0,
-    "deletions": 0,
-    "top_committers": []
+    "commits": 4,
+    "files_changed": 40,
+    "additions": 2063,
+    "deletions": 408,
+    "top_committers": [
+      {
+        "login": "wmalpica",
+        "commits": 1
+      },
+      {
+        "login": "patdevinwilson",
+        "commits": 1
+      },
+      {
+        "login": "infblueocean",
+        "commits": 1
+      },
+      {
+        "login": "mbrobbel",
+        "commits": 1
+      }
+    ]
   },
   "labels": {
     "priority_counts": {
@@ -30,12 +47,12 @@
       },
       "! - P1": {
         "issues": 28,
-        "prs": 16,
+        "prs": 15,
         "color": "d93f0b"
       },
       "! - P2": {
         "issues": 39,
-        "prs": 11,
+        "prs": 10,
         "color": "fbca04"
       },
       "! - P3": {
@@ -45,6 +62,11 @@
       }
     },
     "other_counts": {
+      "enhancement": {
+        "issues": 24,
+        "prs": 1,
+        "color": "a2eeef"
+      },
       "dependencies": {
         "issues": 0,
         "prs": 6,
@@ -54,11 +76,6 @@
         "issues": 0,
         "prs": 5,
         "color": "000000"
-      },
-      "enhancement": {
-        "issues": 23,
-        "prs": 1,
-        "color": "a2eeef"
       },
       "starrocks": {
         "issues": 14,
@@ -269,13 +286,6 @@
         "priority_label": "! - P1"
       },
       {
-        "number": 1365,
-        "title": "feat: [Concurrency]  PR 2 of ?. Move completion_handler ownership from task_scheduler to sirius_engine; Removed SiriusContext::query_",
-        "url": "https://github.com/sirius-db/sirius/pull/1365",
-        "updated_at": "2026-08-21T22:53:38Z",
-        "priority_label": "! - P1"
-      },
-      {
         "number": 1366,
         "title": "feat: [Concurrency]  PR 3 of ?. Per-query scan manager state (query_scan_manager_state)",
         "url": "https://github.com/sirius-db/sirius/pull/1366",
@@ -287,6 +297,13 @@
         "title": "[Concurrency] PR 4 of ?. Per-query enqueue gate and per-query failure containment",
         "url": "https://github.com/sirius-db/sirius/pull/1369",
         "updated_at": "2026-08-21T22:53:59Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1427,
+        "title": "perf(dynamic filter): push dynamic filter below D2H copy",
+        "url": "https://github.com/sirius-db/sirius/pull/1427",
+        "updated_at": "2026-08-21T23:07:29Z",
         "priority_label": "! - P1"
       }
     ],
@@ -488,26 +505,26 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-07",
-    "views": 287,
-    "unique_views": 44,
-    "clones": 85,
-    "unique_clones": 30,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 596,
-        "uniques": 66
+        "count": 530,
+        "uniques": 63
       },
       {
         "referrer": "Google",
-        "count": 332,
-        "uniques": 145
+        "count": 306,
+        "uniques": 139
       },
       {
         "referrer": "sirius-db.com",
-        "count": 171,
-        "uniques": 47
+        "count": 163,
+        "uniques": 46
       },
       {
         "referrer": "Bing",
@@ -516,18 +533,18 @@
       },
       {
         "referrer": "linkedin.com",
-        "count": 12,
-        "uniques": 9
+        "count": 9,
+        "uniques": 6
+      },
+      {
+        "referrer": "chatgpt.com",
+        "count": 8,
+        "uniques": 3
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
         "count": 7,
         "uniques": 4
-      },
-      {
-        "referrer": "chatgpt.com",
-        "count": 4,
-        "uniques": 2
       },
       {
         "referrer": "developer.nvidia.com",
@@ -548,53 +565,53 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 1028,
-        "uniques": 331
+        "count": 976,
+        "uniques": 326
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 436,
-        "uniques": 46
+        "count": 353,
+        "uniques": 42
       },
       {
         "path": "/sirius-db/sirius/stargazers",
-        "count": 160,
+        "count": 147,
         "uniques": 3
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 121,
-        "uniques": 32
+        "count": 112,
+        "uniques": 30
       },
       {
         "path": "/sirius-db/sirius/commits/dev",
-        "count": 117,
-        "uniques": 25
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1524",
-        "count": 74,
-        "uniques": 17
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1425",
-        "count": 67,
-        "uniques": 9
+        "count": 106,
+        "uniques": 21
       },
       {
         "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
-        "count": 65,
-        "uniques": 31
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1606",
-        "count": 63,
-        "uniques": 8
+        "count": 72,
+        "uniques": 32
       },
       {
         "path": "/sirius-db/sirius/pull/1663",
         "count": 56,
         "uniques": 9
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1524",
+        "count": 54,
+        "uniques": 15
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1661",
+        "count": 51,
+        "uniques": 23
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1425",
+        "count": 46,
+        "uniques": 10
       }
     ]
   },
