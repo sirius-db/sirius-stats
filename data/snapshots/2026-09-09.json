@@ -1,40 +1,28 @@
 {
-  "date": "2026-09-08",
-  "collected_at": "2026-09-09T05:02:22Z",
+  "date": "2026-09-09",
+  "collected_at": "2026-09-10T05:05:26Z",
   "repo": {
-    "stars": 1061,
-    "forks": 121,
+    "stars": 1063,
+    "forks": 122,
     "watchers": 13,
-    "open_issues": 121,
-    "open_prs": 115,
+    "open_issues": 132,
+    "open_prs": 116,
     "contributors": 44
   },
   "activity": {
-    "issues_opened": 2,
-    "issues_closed": 0,
-    "prs_opened": 2,
-    "prs_merged": 4,
+    "issues_opened": 8,
+    "issues_closed": 1,
+    "prs_opened": 6,
+    "prs_merged": 2,
     "prs_closed": 0,
-    "commits": 4,
-    "files_changed": 40,
-    "additions": 2063,
-    "deletions": 408,
+    "commits": 2,
+    "files_changed": 2,
+    "additions": 4,
+    "deletions": 4,
     "top_committers": [
       {
-        "login": "wmalpica",
-        "commits": 1
-      },
-      {
-        "login": "patdevinwilson",
-        "commits": 1
-      },
-      {
-        "login": "infblueocean",
-        "commits": 1
-      },
-      {
-        "login": "mbrobbel",
-        "commits": 1
+        "login": "dependabot[bot]",
+        "commits": 2
       }
     ]
   },
@@ -42,7 +30,7 @@
     "priority_counts": {
       "! - P0": {
         "issues": 0,
-        "prs": 3,
+        "prs": 5,
         "color": "b60205"
       },
       "! - P1": {
@@ -63,34 +51,79 @@
     },
     "other_counts": {
       "enhancement": {
-        "issues": 24,
+        "issues": 29,
         "prs": 1,
         "color": "a2eeef"
       },
-      "dependencies": {
-        "issues": 0,
-        "prs": 6,
-        "color": "0366d6"
+      "starrocks": {
+        "issues": 14,
+        "prs": 4,
+        "color": "327D8C"
       },
       "rust": {
         "issues": 0,
-        "prs": 5,
+        "prs": 4,
         "color": "000000"
       },
-      "starrocks": {
-        "issues": 14,
+      "perf": {
+        "issues": 0,
+        "prs": 1,
+        "color": "044b1c"
+      },
+      "benchmarking": {
+        "issues": 1,
         "prs": 2,
-        "color": "327D8C"
+        "color": "08d901"
+      },
+      "multi-gpu": {
+        "issues": 3,
+        "prs": 2,
+        "color": "60ed43"
+      },
+      "documentation": {
+        "issues": 1,
+        "prs": 1,
+        "color": "0075ca"
+      },
+      "config": {
+        "issues": 0,
+        "prs": 1,
+        "color": "B51842"
+      },
+      "quent": {
+        "issues": 3,
+        "prs": 0,
+        "color": "a249b6"
+      },
+      "telemetry": {
+        "issues": 4,
+        "prs": 0,
+        "color": "aaaaaa"
+      },
+      "ci": {
+        "issues": 4,
+        "prs": 1,
+        "color": "e7ce1d"
+      },
+      "chore": {
+        "issues": 4,
+        "prs": 0,
+        "color": "1abc4b"
+      },
+      "cmake": {
+        "issues": 2,
+        "prs": 0,
+        "color": "a0254c"
+      },
+      "dependencies": {
+        "issues": 0,
+        "prs": 4,
+        "color": "0366d6"
       },
       "github_actions": {
         "issues": 0,
         "prs": 1,
         "color": "000000"
-      },
-      "chore": {
-        "issues": 1,
-        "prs": 0,
-        "color": "1abc4b"
       },
       "test": {
         "issues": 1,
@@ -117,45 +150,15 @@
         "prs": 1,
         "color": "df3028"
       },
-      "documentation": {
-        "issues": 1,
-        "prs": 0,
-        "color": "0075ca"
-      },
-      "ci": {
-        "issues": 3,
-        "prs": 1,
-        "color": "e7ce1d"
-      },
-      "quent": {
-        "issues": 2,
-        "prs": 0,
-        "color": "a249b6"
-      },
-      "telemetry": {
-        "issues": 3,
-        "prs": 0,
-        "color": "aaaaaa"
-      },
       "dynamic-filters": {
         "issues": 5,
         "prs": 0,
         "color": "1d76db"
       },
-      "multi-gpu": {
-        "issues": 3,
-        "prs": 0,
-        "color": "60ed43"
-      },
       "memory": {
         "issues": 2,
         "prs": 0,
         "color": "c46edb"
-      },
-      "benchmarking": {
-        "issues": 1,
-        "prs": 0,
-        "color": "08d901"
       },
       "duckdb": {
         "issues": 10,
@@ -251,10 +254,24 @@
         "priority_label": "! - P0"
       },
       {
+        "number": 1577,
+        "title": "perf(scan): see through DATE\u2192TIMESTAMP casts in fused scan-filter range extraction",
+        "url": "https://github.com/sirius-db/sirius/pull/1577",
+        "updated_at": "2026-09-09T13:46:44Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1725,
+        "title": "perf(scan): project zero-column parquet scans to one narrow column",
+        "url": "https://github.com/sirius-db/sirius/pull/1725",
+        "updated_at": "2026-09-09T17:17:48Z",
+        "priority_label": "! - P0"
+      },
+      {
         "number": 1425,
         "title": "feat(iceberg): re-enable GPU execution for iceberg scans",
         "url": "https://github.com/sirius-db/sirius/pull/1425",
-        "updated_at": "2026-08-28T23:11:50Z",
+        "updated_at": "2026-09-10T00:18:12Z",
         "priority_label": "! - P0"
       },
       {
@@ -283,20 +300,6 @@
         "title": "fix(pin): key duckdb pin-cache identity on the table incarnation",
         "url": "https://github.com/sirius-db/sirius/pull/1591",
         "updated_at": "2026-08-21T06:56:49Z",
-        "priority_label": "! - P1"
-      },
-      {
-        "number": 1366,
-        "title": "feat: [Concurrency]  PR 3 of ?. Per-query scan manager state (query_scan_manager_state)",
-        "url": "https://github.com/sirius-db/sirius/pull/1366",
-        "updated_at": "2026-08-21T22:53:48Z",
-        "priority_label": "! - P1"
-      },
-      {
-        "number": 1369,
-        "title": "[Concurrency] PR 4 of ?. Per-query enqueue gate and per-query failure containment",
-        "url": "https://github.com/sirius-db/sirius/pull/1369",
-        "updated_at": "2026-08-21T22:53:59Z",
         "priority_label": "! - P1"
       },
       {
@@ -463,26 +466,6 @@
         ]
       },
       {
-        "number": 1682,
-        "title": "build(deps): bump uuid from 1.25.0 to 1.26.0 in /experimental/starrocks",
-        "url": "https://github.com/sirius-db/sirius/pull/1682",
-        "updated_at": "2026-08-31T18:07:35Z",
-        "labels": [
-          "dependencies",
-          "rust"
-        ]
-      },
-      {
-        "number": 1683,
-        "title": "build(deps): bump uuid from 1.25.0 to 1.26.0 in /rust",
-        "url": "https://github.com/sirius-db/sirius/pull/1683",
-        "updated_at": "2026-08-31T18:07:51Z",
-        "labels": [
-          "dependencies",
-          "rust"
-        ]
-      },
-      {
         "number": 1684,
         "title": "build(deps): bump substrait from 0.64.1 to 0.65.0 in /rust",
         "url": "https://github.com/sirius-db/sirius/pull/1684",
@@ -501,50 +484,73 @@
           "dependencies",
           "rust"
         ]
+      },
+      {
+        "number": 1737,
+        "title": "docs(bench): add the SF500 two-MIG memory and reproduction runbook",
+        "url": "https://github.com/sirius-db/sirius/pull/1737",
+        "updated_at": "2026-09-09T17:22:30Z",
+        "labels": [
+          "documentation",
+          "benchmarking",
+          "multi-gpu",
+          "config"
+        ]
+      },
+      {
+        "number": 1738,
+        "title": "chore(bench): add TPC-H harness and GPU/MIG placement",
+        "url": "https://github.com/sirius-db/sirius/pull/1738",
+        "updated_at": "2026-09-09T17:23:11Z",
+        "labels": [
+          "benchmarking",
+          "multi-gpu",
+          "starrocks"
+        ]
       }
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-08",
-    "views": 403,
-    "unique_views": 66,
-    "clones": 306,
-    "unique_clones": 49,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 530,
+        "count": 480,
         "uniques": 63
       },
       {
         "referrer": "Google",
-        "count": 306,
-        "uniques": 139
+        "count": 299,
+        "uniques": 135
       },
       {
         "referrer": "sirius-db.com",
-        "count": 163,
-        "uniques": 46
+        "count": 164,
+        "uniques": 50
       },
       {
         "referrer": "Bing",
-        "count": 18,
-        "uniques": 7
+        "count": 19,
+        "uniques": 8
       },
       {
         "referrer": "linkedin.com",
-        "count": 9,
-        "uniques": 6
+        "count": 8,
+        "uniques": 5
+      },
+      {
+        "referrer": "teams.public.onecdn.static.microsoft",
+        "count": 8,
+        "uniques": 5
       },
       {
         "referrer": "chatgpt.com",
         "count": 8,
         "uniques": 3
-      },
-      {
-        "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 7,
-        "uniques": 4
       },
       {
         "referrer": "developer.nvidia.com",
@@ -565,33 +571,33 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 976,
-        "uniques": 326
+        "count": 939,
+        "uniques": 336
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 353,
-        "uniques": 42
+        "count": 285,
+        "uniques": 40
       },
       {
         "path": "/sirius-db/sirius/stargazers",
-        "count": 147,
+        "count": 135,
         "uniques": 3
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 112,
-        "uniques": 30
+        "count": 117,
+        "uniques": 31
       },
       {
         "path": "/sirius-db/sirius/commits/dev",
-        "count": 106,
+        "count": 86,
         "uniques": 21
       },
       {
         "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
-        "count": 72,
-        "uniques": 32
+        "count": 76,
+        "uniques": 33
       },
       {
         "path": "/sirius-db/sirius/pull/1663",
@@ -599,18 +605,18 @@
         "uniques": 9
       },
       {
-        "path": "/sirius-db/sirius/pull/1524",
-        "count": 54,
-        "uniques": 15
-      },
-      {
         "path": "/sirius-db/sirius/pull/1661",
         "count": 51,
-        "uniques": 23
+        "uniques": 22
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1662",
+        "count": 46,
+        "uniques": 11
       },
       {
         "path": "/sirius-db/sirius/pull/1425",
-        "count": 46,
+        "count": 45,
         "uniques": 10
       }
     ]
