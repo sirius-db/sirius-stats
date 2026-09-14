@@ -1,18 +1,18 @@
 {
-  "date": "2026-09-12",
-  "collected_at": "2026-09-13T05:14:43Z",
+  "date": "2026-09-13",
+  "collected_at": "2026-09-14T05:19:33Z",
   "repo": {
-    "stars": 1067,
+    "stars": 1068,
     "forks": 123,
     "watchers": 13,
     "open_issues": 134,
-    "open_prs": 108,
+    "open_prs": 109,
     "contributors": 45
   },
   "activity": {
     "issues_opened": 0,
     "issues_closed": 0,
-    "prs_opened": 0,
+    "prs_opened": 2,
     "prs_merged": 0,
     "prs_closed": 0,
     "commits": 0,
@@ -279,13 +279,6 @@
         "priority_label": "! - P1"
       },
       {
-        "number": 1591,
-        "title": "fix(pin): key duckdb pin-cache identity on the table incarnation",
-        "url": "https://github.com/sirius-db/sirius/pull/1591",
-        "updated_at": "2026-08-21T06:56:49Z",
-        "priority_label": "! - P1"
-      },
-      {
         "number": 1427,
         "title": "perf(dynamic filter): push dynamic filter below D2H copy",
         "url": "https://github.com/sirius-db/sirius/pull/1427",
@@ -297,6 +290,13 @@
         "title": "feat(dynamic filter): Add TopK dynamic filter",
         "url": "https://github.com/sirius-db/sirius/pull/1429",
         "updated_at": "2026-08-21T23:07:30Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1451,
+        "title": "feat(dynamic filter): build filters for multi-input batch build sides",
+        "url": "https://github.com/sirius-db/sirius/pull/1451",
+        "updated_at": "2026-08-24T20:52:44Z",
         "priority_label": "! - P1"
       }
     ],
@@ -492,41 +492,41 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-12",
-    "views": 205,
-    "unique_views": 45,
-    "clones": 62,
-    "unique_clones": 41,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 397,
-        "uniques": 60
+        "count": 403,
+        "uniques": 63
       },
       {
         "referrer": "Google",
-        "count": 298,
-        "uniques": 137
+        "count": 332,
+        "uniques": 145
       },
       {
         "referrer": "sirius-db.com",
-        "count": 124,
+        "count": 127,
         "uniques": 45
       },
       {
-        "referrer": "Bing",
-        "count": 14,
-        "uniques": 8
+        "referrer": "linkedin.com",
+        "count": 17,
+        "uniques": 5
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 12,
-        "uniques": 11
+        "count": 15,
+        "uniques": 12
       },
       {
-        "referrer": "linkedin.com",
+        "referrer": "Bing",
         "count": 12,
-        "uniques": 5
+        "uniques": 7
       },
       {
         "referrer": "chatgpt.com",
@@ -539,61 +539,61 @@
         "uniques": 4
       },
       {
+        "referrer": "DuckDuckGo",
+        "count": 5,
+        "uniques": 3
+      },
+      {
         "referrer": "docs.nvidia.com",
         "count": 5,
         "uniques": 2
-      },
-      {
-        "referrer": "search.brave.com",
-        "count": 4,
-        "uniques": 1
       }
     ],
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 921,
-        "uniques": 340
+        "count": 912,
+        "uniques": 337
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 200,
-        "uniques": 34
-      },
-      {
-        "path": "/sirius-db/sirius/issues",
-        "count": 135,
+        "count": 197,
         "uniques": 33
       },
       {
-        "path": "/sirius-db/sirius/stargazers",
-        "count": 105,
-        "uniques": 3
+        "path": "/sirius-db/sirius/issues",
+        "count": 136,
+        "uniques": 34
       },
       {
         "path": "/sirius-db/sirius/blob/dev/docs/sirius-for-research.md",
         "count": 94,
-        "uniques": 41
+        "uniques": 42
+      },
+      {
+        "path": "/sirius-db/sirius/stargazers",
+        "count": 94,
+        "uniques": 3
       },
       {
         "path": "/sirius-db/sirius/commits/dev",
-        "count": 61,
-        "uniques": 22
-      },
-      {
-        "path": "/sirius-db/sirius/issues/1590",
-        "count": 57,
+        "count": 68,
         "uniques": 25
       },
       {
+        "path": "/sirius-db/sirius/issues/1590",
+        "count": 60,
+        "uniques": 26
+      },
+      {
         "path": "/sirius-db/sirius/pull/1661",
-        "count": 50,
-        "uniques": 21
+        "count": 55,
+        "uniques": 22
       },
       {
         "path": "/sirius-db/sirius/graphs/contributors",
-        "count": 44,
-        "uniques": 31
+        "count": 42,
+        "uniques": 30
       },
       {
         "path": "/sirius-db/sirius/pull/1604/changes",
