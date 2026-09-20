@@ -1,38 +1,25 @@
 {
-  "date": "2026-09-18",
-  "collected_at": "2026-09-19T04:54:20Z",
+  "date": "2026-09-19",
+  "collected_at": "2026-09-20T05:15:33Z",
   "repo": {
-    "stars": 1072,
+    "stars": 1074,
     "forks": 128,
     "watchers": 14,
-    "open_issues": 147,
-    "open_prs": 104,
+    "open_issues": 148,
+    "open_prs": 108,
     "contributors": 45
   },
   "activity": {
-    "issues_opened": 5,
+    "issues_opened": 0,
     "issues_closed": 0,
-    "prs_opened": 9,
-    "prs_merged": 4,
+    "prs_opened": 4,
+    "prs_merged": 0,
     "prs_closed": 0,
-    "commits": 4,
-    "files_changed": 86,
-    "additions": 3067,
-    "deletions": 498,
-    "top_committers": [
-      {
-        "login": "aminaramoon",
-        "commits": 2
-      },
-      {
-        "login": "mbrobbel",
-        "commits": 1
-      },
-      {
-        "login": "felipeblazing",
-        "commits": 1
-      }
-    ]
+    "commits": 0,
+    "files_changed": 0,
+    "additions": 0,
+    "deletions": 0,
+    "top_committers": []
   },
   "labels": {
     "priority_counts": {
@@ -157,6 +144,11 @@
         "issues": 1,
         "prs": 0,
         "color": "08d901"
+      },
+      "doris": {
+        "issues": 1,
+        "prs": 0,
+        "color": "b524e8"
       }
     },
     "priority_issues_stale_top10": [
@@ -495,36 +487,36 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-18",
-    "views": 636,
-    "unique_views": 87,
-    "clones": 830,
-    "unique_clones": 101,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 476,
+        "count": 492,
         "uniques": 68
       },
       {
         "referrer": "Google",
-        "count": 294,
-        "uniques": 129
+        "count": 287,
+        "uniques": 120
       },
       {
         "referrer": "sirius-db.com",
-        "count": 82,
+        "count": 83,
         "uniques": 32
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 29,
+        "count": 31,
         "uniques": 18
       },
       {
         "referrer": "linkedin.com",
-        "count": 25,
-        "uniques": 15
+        "count": 27,
+        "uniques": 17
       },
       {
         "referrer": "chatgpt.com",
@@ -533,8 +525,13 @@
       },
       {
         "referrer": "Baidu",
-        "count": 6,
-        "uniques": 5
+        "count": 7,
+        "uniques": 6
+      },
+      {
+        "referrer": "docs.nvidia.com",
+        "count": 7,
+        "uniques": 4
       },
       {
         "referrer": "DuckDuckGo",
@@ -542,65 +539,60 @@
         "uniques": 3
       },
       {
-        "referrer": "Bing",
-        "count": 5,
-        "uniques": 5
-      },
-      {
-        "referrer": "docs.nvidia.com",
-        "count": 5,
-        "uniques": 2
+        "referrer": "pages.cs.wisc.edu",
+        "count": 6,
+        "uniques": 3
       }
     ],
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 906,
-        "uniques": 335
+        "count": 908,
+        "uniques": 337
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 336,
-        "uniques": 29
-      },
-      {
-        "path": "/sirius-db/sirius/issues",
-        "count": 162,
-        "uniques": 43
-      },
-      {
-        "path": "/sirius-db/sirius/issues/1760",
-        "count": 114,
-        "uniques": 27
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1776",
-        "count": 66,
-        "uniques": 11
-      },
-      {
-        "path": "/sirius-db/sirius/commits/dev",
-        "count": 60,
+        "count": 369,
         "uniques": 28
       },
       {
-        "path": "/sirius-db/sirius/pull/1425",
-        "count": 54,
-        "uniques": 18
+        "path": "/sirius-db/sirius/issues",
+        "count": 200,
+        "uniques": 44
+      },
+      {
+        "path": "/sirius-db/sirius/issues/1760",
+        "count": 146,
+        "uniques": 36
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1776",
+        "count": 70,
+        "uniques": 12
+      },
+      {
+        "path": "/sirius-db/sirius/commits/dev",
+        "count": 59,
+        "uniques": 27
       },
       {
         "path": "/sirius-db/sirius/pull/1771",
-        "count": 54,
+        "count": 58,
         "uniques": 14
       },
       {
-        "path": "/sirius-db/sirius/stargazers",
+        "path": "/sirius-db/sirius/pull/1425",
+        "count": 57,
+        "uniques": 17
+      },
+      {
+        "path": "/sirius-db/sirius/issues/1728",
         "count": 54,
-        "uniques": 2
+        "uniques": 20
       },
       {
         "path": "/sirius-db/sirius/issues/1590",
-        "count": 48,
+        "count": 52,
         "uniques": 23
       }
     ]
