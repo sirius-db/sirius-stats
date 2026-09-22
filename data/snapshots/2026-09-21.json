@@ -1,25 +1,58 @@
 {
-  "date": "2026-09-20",
-  "collected_at": "2026-09-21T05:18:30Z",
+  "date": "2026-09-21",
+  "collected_at": "2026-09-22T05:16:34Z",
   "repo": {
-    "stars": 1074,
-    "forks": 128,
+    "stars": 1073,
+    "forks": 129,
     "watchers": 14,
-    "open_issues": 148,
-    "open_prs": 110,
-    "contributors": 45
+    "open_issues": 146,
+    "open_prs": 99,
+    "contributors": 46
   },
   "activity": {
-    "issues_opened": 0,
-    "issues_closed": 0,
-    "prs_opened": 1,
-    "prs_merged": 0,
-    "prs_closed": 0,
-    "commits": 0,
-    "files_changed": 0,
-    "additions": 0,
-    "deletions": 0,
-    "top_committers": []
+    "issues_opened": 1,
+    "issues_closed": 3,
+    "prs_opened": 8,
+    "prs_merged": 16,
+    "prs_closed": 1,
+    "commits": 16,
+    "files_changed": 695,
+    "additions": 6592,
+    "deletions": 3294,
+    "top_committers": [
+      {
+        "login": "mbrobbel",
+        "commits": 5
+      },
+      {
+        "login": "dependabot[bot]",
+        "commits": 4
+      },
+      {
+        "login": "jrbourbeau",
+        "commits": 2
+      },
+      {
+        "login": "felipeblazing",
+        "commits": 1
+      },
+      {
+        "login": "jjohnson-99",
+        "commits": 1
+      },
+      {
+        "login": "Jedi18",
+        "commits": 1
+      },
+      {
+        "login": "joosthooz",
+        "commits": 1
+      },
+      {
+        "login": "dhruv9vats",
+        "commits": 1
+      }
+    ]
   },
   "labels": {
     "priority_counts": {
@@ -29,25 +62,25 @@
         "color": "b60205"
       },
       "! - P1": {
-        "issues": 27,
+        "issues": 47,
         "prs": 13,
         "color": "d93f0b"
       },
       "! - P2": {
-        "issues": 40,
-        "prs": 9,
+        "issues": 42,
+        "prs": 8,
         "color": "fbca04"
       },
       "! - P3": {
-        "issues": 14,
-        "prs": 9,
+        "issues": 12,
+        "prs": 17,
         "color": "9198a1"
       }
     },
     "other_counts": {
       "enhancement": {
         "issues": 38,
-        "prs": 1,
+        "prs": 0,
         "color": "a2eeef"
       },
       "IO": {
@@ -57,12 +90,12 @@
       },
       "dependencies": {
         "issues": 0,
-        "prs": 8,
+        "prs": 4,
         "color": "0366d6"
       },
       "rust": {
         "issues": 0,
-        "prs": 8,
+        "prs": 4,
         "color": "000000"
       },
       "dynamic-filters": {
@@ -85,11 +118,6 @@
         "prs": 0,
         "color": "FFF100"
       },
-      "chore": {
-        "issues": 4,
-        "prs": 0,
-        "color": "1abc4b"
-      },
       "quent": {
         "issues": 3,
         "prs": 0,
@@ -105,6 +133,11 @@
         "prs": 1,
         "color": "e7ce1d"
       },
+      "chore": {
+        "issues": 3,
+        "prs": 0,
+        "color": "1abc4b"
+      },
       "cmake": {
         "issues": 1,
         "prs": 0,
@@ -117,13 +150,8 @@
       },
       "stability": {
         "issues": 2,
-        "prs": 1,
+        "prs": 0,
         "color": "cb8bd3"
-      },
-      "! - DO NOT MERGE": {
-        "issues": 0,
-        "prs": 1,
-        "color": "df3028"
       },
       "documentation": {
         "issues": 1,
@@ -232,17 +260,17 @@
         "priority_label": "! - P0"
       },
       {
-        "number": 1557,
-        "title": "perf(dynamic-filter): carrier-native membership probes, mask-aware filtered decode, and key-type generalization (INT8..UINT64, DATE/TIMESTAMP, DECIMAL, STRING, nullable keys)",
-        "url": "https://github.com/sirius-db/sirius/pull/1557",
-        "updated_at": "2026-09-18T21:06:46Z",
-        "priority_label": "! - P0"
-      },
-      {
         "number": 1771,
         "title": "feat(io): add frugal caching and dynamic I/O",
         "url": "https://github.com/sirius-db/sirius/pull/1771",
-        "updated_at": "2026-09-18T23:07:21Z",
+        "updated_at": "2026-09-21T17:52:08Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1557,
+        "title": "perf(dynamic-filter): carrier-native membership probes, mask-aware filtered decode, and key-type generalization (INT8..UINT64, DATE/TIMESTAMP, DECIMAL, STRING, nullable keys)",
+        "url": "https://github.com/sirius-db/sirius/pull/1557",
+        "updated_at": "2026-09-21T20:25:01Z",
         "priority_label": "! - P0"
       },
       {
@@ -296,33 +324,6 @@
       }
     ],
     "other_issues_stale_top10": [
-      {
-        "number": 557,
-        "title": "Decouple from DuckDB: directory restructuring into adapter layer (Phase 8)",
-        "url": "https://github.com/sirius-db/sirius/issues/557",
-        "updated_at": "2026-04-02T13:33:27Z",
-        "labels": [
-          "duckdb"
-        ]
-      },
-      {
-        "number": 562,
-        "title": "Decouple from DuckDB: move shared code from namespace duckdb to namespace sirius",
-        "url": "https://github.com/sirius-db/sirius/issues/562",
-        "updated_at": "2026-04-02T19:44:41Z",
-        "labels": [
-          "duckdb"
-        ]
-      },
-      {
-        "number": 601,
-        "title": "Move pipeline planning from `initialize_internal()` to optimizer stage",
-        "url": "https://github.com/sirius-db/sirius/issues/601",
-        "updated_at": "2026-04-09T09:01:58Z",
-        "labels": [
-          "duckdb"
-        ]
-      },
       {
         "number": 604,
         "title": "Phase 3: Create `sirius_plan_builder` for bind-time plan construction",
@@ -389,6 +390,33 @@
           "enhancement",
           "dynamic-filters"
         ]
+      },
+      {
+        "number": 837,
+        "title": "Streaming sink operator",
+        "url": "https://github.com/sirius-db/sirius/issues/837",
+        "updated_at": "2026-07-01T13:59:29Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1090,
+        "title": "Reflect engine failures via readiness flag in heartbeat",
+        "url": "https://github.com/sirius-db/sirius/issues/1090",
+        "updated_at": "2026-07-07T08:53:01Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 839,
+        "title": "Stream session support",
+        "url": "https://github.com/sirius-db/sirius/issues/839",
+        "updated_at": "2026-07-15T14:42:22Z",
+        "labels": [
+          "starrocks"
+        ]
       }
     ],
     "other_prs_stale_top10": [
@@ -411,42 +439,6 @@
         ]
       },
       {
-        "number": 1704,
-        "title": "fix(starrocks): unwrap CLONE_EXPR and cast FE-narrowed builtins to their declared type",
-        "url": "https://github.com/sirius-db/sirius/pull/1704",
-        "updated_at": "2026-09-14T20:30:58Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1696,
-        "title": "feat(scan): a deterministic byte-range -> row-group ownership rule",
-        "url": "https://github.com/sirius-db/sirius/pull/1696",
-        "updated_at": "2026-09-15T17:03:36Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1700,
-        "title": "feat(scan): the parquet ingestible honors a per-file byte range",
-        "url": "https://github.com/sirius-db/sirius/pull/1700",
-        "updated_at": "2026-09-15T17:04:19Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1717,
-        "title": "feat(scan): serve pinned parquet tables to file-subset scans",
-        "url": "https://github.com/sirius-db/sirius/pull/1717",
-        "updated_at": "2026-09-15T17:05:16Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
         "number": 1792,
         "title": "feat: demo distributed query using Arrow for data exchange",
         "url": "https://github.com/sirius-db/sirius/pull/1792",
@@ -456,30 +448,66 @@
         ]
       },
       {
-        "number": 1684,
-        "title": "build(deps): bump substrait from 0.64.1 to 0.65.0 in /rust",
-        "url": "https://github.com/sirius-db/sirius/pull/1684",
-        "updated_at": "2026-09-16T10:39:09Z",
+        "number": 1830,
+        "title": "build(deps): bump arrow-array from 59.3.0 to 60.0.0 in /experimental/starrocks",
+        "url": "https://github.com/sirius-db/sirius/pull/1830",
+        "updated_at": "2026-09-18T18:05:34Z",
         "labels": [
           "dependencies",
           "rust"
         ]
       },
       {
-        "number": 1681,
-        "title": "build(deps): bump substrait from 0.63.0 to 0.65.0 in /experimental/starrocks",
-        "url": "https://github.com/sirius-db/sirius/pull/1681",
-        "updated_at": "2026-09-16T10:39:32Z",
+        "number": 1833,
+        "title": "build(deps): bump arrow-array from 59.3.0 to 60.0.0 in /rust",
+        "url": "https://github.com/sirius-db/sirius/pull/1833",
+        "updated_at": "2026-09-18T18:05:57Z",
         "labels": [
           "dependencies",
           "rust"
+        ]
+      },
+      {
+        "number": 1791,
+        "title": "feat: refactor  streaming fragment",
+        "url": "https://github.com/sirius-db/sirius/pull/1791",
+        "updated_at": "2026-09-19T15:37:20Z",
+        "labels": [
+          "starrocks"
         ]
       },
       {
         "number": 1794,
         "title": "feat:  shuffle over NIXL transmit_chunk using staging arena",
         "url": "https://github.com/sirius-db/sirius/pull/1794",
-        "updated_at": "2026-09-16T15:20:29Z",
+        "updated_at": "2026-09-21T12:22:48Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1704,
+        "title": "fix(starrocks): unwrap CLONE_EXPR and cast FE-narrowed builtins to their declared type",
+        "url": "https://github.com/sirius-db/sirius/pull/1704",
+        "updated_at": "2026-09-21T13:00:50Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1717,
+        "title": "feat(scan): serve pinned parquet tables to file-subset scans",
+        "url": "https://github.com/sirius-db/sirius/pull/1717",
+        "updated_at": "2026-09-21T13:01:07Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1700,
+        "title": "feat(scan): the parquet ingestible honors a per-file byte range",
+        "url": "https://github.com/sirius-db/sirius/pull/1700",
+        "updated_at": "2026-09-21T13:02:07Z",
         "labels": [
           "starrocks"
         ]
@@ -487,25 +515,25 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-20",
-    "views": 326,
-    "unique_views": 71,
-    "clones": 123,
-    "unique_clones": 56,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 482,
-        "uniques": 66
+        "count": 480,
+        "uniques": 72
       },
       {
         "referrer": "Google",
-        "count": 285,
+        "count": 280,
         "uniques": 119
       },
       {
         "referrer": "sirius-db.com",
-        "count": 84,
+        "count": 78,
         "uniques": 32
       },
       {
@@ -515,21 +543,21 @@
       },
       {
         "referrer": "linkedin.com",
-        "count": 29,
-        "uniques": 19
-      },
-      {
-        "referrer": "chatgpt.com",
-        "count": 10,
-        "uniques": 3
+        "count": 31,
+        "uniques": 21
       },
       {
         "referrer": "Baidu",
-        "count": 7,
+        "count": 8,
         "uniques": 6
       },
       {
         "referrer": "DuckDuckGo",
+        "count": 7,
+        "uniques": 4
+      },
+      {
+        "referrer": "pages.cs.wisc.edu",
         "count": 7,
         "uniques": 4
       },
@@ -539,7 +567,7 @@
         "uniques": 5
       },
       {
-        "referrer": "docs.nvidia.com",
+        "referrer": "chatgpt.com",
         "count": 6,
         "uniques": 3
       }
@@ -547,23 +575,23 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 926,
-        "uniques": 335
+        "count": 935,
+        "uniques": 344
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 389,
-        "uniques": 30
+        "count": 404,
+        "uniques": 34
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 205,
-        "uniques": 43
+        "count": 214,
+        "uniques": 45
       },
       {
         "path": "/sirius-db/sirius/issues/1760",
-        "count": 150,
-        "uniques": 37
+        "count": 159,
+        "uniques": 39
       },
       {
         "path": "/sirius-db/sirius/pull/1776",
@@ -573,7 +601,7 @@
       {
         "path": "/sirius-db/sirius/commits/dev",
         "count": 65,
-        "uniques": 28
+        "uniques": 27
       },
       {
         "path": "/sirius-db/sirius/pull/1771",
@@ -581,19 +609,19 @@
         "uniques": 14
       },
       {
-        "path": "/sirius-db/sirius/issues/1590",
-        "count": 54,
-        "uniques": 23
-      },
-      {
         "path": "/sirius-db/sirius/issues/1728",
-        "count": 54,
+        "count": 55,
         "uniques": 20
       },
       {
         "path": "/sirius-db/sirius/pull/1425",
-        "count": 51,
-        "uniques": 17
+        "count": 54,
+        "uniques": 19
+      },
+      {
+        "path": "/sirius-db/sirius/issues/1590",
+        "count": 53,
+        "uniques": 22
       }
     ]
   },
