@@ -1,39 +1,43 @@
 {
-  "date": "2026-09-22",
-  "collected_at": "2026-09-23T05:02:13Z",
+  "date": "2026-09-23",
+  "collected_at": "2026-09-24T05:13:09Z",
   "repo": {
-    "stars": 1074,
-    "forks": 129,
+    "stars": 1075,
+    "forks": 130,
     "watchers": 14,
-    "open_issues": 147,
-    "open_prs": 95,
-    "contributors": 46
+    "open_issues": 150,
+    "open_prs": 99,
+    "contributors": 47
   },
   "activity": {
-    "issues_opened": 1,
-    "issues_closed": 0,
-    "prs_opened": 7,
-    "prs_merged": 7,
-    "prs_closed": 5,
-    "commits": 7,
-    "files_changed": 48,
-    "additions": 5388,
-    "deletions": 1564,
+    "issues_opened": 3,
+    "issues_closed": 1,
+    "prs_opened": 13,
+    "prs_merged": 8,
+    "prs_closed": 0,
+    "commits": 8,
+    "files_changed": 81,
+    "additions": 5421,
+    "deletions": 1590,
     "top_committers": [
       {
         "login": "mbrobbel",
         "commits": 5
       },
       {
-        "login": "ran-yuan-rui",
+        "login": "buzzcrow",
         "commits": 2
+      },
+      {
+        "login": "mike-wendt",
+        "commits": 1
       }
     ]
   },
   "labels": {
     "priority_counts": {
       "! - P0": {
-        "issues": 1,
+        "issues": 0,
         "prs": 5,
         "color": "b60205"
       },
@@ -54,25 +58,15 @@
       }
     },
     "other_counts": {
-      "documentation": {
-        "issues": 1,
-        "prs": 1,
-        "color": "0075ca"
-      },
       "enhancement": {
-        "issues": 39,
+        "issues": 41,
         "prs": 0,
         "color": "a2eeef"
       },
-      "ci": {
-        "issues": 5,
-        "prs": 1,
-        "color": "e7ce1d"
-      },
-      "chore": {
-        "issues": 4,
+      "bug": {
+        "issues": 8,
         "prs": 0,
-        "color": "1abc4b"
+        "color": "d73a4a"
       },
       "IO": {
         "issues": 14,
@@ -99,6 +93,16 @@
         "prs": 0,
         "color": "aaaaaa"
       },
+      "ci": {
+        "issues": 4,
+        "prs": 1,
+        "color": "e7ce1d"
+      },
+      "chore": {
+        "issues": 3,
+        "prs": 0,
+        "color": "1abc4b"
+      },
       "cmake": {
         "issues": 1,
         "prs": 0,
@@ -109,15 +113,15 @@
         "prs": 0,
         "color": "4f55db"
       },
-      "bug": {
-        "issues": 7,
-        "prs": 0,
-        "color": "d73a4a"
-      },
       "stability": {
         "issues": 2,
         "prs": 0,
         "color": "cb8bd3"
+      },
+      "documentation": {
+        "issues": 1,
+        "prs": 0,
+        "color": "0075ca"
       },
       "multi-gpu": {
         "issues": 3,
@@ -146,13 +150,6 @@
       }
     },
     "priority_issues_stale_top10": [
-      {
-        "number": 1859,
-        "title": "chore: switch default branch from dev to main",
-        "url": "https://github.com/sirius-db/sirius/issues/1859",
-        "updated_at": "2026-09-22T20:11:07Z",
-        "priority_label": "! - P0"
-      },
       {
         "number": 819,
         "title": "Concurrent INSERT/DELETE via DuckDB with Sirius Pin-Table Cache",
@@ -215,6 +212,13 @@
         "url": "https://github.com/sirius-db/sirius/issues/1125",
         "updated_at": "2026-08-19T19:38:13Z",
         "priority_label": "! - P1"
+      },
+      {
+        "number": 1161,
+        "title": "Support INSERT/DELETE/UPDATE with DuckDB format",
+        "url": "https://github.com/sirius-db/sirius/issues/1161",
+        "updated_at": "2026-08-19T19:38:18Z",
+        "priority_label": "! - P1"
       }
     ],
     "priority_prs_stale_top10": [
@@ -222,70 +226,70 @@
         "number": 1578,
         "title": "perf(scan): cache + fuse + parallelize the duckdb-native metadata prepare walk",
         "url": "https://github.com/sirius-db/sirius/pull/1578",
-        "updated_at": "2026-09-18T02:56:54Z",
+        "updated_at": "2026-09-23T22:48:37Z",
         "priority_label": "! - P0"
       },
       {
         "number": 1557,
         "title": "perf(dynamic-filter): carrier-native membership probes, mask-aware filtered decode, and key-type generalization (INT8..UINT64, DATE/TIMESTAMP, DECIMAL, STRING, nullable keys)",
         "url": "https://github.com/sirius-db/sirius/pull/1557",
-        "updated_at": "2026-09-21T20:25:01Z",
+        "updated_at": "2026-09-23T22:48:37Z",
         "priority_label": "! - P0"
       },
       {
         "number": 1843,
         "title": "refactor(dynamic-filter): make publication lifecycle explicit (S1 of #1818)",
         "url": "https://github.com/sirius-db/sirius/pull/1843",
-        "updated_at": "2026-09-22T16:14:26Z",
+        "updated_at": "2026-09-23T22:48:40Z",
         "priority_label": "! - P0"
       },
       {
         "number": 1819,
         "title": "docs: define the complete-build dynamic-filter design and delivery stack",
         "url": "https://github.com/sirius-db/sirius/pull/1819",
-        "updated_at": "2026-09-22T16:24:42Z",
+        "updated_at": "2026-09-23T22:48:40Z",
         "priority_label": "! - P0"
       },
       {
         "number": 1771,
         "title": "feat(io): add frugal caching and dynamic I/O",
         "url": "https://github.com/sirius-db/sirius/pull/1771",
-        "updated_at": "2026-09-22T22:37:07Z",
+        "updated_at": "2026-09-23T23:54:43Z",
         "priority_label": "! - P0"
       },
       {
-        "number": 1372,
-        "title": "[Concurrency] BIG WIP",
-        "url": "https://github.com/sirius-db/sirius/pull/1372",
-        "updated_at": "2026-08-19T19:39:10Z",
-        "priority_label": "! - P1"
-      },
-      {
-        "number": 1588,
-        "title": "perf(planner): fuse twin same-table scans behind a shared dynamic filter",
-        "url": "https://github.com/sirius-db/sirius/pull/1588",
-        "updated_at": "2026-08-19T21:10:48Z",
+        "number": 1180,
+        "title": "feat(telemetry): per-operator activity in the quent operator timeline",
+        "url": "https://github.com/sirius-db/sirius/pull/1180",
+        "updated_at": "2026-09-23T22:48:34Z",
         "priority_label": "! - P1"
       },
       {
         "number": 1427,
         "title": "perf(dynamic filter): push dynamic filter below D2H copy",
         "url": "https://github.com/sirius-db/sirius/pull/1427",
-        "updated_at": "2026-08-21T23:07:29Z",
+        "updated_at": "2026-09-23T22:48:35Z",
         "priority_label": "! - P1"
       },
       {
-        "number": 1429,
-        "title": "feat(dynamic filter): Add TopK dynamic filter",
-        "url": "https://github.com/sirius-db/sirius/pull/1429",
-        "updated_at": "2026-08-21T23:07:30Z",
+        "number": 1403,
+        "title": "feat: Add FSST compression operator",
+        "url": "https://github.com/sirius-db/sirius/pull/1403",
+        "updated_at": "2026-09-23T22:48:35Z",
         "priority_label": "! - P1"
       },
       {
-        "number": 1585,
-        "title": "perf(concat): lock-free readiness hint and taskless single-batch forwarding",
-        "url": "https://github.com/sirius-db/sirius/pull/1585",
-        "updated_at": "2026-08-26T07:26:50Z",
+        "number": 1372,
+        "title": "[Concurrency] BIG WIP",
+        "url": "https://github.com/sirius-db/sirius/pull/1372",
+        "updated_at": "2026-09-23T22:48:35Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1369,
+        "title": "[Concurrency] PR 4 of ?. Per-query enqueue gate and per-query failure containment",
+        "url": "https://github.com/sirius-db/sirius/pull/1369",
+        "updated_at": "2026-09-23T22:48:35Z",
         "priority_label": "! - P1"
       }
     ],
@@ -387,60 +391,6 @@
     ],
     "other_prs_stale_top10": [
       {
-        "number": 919,
-        "title": "test(s3): replace MinIO/testcontainers with a spawned SeaweedFS process",
-        "url": "https://github.com/sirius-db/sirius/pull/919",
-        "updated_at": "2026-08-19T19:37:48Z",
-        "labels": [
-          "ci"
-        ]
-      },
-      {
-        "number": 1237,
-        "title": "fix(starrocks): sort merging exchange input",
-        "url": "https://github.com/sirius-db/sirius/pull/1237",
-        "updated_at": "2026-08-19T19:38:42Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1792,
-        "title": "feat: demo distributed query using Arrow for data exchange",
-        "url": "https://github.com/sirius-db/sirius/pull/1792",
-        "updated_at": "2026-09-15T17:13:51Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1791,
-        "title": "feat: refactor  streaming fragment",
-        "url": "https://github.com/sirius-db/sirius/pull/1791",
-        "updated_at": "2026-09-19T15:37:20Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1794,
-        "title": "feat:  shuffle over NIXL transmit_chunk using staging arena",
-        "url": "https://github.com/sirius-db/sirius/pull/1794",
-        "updated_at": "2026-09-21T12:22:48Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
-        "number": 1704,
-        "title": "fix(starrocks): unwrap CLONE_EXPR and cast FE-narrowed builtins to their declared type",
-        "url": "https://github.com/sirius-db/sirius/pull/1704",
-        "updated_at": "2026-09-21T13:00:50Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
         "number": 1717,
         "title": "feat(scan): serve pinned parquet tables to file-subset scans",
         "url": "https://github.com/sirius-db/sirius/pull/1717",
@@ -459,51 +409,96 @@
         ]
       },
       {
-        "number": 1696,
-        "title": "feat(scan): a deterministic byte-range -> row-group ownership rule",
-        "url": "https://github.com/sirius-db/sirius/pull/1696",
-        "updated_at": "2026-09-21T13:03:46Z",
+        "number": 1237,
+        "title": "fix(starrocks): sort merging exchange input",
+        "url": "https://github.com/sirius-db/sirius/pull/1237",
+        "updated_at": "2026-09-23T22:48:34Z",
         "labels": [
           "starrocks"
         ]
       },
       {
-        "number": 1860,
-        "title": "docs: add public API reference and deploy to GitHub Pages",
-        "url": "https://github.com/sirius-db/sirius/pull/1860",
-        "updated_at": "2026-09-22T22:12:55Z",
+        "number": 919,
+        "title": "test(s3): replace MinIO/testcontainers with a spawned SeaweedFS process",
+        "url": "https://github.com/sirius-db/sirius/pull/919",
+        "updated_at": "2026-09-23T22:48:34Z",
         "labels": [
-          "documentation"
+          "ci"
+        ]
+      },
+      {
+        "number": 1794,
+        "title": "feat:  shuffle over NIXL transmit_chunk using staging arena",
+        "url": "https://github.com/sirius-db/sirius/pull/1794",
+        "updated_at": "2026-09-23T22:48:39Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1792,
+        "title": "feat: demo distributed query using Arrow for data exchange",
+        "url": "https://github.com/sirius-db/sirius/pull/1792",
+        "updated_at": "2026-09-23T22:48:39Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1791,
+        "title": "feat: refactor  streaming fragment",
+        "url": "https://github.com/sirius-db/sirius/pull/1791",
+        "updated_at": "2026-09-23T22:48:39Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1704,
+        "title": "fix(starrocks): unwrap CLONE_EXPR and cast FE-narrowed builtins to their declared type",
+        "url": "https://github.com/sirius-db/sirius/pull/1704",
+        "updated_at": "2026-09-23T22:48:39Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1696,
+        "title": "feat(scan): a deterministic byte-range -> row-group ownership rule",
+        "url": "https://github.com/sirius-db/sirius/pull/1696",
+        "updated_at": "2026-09-23T22:48:39Z",
+        "labels": [
+          "starrocks"
         ]
       }
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-22",
-    "views": 675,
-    "unique_views": 76,
-    "clones": 494,
-    "unique_clones": 122,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 524,
-        "uniques": 79
+        "count": 545,
+        "uniques": 80
       },
       {
         "referrer": "Google",
-        "count": 276,
-        "uniques": 122
+        "count": 279,
+        "uniques": 125
       },
       {
         "referrer": "sirius-db.com",
-        "count": 81,
-        "uniques": 34
+        "count": 66,
+        "uniques": 29
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
         "count": 40,
-        "uniques": 19
+        "uniques": 18
       },
       {
         "referrer": "linkedin.com",
@@ -539,33 +534,38 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 1017,
-        "uniques": 357
+        "count": 1023,
+        "uniques": 347
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 478,
-        "uniques": 36
+        "count": 538,
+        "uniques": 40
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 219,
+        "count": 225,
         "uniques": 44
       },
       {
         "path": "/sirius-db/sirius/issues/1760",
-        "count": 168,
+        "count": 182,
         "uniques": 41
       },
       {
-        "path": "/sirius-db/sirius/commits/dev",
-        "count": 78,
-        "uniques": 29
+        "path": "/sirius-db/sirius/pull/1771",
+        "count": 103,
+        "uniques": 19
       },
       {
-        "path": "/sirius-db/sirius/pull/1771",
-        "count": 73,
-        "uniques": 15
+        "path": "/sirius-db/sirius/commits/dev",
+        "count": 84,
+        "uniques": 28
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1842",
+        "count": 83,
+        "uniques": 47
       },
       {
         "path": "/sirius-db/sirius/pull/1776",
@@ -573,19 +573,14 @@
         "uniques": 12
       },
       {
-        "path": "/sirius-db/sirius/pull/1842",
-        "count": 69,
-        "uniques": 38
-      },
-      {
-        "path": "/sirius-db/sirius/issues/1728",
-        "count": 61,
-        "uniques": 20
-      },
-      {
         "path": "/sirius-db/sirius/pull/1806",
-        "count": 58,
+        "count": 60,
         "uniques": 11
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1799",
+        "count": 56,
+        "uniques": 7
       }
     ]
   },
