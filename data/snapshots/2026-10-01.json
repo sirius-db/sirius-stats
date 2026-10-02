@@ -1,31 +1,31 @@
 {
-  "date": "2026-09-30",
-  "collected_at": "2026-10-01T06:23:58Z",
+  "date": "2026-10-01",
+  "collected_at": "2026-10-02T06:02:02Z",
   "repo": {
     "stars": 1079,
-    "forks": 132,
+    "forks": 133,
     "watchers": 14,
-    "open_issues": 162,
-    "open_prs": 99,
-    "contributors": 50
+    "open_issues": 163,
+    "open_prs": 98,
+    "contributors": 51
   },
   "activity": {
-    "issues_opened": 3,
+    "issues_opened": 1,
     "issues_closed": 2,
-    "prs_opened": 11,
-    "prs_merged": 12,
+    "prs_opened": 10,
+    "prs_merged": 9,
     "prs_closed": 0,
-    "commits": 12,
-    "files_changed": 314,
-    "additions": 2786,
-    "deletions": 40076,
+    "commits": 9,
+    "files_changed": 161,
+    "additions": 5183,
+    "deletions": 1876,
     "top_committers": [
       {
-        "login": "mbrobbel",
-        "commits": 5
+        "login": "jrbourbeau",
+        "commits": 3
       },
       {
-        "login": "mike-wendt",
+        "login": "Jedi18",
         "commits": 2
       },
       {
@@ -33,15 +33,11 @@
         "commits": 2
       },
       {
-        "login": "wmalpica",
+        "login": "aocsa",
         "commits": 1
       },
       {
-        "login": "jrbourbeau",
-        "commits": 1
-      },
-      {
-        "login": "ran-yuan-rui",
+        "login": "ye-yi-yy",
         "commits": 1
       }
     ]
@@ -55,7 +51,7 @@
       },
       "! - P1": {
         "issues": 38,
-        "prs": 13,
+        "prs": 12,
         "color": "d93f0b"
       },
       "! - P2": {
@@ -71,9 +67,14 @@
     },
     "other_counts": {
       "bug": {
-        "issues": 16,
+        "issues": 17,
         "prs": 2,
         "color": "d73a4a"
+      },
+      "starrocks": {
+        "issues": 16,
+        "prs": 6,
+        "color": "327D8C"
       },
       "ci": {
         "issues": 6,
@@ -104,11 +105,6 @@
         "issues": 5,
         "prs": 0,
         "color": "1d76db"
-      },
-      "starrocks": {
-        "issues": 15,
-        "prs": 7,
-        "color": "327D8C"
       },
       "quent": {
         "issues": 2,
@@ -173,7 +169,7 @@
         "number": 1869,
         "title": "feat: publish rolling latest and manually promoted stable releases",
         "url": "https://github.com/sirius-db/sirius/issues/1869",
-        "updated_at": "2026-09-30T07:06:21Z",
+        "updated_at": "2026-10-01T19:06:53Z",
         "priority_label": "! - P0"
       },
       {
@@ -457,19 +453,10 @@
         ]
       },
       {
-        "number": 1794,
-        "title": "feat:  shuffle over NIXL transmit_chunk using staging arena",
-        "url": "https://github.com/sirius-db/sirius/pull/1794",
-        "updated_at": "2026-09-29T03:11:13Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
         "number": 1943,
         "title": "fix(aggregate): widen DECIMAL sums before aggregating",
         "url": "https://github.com/sirius-db/sirius/pull/1943",
-        "updated_at": "2026-09-30T11:57:55Z",
+        "updated_at": "2026-10-01T16:02:17Z",
         "labels": [
           "bug"
         ]
@@ -478,16 +465,16 @@
         "number": 1955,
         "title": "fix: keep peer access disabled where cucascade's P2P probe fails",
         "url": "https://github.com/sirius-db/sirius/pull/1955",
-        "updated_at": "2026-09-30T19:09:52Z",
+        "updated_at": "2026-10-01T20:29:41Z",
         "labels": [
           "bug"
         ]
       },
       {
-        "number": 1791,
-        "title": "feat: refactor  streaming fragment",
-        "url": "https://github.com/sirius-db/sirius/pull/1791",
-        "updated_at": "2026-10-01T00:56:12Z",
+        "number": 1794,
+        "title": "feat:  shuffle over NIXL transmit_chunk using staging arena",
+        "url": "https://github.com/sirius-db/sirius/pull/1794",
+        "updated_at": "2026-10-02T02:55:36Z",
         "labels": [
           "starrocks"
         ]
@@ -495,35 +482,40 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-09-30",
-    "views": 818,
-    "unique_views": 150,
-    "clones": 951,
-    "unique_clones": 141,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 553,
-        "uniques": 71
+        "count": 554,
+        "uniques": 75
       },
       {
         "referrer": "Google",
-        "count": 151,
-        "uniques": 98
+        "count": 154,
+        "uniques": 103
+      },
+      {
+        "referrer": "linkedin.com",
+        "count": 81,
+        "uniques": 69
       },
       {
         "referrer": "sirius-db.com",
-        "count": 46,
-        "uniques": 33
+        "count": 50,
+        "uniques": 36
       },
       {
         "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 30,
-        "uniques": 12
+        "count": 26,
+        "uniques": 14
       },
       {
         "referrer": "developer.nvidia.com",
-        "count": 10,
+        "count": 11,
         "uniques": 9
       },
       {
@@ -532,56 +524,51 @@
         "uniques": 2
       },
       {
-        "referrer": "linkedin.com",
+        "referrer": "com.linkedin.android",
         "count": 7,
-        "uniques": 7
+        "uniques": 6
       },
       {
         "referrer": "Baidu",
-        "count": 7,
-        "uniques": 5
-      },
-      {
-        "referrer": "DuckDuckGo",
         "count": 6,
         "uniques": 5
       },
       {
-        "referrer": "com.slack",
+        "referrer": "Bing",
         "count": 5,
-        "uniques": 3
+        "uniques": 5
       }
     ],
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 977,
-        "uniques": 280
+        "count": 986,
+        "uniques": 295
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 782,
+        "count": 790,
         "uniques": 44
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 265,
-        "uniques": 38
+        "count": 261,
+        "uniques": 37
       },
       {
         "path": "/sirius-db/sirius/issues/1760",
-        "count": 166,
-        "uniques": 38
+        "count": 139,
+        "uniques": 36
       },
       {
         "path": "/sirius-db/sirius/pull/1842",
-        "count": 127,
+        "count": 129,
         "uniques": 60
       },
       {
-        "path": "/sirius-db/sirius/pull/1771",
-        "count": 112,
-        "uniques": 20
+        "path": "/sirius-db/sirius/blob/main/docs/sirius-for-research.md",
+        "count": 108,
+        "uniques": 84
       },
       {
         "path": "/sirius-db/sirius/pull/1846",
@@ -589,19 +576,19 @@
         "uniques": 21
       },
       {
+        "path": "/sirius-db/sirius/pull/1771",
+        "count": 99,
+        "uniques": 19
+      },
+      {
         "path": "/sirius-db/sirius/pull/1799",
-        "count": 83,
+        "count": 67,
         "uniques": 8
       },
       {
-        "path": "/sirius-db/sirius/commits/dev",
-        "count": 68,
-        "uniques": 18
-      },
-      {
-        "path": "/sirius-db/sirius/pull/1806",
-        "count": 62,
-        "uniques": 12
+        "path": "/sirius-db/sirius/commits/main",
+        "count": 65,
+        "uniques": 20
       }
     ]
   },
