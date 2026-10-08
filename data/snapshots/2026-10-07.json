@@ -1,59 +1,55 @@
 {
-  "date": "2026-10-06",
-  "collected_at": "2026-10-07T06:20:04Z",
+  "date": "2026-10-07",
+  "collected_at": "2026-10-08T06:31:29Z",
   "repo": {
     "stars": 1083,
     "forks": 136,
     "watchers": 15,
-    "open_issues": 168,
-    "open_prs": 118,
+    "open_issues": 174,
+    "open_prs": 117,
     "contributors": 52
   },
   "activity": {
-    "issues_opened": 9,
-    "issues_closed": 7,
-    "prs_opened": 26,
-    "prs_merged": 16,
-    "prs_closed": 3,
-    "commits": 22,
-    "files_changed": 419,
-    "additions": 42432,
-    "deletions": 1728,
+    "issues_opened": 10,
+    "issues_closed": 3,
+    "prs_opened": 12,
+    "prs_merged": 18,
+    "prs_closed": 0,
+    "commits": 12,
+    "files_changed": 113,
+    "additions": 6220,
+    "deletions": 1795,
     "top_committers": [
       {
         "login": "mbrobbel",
-        "commits": 5
-      },
-      {
-        "login": "dependabot[bot]",
         "commits": 4
-      },
-      {
-        "login": "Jedi18",
-        "commits": 4
-      },
-      {
-        "login": "joosthooz",
-        "commits": 3
       },
       {
         "login": "madsbk",
         "commits": 2
       },
       {
-        "login": "mike-wendt",
+        "login": "ran-yuan-rui",
         "commits": 1
       },
       {
-        "login": "kevkrist",
+        "login": "wence-",
         "commits": 1
       },
       {
-        "login": "9prady9",
+        "login": "aminaramoon",
         "commits": 1
       },
       {
-        "login": "morningman",
+        "login": "joosthooz",
+        "commits": 1
+      },
+      {
+        "login": "jrbourbeau",
+        "commits": 1
+      },
+      {
+        "login": "Jedi18",
         "commits": 1
       }
     ]
@@ -62,7 +58,7 @@
     "priority_counts": {
       "! - P0": {
         "issues": 1,
-        "prs": 3,
+        "prs": 2,
         "color": "b60205"
       },
       "! - P1": {
@@ -82,50 +78,50 @@
       }
     },
     "other_counts": {
-      "feat": {
-        "issues": 42,
+      "governance": {
+        "issues": 5,
+        "prs": 1,
+        "color": "525877"
+      },
+      "nominate": {
+        "issues": 3,
         "prs": 0,
-        "color": "a2eeef"
+        "color": "915205"
       },
       "bug": {
-        "issues": 16,
+        "issues": 19,
         "prs": 0,
         "color": "d73a4a"
+      },
+      "ci": {
+        "issues": 7,
+        "prs": 0,
+        "color": "e7ce1d"
+      },
+      "releases": {
+        "issues": 3,
+        "prs": 0,
+        "color": "29093c"
+      },
+      "duckdb": {
+        "issues": 11,
+        "prs": 0,
+        "color": "FFF100"
+      },
+      "feat": {
+        "issues": 41,
+        "prs": 0,
+        "color": "a2eeef"
       },
       "docs": {
         "issues": 3,
         "prs": 0,
         "color": "0075ca"
       },
-      "governance": {
-        "issues": 3,
-        "prs": 0,
-        "color": "525877"
-      },
-      "nominate": {
-        "issues": 1,
-        "prs": 0,
-        "color": "915205"
-      },
       "starrocks": {
         "issues": 16,
-        "prs": 5,
+        "prs": 4,
         "color": "327D8C"
-      },
-      "ci": {
-        "issues": 6,
-        "prs": 0,
-        "color": "e7ce1d"
-      },
-      "releases": {
-        "issues": 2,
-        "prs": 0,
-        "color": "29093c"
-      },
-      "duckdb": {
-        "issues": 10,
-        "prs": 0,
-        "color": "FFF100"
       },
       "IO": {
         "issues": 11,
@@ -266,13 +262,6 @@
         "priority_label": "! - P0"
       },
       {
-        "number": 1935,
-        "title": "perf(dynamic filter): extend dynamic filter operator to multi-partition builds",
-        "url": "https://github.com/sirius-db/sirius/pull/1935",
-        "updated_at": "2026-10-06T19:34:28Z",
-        "priority_label": "! - P0"
-      },
-      {
         "number": 1180,
         "title": "feat(telemetry): per-operator activity in the quent operator timeline",
         "url": "https://github.com/sirius-db/sirius/pull/1180",
@@ -318,6 +307,13 @@
         "number": 1588,
         "title": "perf(planner): fuse twin same-table scans behind a shared dynamic filter",
         "url": "https://github.com/sirius-db/sirius/pull/1588",
+        "updated_at": "2026-09-23T22:48:37Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1585,
+        "title": "perf(concat): lock-free readiness hint and taskless single-batch forwarding",
+        "url": "https://github.com/sirius-db/sirius/pull/1585",
         "updated_at": "2026-09-23T22:48:37Z",
         "priority_label": "! - P1"
       }
@@ -450,48 +446,48 @@
         "number": 1704,
         "title": "fix(starrocks): unwrap CLONE_EXPR and cast FE-narrowed builtins to their declared type",
         "url": "https://github.com/sirius-db/sirius/pull/1704",
-        "updated_at": "2026-10-02T17:41:28Z",
+        "updated_at": "2026-10-07T16:23:31Z",
         "labels": [
           "starrocks"
         ]
       },
       {
-        "number": 1990,
-        "title": "refactor(starrocks): track translated row layouts explicitly",
-        "url": "https://github.com/sirius-db/sirius/pull/1990",
-        "updated_at": "2026-10-06T07:42:39Z",
+        "number": 2069,
+        "title": "chore: promote jrbourdbeau to maintainer",
+        "url": "https://github.com/sirius-db/sirius/pull/2069",
+        "updated_at": "2026-10-07T22:44:09Z",
         "labels": [
-          "starrocks"
+          "governance"
         ]
       }
     ]
   },
   "traffic": {
-    "as_of_date": "2026-10-06",
-    "views": 1130,
-    "unique_views": 90,
-    "clones": 2170,
-    "unique_clones": 177,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 563,
-        "uniques": 73
+        "count": 587,
+        "uniques": 76
       },
       {
         "referrer": "linkedin.com",
-        "count": 171,
-        "uniques": 131
+        "count": 174,
+        "uniques": 132
       },
       {
         "referrer": "Google",
-        "count": 139,
-        "uniques": 103
+        "count": 131,
+        "uniques": 100
       },
       {
         "referrer": "sirius-db.com",
-        "count": 54,
-        "uniques": 43
+        "count": 59,
+        "uniques": 47
       },
       {
         "referrer": "com.linkedin.android",
@@ -499,14 +495,14 @@
         "uniques": 19
       },
       {
-        "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 14,
-        "uniques": 8
+        "referrer": "developer.nvidia.com",
+        "count": 13,
+        "uniques": 11
       },
       {
-        "referrer": "developer.nvidia.com",
-        "count": 12,
-        "uniques": 10
+        "referrer": "teams.public.onecdn.static.microsoft",
+        "count": 13,
+        "uniques": 8
       },
       {
         "referrer": "Bing",
@@ -519,7 +515,7 @@
         "uniques": 2
       },
       {
-        "referrer": "DuckDuckGo",
+        "referrer": "lnkd.in",
         "count": 4,
         "uniques": 4
       }
@@ -527,53 +523,53 @@
     "top_paths": [
       {
         "path": "/sirius-db/sirius",
-        "count": 940,
-        "uniques": 287
+        "count": 959,
+        "uniques": 294
       },
       {
         "path": "/sirius-db/sirius/pulls",
-        "count": 905,
-        "uniques": 46
+        "count": 936,
+        "uniques": 44
       },
       {
         "path": "/sirius-db/sirius/blob/main/docs/sirius-for-research.md",
-        "count": 288,
-        "uniques": 214
+        "count": 297,
+        "uniques": 219
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 263,
-        "uniques": 35
+        "count": 290,
+        "uniques": 36
       },
       {
         "path": "/sirius-db/sirius/commits/main",
-        "count": 105,
-        "uniques": 25
+        "count": 125,
+        "uniques": 26
       },
       {
         "path": "/sirius-db/sirius/pull/1927",
-        "count": 97,
-        "uniques": 9
+        "count": 102,
+        "uniques": 11
       },
       {
         "path": "/sirius-db/sirius/pull/1883",
-        "count": 80,
+        "count": 85,
         "uniques": 6
       },
       {
-        "path": "/sirius-db/sirius/pull/1771",
-        "count": 75,
-        "uniques": 17
-      },
-      {
         "path": "/sirius-db/sirius/issues/1760",
-        "count": 71,
+        "count": 62,
         "uniques": 24
       },
       {
-        "path": "/sirius-db/sirius/pull/1842",
-        "count": 64,
-        "uniques": 33
+        "path": "/sirius-db/sirius/pull/1908",
+        "count": 61,
+        "uniques": 9
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1956",
+        "count": 58,
+        "uniques": 7
       }
     ]
   },
@@ -611,7 +607,7 @@
     {
       "tag": "stable",
       "asset": "MANIFEST.sha256",
-      "download_count": 2
+      "download_count": 3
     },
     {
       "tag": "stable",
@@ -621,7 +617,7 @@
     {
       "tag": "stable",
       "asset": "sirius-linux_amd64-cuda13.duckdb_extension.gz",
-      "download_count": 3
+      "download_count": 5
     },
     {
       "tag": "stable",
