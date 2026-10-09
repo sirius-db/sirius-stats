@@ -1,35 +1,35 @@
 {
-  "date": "2026-10-07",
-  "collected_at": "2026-10-08T06:31:29Z",
+  "date": "2026-10-08",
+  "collected_at": "2026-10-09T06:32:35Z",
   "repo": {
-    "stars": 1083,
-    "forks": 136,
+    "stars": 1085,
+    "forks": 137,
     "watchers": 15,
-    "open_issues": 174,
-    "open_prs": 117,
+    "open_issues": 176,
+    "open_prs": 114,
     "contributors": 52
   },
   "activity": {
-    "issues_opened": 10,
+    "issues_opened": 4,
     "issues_closed": 3,
-    "prs_opened": 12,
-    "prs_merged": 18,
+    "prs_opened": 16,
+    "prs_merged": 10,
     "prs_closed": 0,
-    "commits": 12,
-    "files_changed": 113,
-    "additions": 6220,
-    "deletions": 1795,
+    "commits": 10,
+    "files_changed": 254,
+    "additions": 22277,
+    "deletions": 4101,
     "top_committers": [
       {
         "login": "mbrobbel",
-        "commits": 4
-      },
-      {
-        "login": "madsbk",
         "commits": 2
       },
       {
-        "login": "ran-yuan-rui",
+        "login": "buzzcrow",
+        "commits": 2
+      },
+      {
+        "login": "madsbk",
         "commits": 1
       },
       {
@@ -37,19 +37,19 @@
         "commits": 1
       },
       {
-        "login": "aminaramoon",
-        "commits": 1
-      },
-      {
         "login": "joosthooz",
         "commits": 1
       },
       {
-        "login": "jrbourbeau",
+        "login": "9prady9",
         "commits": 1
       },
       {
         "login": "Jedi18",
+        "commits": 1
+      },
+      {
+        "login": "kevkrist",
         "commits": 1
       }
     ]
@@ -63,7 +63,7 @@
       },
       "! - P1": {
         "issues": 40,
-        "prs": 11,
+        "prs": 9,
         "color": "d93f0b"
       },
       "! - P2": {
@@ -78,6 +78,16 @@
       }
     },
     "other_counts": {
+      "feat": {
+        "issues": 41,
+        "prs": 0,
+        "color": "a2eeef"
+      },
+      "bug": {
+        "issues": 20,
+        "prs": 0,
+        "color": "d73a4a"
+      },
       "governance": {
         "issues": 5,
         "prs": 1,
@@ -87,11 +97,6 @@
         "issues": 3,
         "prs": 0,
         "color": "915205"
-      },
-      "bug": {
-        "issues": 19,
-        "prs": 0,
-        "color": "d73a4a"
       },
       "ci": {
         "issues": 7,
@@ -108,11 +113,6 @@
         "prs": 0,
         "color": "FFF100"
       },
-      "feat": {
-        "issues": 41,
-        "prs": 0,
-        "color": "a2eeef"
-      },
       "docs": {
         "issues": 3,
         "prs": 0,
@@ -120,11 +120,11 @@
       },
       "starrocks": {
         "issues": 16,
-        "prs": 4,
+        "prs": 2,
         "color": "327D8C"
       },
       "IO": {
-        "issues": 11,
+        "issues": 10,
         "prs": 0,
         "color": "1f6e6b"
       },
@@ -416,15 +416,6 @@
     ],
     "other_prs_stale_top10": [
       {
-        "number": 1717,
-        "title": "feat(scan): serve pinned parquet tables to file-subset scans",
-        "url": "https://github.com/sirius-db/sirius/pull/1717",
-        "updated_at": "2026-09-21T13:01:07Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
         "number": 1700,
         "title": "feat(scan): the parquet ingestible honors a per-file byte range",
         "url": "https://github.com/sirius-db/sirius/pull/1700",
@@ -443,15 +434,6 @@
         ]
       },
       {
-        "number": 1704,
-        "title": "fix(starrocks): unwrap CLONE_EXPR and cast FE-narrowed builtins to their declared type",
-        "url": "https://github.com/sirius-db/sirius/pull/1704",
-        "updated_at": "2026-10-07T16:23:31Z",
-        "labels": [
-          "starrocks"
-        ]
-      },
-      {
         "number": 2069,
         "title": "chore: promote jrbourdbeau to maintainer",
         "url": "https://github.com/sirius-db/sirius/pull/2069",
@@ -463,30 +445,30 @@
     ]
   },
   "traffic": {
-    "as_of_date": "2026-10-07",
-    "views": 953,
-    "unique_views": 68,
-    "clones": 3579,
-    "unique_clones": 186,
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
     "top_referrers": [
       {
         "referrer": "github.com",
-        "count": 587,
-        "uniques": 76
+        "count": 600,
+        "uniques": 80
       },
       {
         "referrer": "linkedin.com",
-        "count": 174,
-        "uniques": 132
+        "count": 178,
+        "uniques": 135
       },
       {
         "referrer": "Google",
-        "count": 131,
-        "uniques": 100
+        "count": 111,
+        "uniques": 90
       },
       {
         "referrer": "sirius-db.com",
-        "count": 59,
+        "count": 60,
         "uniques": 47
       },
       {
@@ -495,14 +477,14 @@
         "uniques": 19
       },
       {
-        "referrer": "developer.nvidia.com",
-        "count": 13,
-        "uniques": 11
+        "referrer": "teams.public.onecdn.static.microsoft",
+        "count": 12,
+        "uniques": 8
       },
       {
-        "referrer": "teams.public.onecdn.static.microsoft",
-        "count": 13,
-        "uniques": 8
+        "referrer": "developer.nvidia.com",
+        "count": 11,
+        "uniques": 9
       },
       {
         "referrer": "Bing",
@@ -510,66 +492,66 @@
         "uniques": 5
       },
       {
-        "referrer": "chatgpt.com",
-        "count": 5,
-        "uniques": 2
-      },
-      {
         "referrer": "lnkd.in",
         "count": 4,
         "uniques": 4
+      },
+      {
+        "referrer": "search.brave.com",
+        "count": 4,
+        "uniques": 3
       }
     ],
     "top_paths": [
       {
-        "path": "/sirius-db/sirius",
-        "count": 959,
-        "uniques": 294
-      },
-      {
         "path": "/sirius-db/sirius/pulls",
-        "count": 936,
+        "count": 954,
         "uniques": 44
       },
       {
-        "path": "/sirius-db/sirius/blob/main/docs/sirius-for-research.md",
-        "count": 297,
-        "uniques": 219
+        "path": "/sirius-db/sirius",
+        "count": 878,
+        "uniques": 284
       },
       {
         "path": "/sirius-db/sirius/issues",
-        "count": 290,
-        "uniques": 36
+        "count": 310,
+        "uniques": 38
+      },
+      {
+        "path": "/sirius-db/sirius/blob/main/docs/sirius-for-research.md",
+        "count": 302,
+        "uniques": 222
       },
       {
         "path": "/sirius-db/sirius/commits/main",
-        "count": 125,
-        "uniques": 26
+        "count": 140,
+        "uniques": 27
       },
       {
         "path": "/sirius-db/sirius/pull/1927",
-        "count": 102,
+        "count": 104,
         "uniques": 11
       },
       {
         "path": "/sirius-db/sirius/pull/1883",
-        "count": 85,
+        "count": 94,
         "uniques": 6
       },
       {
-        "path": "/sirius-db/sirius/issues/1760",
-        "count": 62,
-        "uniques": 24
+        "path": "/sirius-db/sirius/pull/1956",
+        "count": 71,
+        "uniques": 8
       },
       {
         "path": "/sirius-db/sirius/pull/1908",
-        "count": 61,
+        "count": 62,
         "uniques": 9
       },
       {
-        "path": "/sirius-db/sirius/pull/1956",
-        "count": 58,
-        "uniques": 7
+        "path": "/sirius-db/sirius/pull/1884",
+        "count": 61,
+        "uniques": 10
       }
     ]
   },
@@ -617,7 +599,7 @@
     {
       "tag": "stable",
       "asset": "sirius-linux_amd64-cuda13.duckdb_extension.gz",
-      "download_count": 5
+      "download_count": 6
     },
     {
       "tag": "stable",
