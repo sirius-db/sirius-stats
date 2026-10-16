@@ -437,11 +437,11 @@
     ]
   },
   "traffic": {
-    "as_of_date": null,
-    "views": 0,
-    "unique_views": 0,
-    "clones": 0,
-    "unique_clones": 0,
+    "as_of_date": "2026-10-14",
+    "views": 719,
+    "unique_views": 60,
+    "clones": 2583,
+    "unique_clones": 215,
     "top_referrers": [
       {
         "referrer": "github.com",
