@@ -1,0 +1,653 @@
+{
+  "date": "2026-10-26",
+  "collected_at": "2026-10-27T05:25:56Z",
+  "repo": {
+    "stars": 1100,
+    "forks": 144,
+    "watchers": 15,
+    "open_issues": 216,
+    "open_prs": 137,
+    "contributors": 52
+  },
+  "activity": {
+    "issues_opened": 2,
+    "issues_closed": 2,
+    "prs_opened": 15,
+    "prs_merged": 5,
+    "prs_closed": 0,
+    "commits": 5,
+    "files_changed": 5,
+    "additions": 10,
+    "deletions": 9,
+    "top_committers": [
+      {
+        "login": "dependabot[bot]",
+        "commits": 3
+      },
+      {
+        "login": "aocsa",
+        "commits": 1
+      },
+      {
+        "login": "mbrobbel",
+        "commits": 1
+      }
+    ]
+  },
+  "labels": {
+    "priority_counts": {
+      "! - P0": {
+        "issues": 10,
+        "prs": 1,
+        "color": "b60205"
+      },
+      "! - P1": {
+        "issues": 40,
+        "prs": 9,
+        "color": "d93f0b"
+      },
+      "! - P2": {
+        "issues": 65,
+        "prs": 2,
+        "color": "fbca04"
+      },
+      "! - P3": {
+        "issues": 20,
+        "prs": 13,
+        "color": "9198a1"
+      }
+    },
+    "other_counts": {
+      "chore": {
+        "issues": 5,
+        "prs": 1,
+        "color": "1abc4b"
+      },
+      "dependencies": {
+        "issues": 1,
+        "prs": 5,
+        "color": "0366d6"
+      },
+      "ci": {
+        "issues": 7,
+        "prs": 1,
+        "color": "e7ce1d"
+      },
+      "duckdb": {
+        "issues": 11,
+        "prs": 1,
+        "color": "FFF100"
+      },
+      "rust": {
+        "issues": 0,
+        "prs": 4,
+        "color": "000000"
+      },
+      "feat": {
+        "issues": 61,
+        "prs": 0,
+        "color": "a2eeef"
+      },
+      "perf": {
+        "issues": 5,
+        "prs": 0,
+        "color": "044b1c"
+      },
+      "dynamic-filters": {
+        "issues": 10,
+        "prs": 1,
+        "color": "1d76db"
+      },
+      "bug": {
+        "issues": 24,
+        "prs": 0,
+        "color": "d73a4a"
+      },
+      "test": {
+        "issues": 2,
+        "prs": 0,
+        "color": "4f55db"
+      },
+      "! - DO NOT MERGE": {
+        "issues": 0,
+        "prs": 1,
+        "color": "df3028"
+      },
+      "starrocks": {
+        "issues": 20,
+        "prs": 0,
+        "color": "327D8C"
+      },
+      "benchmarking": {
+        "issues": 2,
+        "prs": 0,
+        "color": "08d901"
+      },
+      "quent": {
+        "issues": 3,
+        "prs": 0,
+        "color": "a249b6"
+      },
+      "releases": {
+        "issues": 3,
+        "prs": 0,
+        "color": "29093c"
+      },
+      "docs": {
+        "issues": 3,
+        "prs": 0,
+        "color": "0075ca"
+      },
+      "governance": {
+        "issues": 2,
+        "prs": 0,
+        "color": "525877"
+      },
+      "IO": {
+        "issues": 8,
+        "prs": 0,
+        "color": "1f6e6b"
+      },
+      "telemetry": {
+        "issues": 3,
+        "prs": 0,
+        "color": "aaaaaa"
+      },
+      "stability": {
+        "issues": 2,
+        "prs": 0,
+        "color": "cb8bd3"
+      },
+      "memory": {
+        "issues": 2,
+        "prs": 0,
+        "color": "c46edb"
+      },
+      "multi-gpu": {
+        "issues": 1,
+        "prs": 0,
+        "color": "60ed43"
+      }
+    },
+    "priority_issues_stale_top10": [
+      {
+        "number": 1730,
+        "title": "Support CPU fallback for queries on S3 data",
+        "url": "https://github.com/sirius-db/sirius/issues/1730",
+        "updated_at": "2026-10-06T05:36:26Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1744,
+        "title": "Investigate Missing Operators",
+        "url": "https://github.com/sirius-db/sirius/issues/1744",
+        "updated_at": "2026-10-13T14:55:23Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1743,
+        "title": "Running TPC-DS on Sirius",
+        "url": "https://github.com/sirius-db/sirius/issues/1743",
+        "updated_at": "2026-10-14T10:07:22Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1882,
+        "title": "feat: lowering for LogicalDistinct",
+        "url": "https://github.com/sirius-db/sirius/issues/1882",
+        "updated_at": "2026-10-14T10:12:46Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 2017,
+        "title": "feat: scalable ungrouped COUNT(DISTINCT) for large distinct counts",
+        "url": "https://github.com/sirius-db/sirius/issues/2017",
+        "updated_at": "2026-10-14T10:12:59Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 2065,
+        "title": "Functional Nightly TPCDS",
+        "url": "https://github.com/sirius-db/sirius/issues/2065",
+        "updated_at": "2026-10-14T10:19:31Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1745,
+        "title": "Supporting Window Function",
+        "url": "https://github.com/sirius-db/sirius/issues/1745",
+        "updated_at": "2026-10-14T15:58:37Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 2096,
+        "title": "feat: lower distinct EXCEPT and INTERSECT to a null-safe semi / anti join",
+        "url": "https://github.com/sirius-db/sirius/issues/2096",
+        "updated_at": "2026-10-14T18:48:00Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 2019,
+        "title": "feat: lowering for LOGICAL_EXCEPT and LOGICAL_INTERSECT",
+        "url": "https://github.com/sirius-db/sirius/issues/2019",
+        "updated_at": "2026-10-22T11:05:14Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 2225,
+        "title": "bug: Q21 correctness problem with new duckdb 2.0 plan",
+        "url": "https://github.com/sirius-db/sirius/issues/2225",
+        "updated_at": "2026-10-26T20:12:49Z",
+        "priority_label": "! - P0"
+      }
+    ],
+    "priority_prs_stale_top10": [
+      {
+        "number": 1581,
+        "title": "perf(planner): eager aggregation pushdown below equi-joins (TPC-H q13)",
+        "url": "https://github.com/sirius-db/sirius/pull/1581",
+        "updated_at": "2026-10-05T17:04:28Z",
+        "priority_label": "! - P0"
+      },
+      {
+        "number": 1180,
+        "title": "feat(telemetry): per-operator activity in the quent operator timeline",
+        "url": "https://github.com/sirius-db/sirius/pull/1180",
+        "updated_at": "2026-09-23T22:48:34Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1427,
+        "title": "perf(dynamic filter): push dynamic filter below D2H copy",
+        "url": "https://github.com/sirius-db/sirius/pull/1427",
+        "updated_at": "2026-09-23T22:48:35Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1403,
+        "title": "feat: Add FSST compression operator",
+        "url": "https://github.com/sirius-db/sirius/pull/1403",
+        "updated_at": "2026-09-23T22:48:35Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1487,
+        "title": "perf(partition): hybrid zero-copy hash partitioning",
+        "url": "https://github.com/sirius-db/sirius/pull/1487",
+        "updated_at": "2026-09-23T22:48:36Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1429,
+        "title": "feat(dynamic filter): Add TopK dynamic filter",
+        "url": "https://github.com/sirius-db/sirius/pull/1429",
+        "updated_at": "2026-09-23T22:48:36Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1588,
+        "title": "perf(planner): fuse twin same-table scans behind a shared dynamic filter",
+        "url": "https://github.com/sirius-db/sirius/pull/1588",
+        "updated_at": "2026-09-23T22:48:37Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1585,
+        "title": "perf(concat): lock-free readiness hint and taskless single-batch forwarding",
+        "url": "https://github.com/sirius-db/sirius/pull/1585",
+        "updated_at": "2026-09-23T22:48:37Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 1582,
+        "title": "perf(scan): serve GPU-pinned scans as views instead of per-query copies",
+        "url": "https://github.com/sirius-db/sirius/pull/1582",
+        "updated_at": "2026-09-23T22:48:37Z",
+        "priority_label": "! - P1"
+      },
+      {
+        "number": 2280,
+        "title": "perf(dynamic filter): fuse membership masks at the cached scan checkpoint (S3C of multi-partition dynamic filters)",
+        "url": "https://github.com/sirius-db/sirius/pull/2280",
+        "updated_at": "2026-10-21T22:17:58Z",
+        "priority_label": "! - P1"
+      }
+    ],
+    "other_issues_stale_top10": [
+      {
+        "number": 604,
+        "title": "Phase 3: Create `sirius_plan_builder` for bind-time plan construction",
+        "url": "https://github.com/sirius-db/sirius/issues/604",
+        "updated_at": "2026-04-09T09:02:20Z",
+        "labels": [
+          "duckdb"
+        ]
+      },
+      {
+        "number": 605,
+        "title": "Phase 4: Enable `gpu_explain` and transparent execution with pre-built plan",
+        "url": "https://github.com/sirius-db/sirius/issues/605",
+        "updated_at": "2026-04-09T09:02:21Z",
+        "labels": [
+          "duckdb"
+        ]
+      },
+      {
+        "number": 606,
+        "title": "Phase 5: Cleanup legacy planning code",
+        "url": "https://github.com/sirius-db/sirius/issues/606",
+        "updated_at": "2026-04-09T09:02:22Z",
+        "labels": [
+          "duckdb"
+        ]
+      },
+      {
+        "number": 838,
+        "title": "Streaming sink partitioning support",
+        "url": "https://github.com/sirius-db/sirius/issues/838",
+        "updated_at": "2026-05-29T19:41:40Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 840,
+        "title": "Resource management API",
+        "url": "https://github.com/sirius-db/sirius/issues/840",
+        "updated_at": "2026-05-29T19:55:53Z",
+        "labels": [
+          "memory",
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1012,
+        "title": "Dynamic filters: tune gate / L2-fit / domain-coverage heuristics",
+        "url": "https://github.com/sirius-db/sirius/issues/1012",
+        "updated_at": "2026-06-26T17:47:32Z",
+        "labels": [
+          "feat",
+          "benchmarking",
+          "dynamic-filters"
+        ]
+      },
+      {
+        "number": 1013,
+        "title": "Dynamic filters: NDV/cardinality-based build-side pruning",
+        "url": "https://github.com/sirius-db/sirius/issues/1013",
+        "updated_at": "2026-06-26T17:47:33Z",
+        "labels": [
+          "feat",
+          "dynamic-filters"
+        ]
+      },
+      {
+        "number": 837,
+        "title": "Streaming sink operator",
+        "url": "https://github.com/sirius-db/sirius/issues/837",
+        "updated_at": "2026-07-01T13:59:29Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 1090,
+        "title": "Reflect engine failures via readiness flag in heartbeat",
+        "url": "https://github.com/sirius-db/sirius/issues/1090",
+        "updated_at": "2026-07-07T08:53:01Z",
+        "labels": [
+          "starrocks"
+        ]
+      },
+      {
+        "number": 839,
+        "title": "Stream session support",
+        "url": "https://github.com/sirius-db/sirius/issues/839",
+        "updated_at": "2026-07-15T14:42:22Z",
+        "labels": [
+          "starrocks"
+        ]
+      }
+    ],
+    "other_prs_stale_top10": [
+      {
+        "number": 2209,
+        "title": "fix: bump cuCascade",
+        "url": "https://github.com/sirius-db/sirius/pull/2209",
+        "updated_at": "2026-10-16T10:41:59Z",
+        "labels": [
+          "! - DO NOT MERGE"
+        ]
+      },
+      {
+        "number": 2280,
+        "title": "perf(dynamic filter): fuse membership masks at the cached scan checkpoint (S3C of multi-partition dynamic filters)",
+        "url": "https://github.com/sirius-db/sirius/pull/2280",
+        "updated_at": "2026-10-21T22:17:58Z",
+        "labels": [
+          "dynamic-filters"
+        ]
+      },
+      {
+        "number": 2332,
+        "title": "build(deps): bump tokio from 1.54.0 to 1.54.1 in /experimental/starrocks",
+        "url": "https://github.com/sirius-db/sirius/pull/2332",
+        "updated_at": "2026-10-26T18:44:27Z",
+        "labels": [
+          "dependencies",
+          "rust"
+        ]
+      },
+      {
+        "number": 2333,
+        "title": "build(deps): bump smallvec from 1.16.3 to 1.16.4 in /rust",
+        "url": "https://github.com/sirius-db/sirius/pull/2333",
+        "updated_at": "2026-10-26T18:44:37Z",
+        "labels": [
+          "dependencies",
+          "rust"
+        ]
+      },
+      {
+        "number": 2334,
+        "title": "build(deps): bump uuid from 1.28.0 to 1.29.0 in /rust",
+        "url": "https://github.com/sirius-db/sirius/pull/2334",
+        "updated_at": "2026-10-26T18:44:51Z",
+        "labels": [
+          "dependencies",
+          "rust"
+        ]
+      },
+      {
+        "number": 2335,
+        "title": "build(deps): bump tokio from 1.53.3 to 1.54.1 in /rust",
+        "url": "https://github.com/sirius-db/sirius/pull/2335",
+        "updated_at": "2026-10-26T18:45:10Z",
+        "labels": [
+          "dependencies",
+          "rust"
+        ]
+      },
+      {
+        "number": 2336,
+        "title": "chore: update DuckDB to v2.0.0",
+        "url": "https://github.com/sirius-db/sirius/pull/2336",
+        "updated_at": "2026-10-27T02:50:08Z",
+        "labels": [
+          "dependencies",
+          "ci",
+          "duckdb",
+          "chore"
+        ]
+      }
+    ]
+  },
+  "traffic": {
+    "as_of_date": null,
+    "views": 0,
+    "unique_views": 0,
+    "clones": 0,
+    "unique_clones": 0,
+    "top_referrers": [
+      {
+        "referrer": "github.com",
+        "count": 224,
+        "uniques": 78
+      },
+      {
+        "referrer": "Google",
+        "count": 71,
+        "uniques": 54
+      },
+      {
+        "referrer": "aocr.org",
+        "count": 25,
+        "uniques": 25
+      },
+      {
+        "referrer": "sirius-db.com",
+        "count": 19,
+        "uniques": 14
+      },
+      {
+        "referrer": "linkedin.com",
+        "count": 18,
+        "uniques": 12
+      },
+      {
+        "referrer": "teams.public.onecdn.static.microsoft",
+        "count": 8,
+        "uniques": 6
+      },
+      {
+        "referrer": "Bing",
+        "count": 4,
+        "uniques": 4
+      },
+      {
+        "referrer": "developer.nvidia.com",
+        "count": 4,
+        "uniques": 4
+      },
+      {
+        "referrer": "docs.nvidia.com",
+        "count": 4,
+        "uniques": 4
+      },
+      {
+        "referrer": "com.linkedin.android",
+        "count": 2,
+        "uniques": 2
+      }
+    ],
+    "top_paths": [
+      {
+        "path": "/sirius-db/sirius/pulls",
+        "count": 685,
+        "uniques": 34
+      },
+      {
+        "path": "/sirius-db/sirius",
+        "count": 310,
+        "uniques": 138
+      },
+      {
+        "path": "/sirius-db/sirius/issues",
+        "count": 186,
+        "uniques": 28
+      },
+      {
+        "path": "/sirius-db/sirius/commits/main",
+        "count": 97,
+        "uniques": 17
+      },
+      {
+        "path": "/sirius-db/sirius/pull/2132",
+        "count": 90,
+        "uniques": 6
+      },
+      {
+        "path": "/sirius-db/sirius/actions",
+        "count": 56,
+        "uniques": 3
+      },
+      {
+        "path": "/sirius-db/sirius/pull/2175",
+        "count": 46,
+        "uniques": 18
+      },
+      {
+        "path": "/sirius-db/sirius/issues/1760",
+        "count": 41,
+        "uniques": 9
+      },
+      {
+        "path": "/sirius-db/sirius/pull/2231",
+        "count": 38,
+        "uniques": 8
+      },
+      {
+        "path": "/sirius-db/sirius/pull/1994",
+        "count": 38,
+        "uniques": 5
+      }
+    ]
+  },
+  "releases": [
+    {
+      "tag": "latest",
+      "asset": "LICENSE",
+      "download_count": 0
+    },
+    {
+      "tag": "latest",
+      "asset": "MANIFEST.sha256",
+      "download_count": 0
+    },
+    {
+      "tag": "latest",
+      "asset": "sirius-linux_amd64-cuda12.duckdb_extension.gz",
+      "download_count": 0
+    },
+    {
+      "tag": "latest",
+      "asset": "sirius-linux_amd64-cuda13.duckdb_extension.gz",
+      "download_count": 0
+    },
+    {
+      "tag": "latest",
+      "asset": "sirius-linux_arm64-cuda12.duckdb_extension.gz",
+      "download_count": 0
+    },
+    {
+      "tag": "latest",
+      "asset": "sirius-linux_arm64-cuda13.duckdb_extension.gz",
+      "download_count": 0
+    },
+    {
+      "tag": "stable",
+      "asset": "MANIFEST.sha256",
+      "download_count": 20
+    },
+    {
+      "tag": "stable",
+      "asset": "sirius-linux_amd64-cuda12.duckdb_extension.gz",
+      "download_count": 18
+    },
+    {
+      "tag": "stable",
+      "asset": "sirius-linux_amd64-cuda13.duckdb_extension.gz",
+      "download_count": 754
+    },
+    {
+      "tag": "stable",
+      "asset": "sirius-linux_arm64-cuda12.duckdb_extension.gz",
+      "download_count": 3
+    },
+    {
+      "tag": "stable",
+      "asset": "sirius-linux_arm64-cuda13.duckdb_extension.gz",
+      "download_count": 5
+    }
+  ]
+}
