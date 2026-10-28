@@ -105,7 +105,12 @@ canvas {
   padding: 0.3rem 0.65rem;
   cursor: pointer;
   color: var(--color-text);
-  margin-left: auto;
+}
+
+/* Hidden everywhere except the mobile overlay below -- on desktop #toc is always visible, so
+   there's nothing to close. */
+#tocClose {
+  display: none;
 }
 
 /* body is centered with max-width: 900px -- below this viewport width the fixed sidebar would
@@ -123,17 +128,60 @@ canvas {
     display: none;
   }
 
+  /* #toc's base rules (width: 170px, font-size: 0.85rem, etc.) are sized for a narrow fixed
+     desktop sidebar -- the overlay needs its own larger scale, not that shrunk-down version,
+     and bigger tap targets per link since this is the touch-driven nav entry point. */
   #toc.open {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: fixed;
     inset: 0;
+    top: 0;
+    left: 0;
     width: auto;
     max-height: 100vh;
     background: var(--color-bg);
-    padding: 1.5rem;
+    padding: 4rem 1.5rem 1.5rem;
     box-sizing: border-box;
     z-index: 100;
     overflow-y: auto;
+    font-size: 1.1rem;
+  }
+
+  #toc.open h1 {
+    font-size: 1.4rem;
+  }
+
+  #toc.open p {
+    font-size: 1rem;
+  }
+
+  #toc.open ul {
+    margin: 1.5rem 0 0;
+  }
+
+  #toc.open li {
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  #toc.open a {
+    display: block;
+    padding: 1rem 0.25rem;
+  }
+
+  #tocClose {
+    display: block;
+    position: absolute;
+    top: 1rem;
+    right: 1.25rem;
+    font-size: 2rem;
+    line-height: 1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text);
+    padding: 0.5rem;
   }
 }
 

@@ -2,12 +2,13 @@
 {% block content %}
 
 <header id="mobileHeader">
+  <button id="tocToggle" aria-label="Toggle navigation" aria-controls="toc" aria-expanded="false">&#9776;</button>
   {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
   <h1>Sirius Stats</h1>
-  <button id="tocToggle" aria-label="Toggle navigation" aria-controls="toc" aria-expanded="false">&#9776;</button>
 </header>
 
 <nav id="toc">
+  <button id="tocClose" aria-label="Close navigation">&times;</button>
   {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
   <h1>Sirius Stats</h1>
   <p><em>Developer insights for<br/><a href="https://github.com/sirius-db/sirius">sirius-db/sirius</a></em></p>
@@ -221,6 +222,7 @@ initToc();
 // the section the user just navigated to.
 function initMobileNav() {
   const toggle = document.getElementById('tocToggle');
+  const close = document.getElementById('tocClose');
   const toc = document.getElementById('toc');
   if (!toggle || !toc) return;
 
@@ -230,6 +232,7 @@ function initMobileNav() {
   };
 
   toggle.addEventListener('click', () => setOpen(!toc.classList.contains('open')));
+  close.addEventListener('click', () => setOpen(false));
   toc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
 }
 initMobileNav();
