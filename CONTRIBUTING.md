@@ -19,15 +19,19 @@ uv run scripts/build_site.py      # writes site/index.html, site/labels.html, an
 
 `fetch_metrics.py` collects repo stats (stars, forks, watchers, open issues/PRs, contributors),
 same-day activity deltas (issues/PRs opened/closed/merged, commits, files changed,
-additions/deletions, top committers), open issue/PR label counts (priority and other, split by
-issue/PR, with GitHub's real label colors), and release download counts — all unauthenticated,
-though the activity deltas use the GitHub Search API which has a lower unauthenticated rate
-limit, so setting `SIRIUS_TRAFFIC_TOKEN` (see [BOOTSTRAP.md](BOOTSTRAP.md)) speeds this up too
-even though it's not required for activity.
+additions/deletions, top committers), open issue/PR label counts (priority, other, and
+untriaged/unlabeled, split by issue/PR, with GitHub's real label colors), and release download
+counts — all unauthenticated, though activity uses the GitHub Search API which has a lower
+unauthenticated rate limit, so setting `SIRIUS_TRAFFIC_TOKEN` (see
+[BOOTSTRAP.md](BOOTSTRAP.md)) speeds that up too even though it's not required for it.
 
-Traffic stats (`views`/`clones`/top referrers/popular content) require a `SIRIUS_TRAFFIC_TOKEN`
-env var with push access to `sirius-db/sirius` — see [BOOTSTRAP.md](BOOTSTRAP.md). Without it,
-traffic fields in the snapshot stay `null` and the traffic chart/tables on the site are omitted.
+Traffic stats (`views`/`clones`/top referrers/popular content) and review-health metrics
+(first-review latency, zero-review rate, pending reviews by team, draft/idle PR state, PR size
+vs. latency) both require a `SIRIUS_TRAFFIC_TOKEN` env var with push access to
+`sirius-db/sirius` — see [BOOTSTRAP.md](BOOTSTRAP.md). Review metrics are collected via GraphQL,
+which (unlike the REST endpoints above) rejects unauthenticated requests outright rather than
+just rate-limiting them lower, so without the token both `traffic` and `reviews` stay `null` in
+the snapshot and their sections are omitted from the site.
 
 `traffic.views`/`clones` are recorded against `traffic.as_of_date`, which can differ from the
 snapshot's own `date` — GitHub's traffic aggregation can lag its own rolling window by more than
