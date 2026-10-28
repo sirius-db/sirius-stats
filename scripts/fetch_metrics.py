@@ -34,6 +34,22 @@ def api_get(path, token=None):
     return json.loads(body), link_header
 
 
+def graphql_query(query, variables, token=None):
+    """POST a GraphQL query, matching api_get's urllib style (this repo has no `requests` dep)."""
+    headers = {"Accept": "application/vnd.github+json", "Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    payload = json.dumps({"query": query, "variables": variables}).encode("utf-8")
+    request = urllib.request.Request(
+        f"{API_ROOT}/graphql", data=payload, headers=headers, method="POST"
+    )
+    with urllib.request.urlopen(request) as response:
+        result = json.loads(response.read())
+    if "errors" in result:
+        raise RuntimeError(f"GraphQL errors: {result['errors']}")
+    return result["data"]
+
+
 def paginate_all(path, token=None):
     """Follow Link headers to collect every item across all pages."""
     items = []
@@ -193,6 +209,160 @@ def fetch_activity_metrics(today, token):
     }
 
 
+# Fields shared by both review-metrics GraphQL searches below (today's touched PRs, and the
+# current open-PR snapshot) -- the union fragment is needed because GraphQL `search` returns a
+# polymorphic Issue|PullRequest|... node type.
+_REVIEW_PR_FIELDS = """
+    ... on PullRequest {
+      number
+      isDraft
+      createdAt
+      updatedAt
+      additions
+      deletions
+      reviews(first: 1) { totalCount nodes { submittedAt } }
+      timelineItems(itemTypes: [READY_FOR_REVIEW_EVENT], first: 1) {
+        nodes { ... on ReadyForReviewEvent { createdAt } }
+      }
+      reviewRequests(first: 20) {
+        nodes {
+          requestedReviewer {
+            __typename
+            ... on Team { name }
+            ... on User { login }
+          }
+        }
+      }
+    }
+"""
+
+_GRAPHQL_SEARCH_PRS = (
+    """
+query($searchQuery: String!, $cursor: String) {
+  search(query: $searchQuery, type: ISSUE, first: 100, after: $cursor) {
+    nodes {
+"""
+    + _REVIEW_PR_FIELDS
+    + """
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+"""
+)
+
+
+def _search_prs(search_query, token):
+    """Page through a GitHub search query via GraphQL, returning every matching PR node."""
+    prs = []
+    cursor = None
+    while True:
+        data = graphql_query(
+            _GRAPHQL_SEARCH_PRS, {"searchQuery": search_query, "cursor": cursor}, token
+        )
+        page = data["search"]
+        prs.extend(page["nodes"])
+        if not page["pageInfo"]["hasNextPage"]:
+            break
+        cursor = page["pageInfo"]["endCursor"]
+    return prs
+
+
+def _first_review_latency_hours(pr):
+    """Hours from the PR's review-ready baseline to its first review, or None if not yet reviewed.
+
+    Baseline is the most recent ready-for-review event's timestamp when the PR was drafted at
+    some point, falling back to createdAt for PRs that were never drafted -- confirmed live
+    against this repo that formerly-draft PRs reliably carry a ReadyForReviewEvent and
+    never-drafted PRs reliably carry none.
+    """
+    review_nodes = pr["reviews"]["nodes"]
+    if not review_nodes:
+        return None
+    ready_nodes = pr["timelineItems"]["nodes"]
+    baseline = ready_nodes[0]["createdAt"] if ready_nodes else pr["createdAt"]
+    baseline_dt = datetime.fromisoformat(baseline.replace("Z", "+00:00"))
+    first_review_dt = datetime.fromisoformat(review_nodes[0]["submittedAt"].replace("Z", "+00:00"))
+    return (first_review_dt - baseline_dt).total_seconds() / 3600
+
+
+def _reviewer_team_name(review_request):
+    reviewer = review_request["requestedReviewer"]
+    if reviewer and reviewer["__typename"] == "Team":
+        return reviewer["name"]
+    return None
+
+
+def fetch_review_metrics(today, token):
+    """Review-health metrics: bounded daily lists (never a stored full PR list), same
+    discipline as fetch_label_metrics' stale top-10s -- see DATA.md for the rationale.
+
+    Two separate GraphQL passes, deliberately not merged into one query:
+    - "touched today" (search `updated:{today}`): day-scoped, feeds the per-day bounded lists
+      that build_site.py sums/medians into weekly figures (first_review_latencies_hours,
+      zero_review_nondraft_count, pr_sizes_vs_latency). Only PRs *first-reviewed* today
+      contribute to the latency/size lists; a PR touched today for an unrelated reason (a push,
+      a comment) with no review yet contributes only to the zero-review-nondraft denominator.
+    - "currently open" (search `is:pr is:open`): point-in-time state, like `repo.open_prs` --
+      not reconstructable for a past date, only ever reflects "right now" (pending_review_requests
+      _by_team, draft_pr_count, idle_pr_count).
+    """
+    touched = _search_prs(f"repo:{REPO} is:pr updated:{today}", token)
+
+    first_review_latencies_hours = []
+    pr_sizes_vs_latency = []
+    zero_review_nondraft_count = 0
+    nondraft_touched_count = 0
+    for pr in touched:
+        if pr["isDraft"]:
+            continue
+        nondraft_touched_count += 1
+        latency_hours = _first_review_latency_hours(pr)
+        if latency_hours is None:
+            zero_review_nondraft_count += 1
+            continue
+        first_review_submitted = pr["reviews"]["nodes"][0]["submittedAt"][:10]
+        if first_review_submitted != today:
+            continue
+        first_review_latencies_hours.append(round(latency_hours, 2))
+        pr_sizes_vs_latency.append(
+            {
+                "number": pr["number"],
+                "size": pr["additions"] + pr["deletions"],
+                "first_review_latency_hours": round(latency_hours, 2),
+            }
+        )
+
+    open_prs = _search_prs(f"repo:{REPO} is:pr is:open", token)
+    now = datetime.now(timezone.utc)
+    pending_review_requests_by_team = {}
+    draft_pr_count = 0
+    idle_pr_count = 0
+    for pr in open_prs:
+        if pr["isDraft"]:
+            draft_pr_count += 1
+        else:
+            updated_dt = datetime.fromisoformat(pr["updatedAt"].replace("Z", "+00:00"))
+            if (now - updated_dt).days > 30:
+                idle_pr_count += 1
+        for review_request in pr["reviewRequests"]["nodes"]:
+            team = _reviewer_team_name(review_request)
+            if team:
+                pending_review_requests_by_team[team] = (
+                    pending_review_requests_by_team.get(team, 0) + 1
+                )
+
+    return {
+        "first_review_latencies_hours": first_review_latencies_hours,
+        "zero_review_nondraft_count": zero_review_nondraft_count,
+        "nondraft_touched_count": nondraft_touched_count,
+        "pr_sizes_vs_latency": pr_sizes_vs_latency,
+        "pending_review_requests_by_team": pending_review_requests_by_team,
+        "draft_pr_count": draft_pr_count,
+        "idle_pr_count": idle_pr_count,
+    }
+
+
 # Ordered P0 -> P3 (not a set) so severity can be sorted on, not just membership-checked.
 PRIORITY_LABELS = ("! - P0", "! - P1", "! - P2", "! - P3")
 
@@ -215,10 +385,12 @@ def fetch_label_metrics(token=None):
     other_counts = {}
     priority_candidates = []
     other_candidates = []
+    untriaged_counts = {"issues": 0, "prs": 0}
 
     for item in items:
         label_objs = item.get("labels", [])
         if not label_objs:
+            untriaged_counts["prs" if "pull_request" in item else "issues"] += 1
             continue
         labels = [label["name"] for label in label_objs]
         is_pr = "pull_request" in item
@@ -280,6 +452,7 @@ def fetch_label_metrics(token=None):
         "priority_prs_stale_top10": priority_pr_candidates[:10],
         "other_issues_stale_top10": other_issue_candidates[:10],
         "other_prs_stale_top10": other_pr_candidates[:10],
+        "untriaged_counts": untriaged_counts,
     }
 
 
@@ -325,6 +498,7 @@ def main():
         "repo": fetch_repo_metrics(traffic_token),
         "activity": fetch_activity_metrics(target_date, traffic_token),
         "labels": fetch_label_metrics(traffic_token),
+        "reviews": fetch_review_metrics(target_date, traffic_token),
         "traffic": {
             "as_of_date": None,
             "views": None,
