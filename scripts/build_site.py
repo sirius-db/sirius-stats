@@ -120,6 +120,7 @@ def build_data(
     review_weekly = build_review_weekly(snapshots, review_backfill)
     review_current = build_review_current(snapshots)
     review_team_history = build_review_team_history(snapshots)
+    pr_health_history = build_pr_health_history(snapshots)
     review_percentile_windows = build_review_percentile_windows(snapshots, review_backfill)
 
     # as_of_date, not views, is the real null signal here too (see the identical
@@ -142,6 +143,7 @@ def build_data(
         "review_weekly": review_weekly,
         "review_current": review_current,
         "review_team_history": review_team_history,
+        "pr_health_history": pr_health_history,
         "review_percentile_windows": review_percentile_windows,
         "top_referrers": top_referrers,
         "top_paths": top_paths,
@@ -355,7 +357,9 @@ def build_review_weekly(snapshots, review_backfill):
         bucket["pr_count"] += reviews.get("nondraft_touched_count", 0)
         # Snapshots are date-ordered, so the last one processed in the week wins.
         bucket["draft_pr_count"] = reviews.get("draft_pr_count")
-        bucket["idle_pr_count"] = reviews.get("idle_pr_count")
+        # idle_prs is the full PR list (for the donut chart's drill-down column); this field only
+        # ever needs the count.
+        bucket["idle_pr_count"] = len(reviews.get("idle_prs", []))
 
     for week_of, bucket in computed.items():
         # Live-computed data wins over the static backfill on an overlapping week.
@@ -472,18 +476,54 @@ def build_review_team_history(snapshots):
     ]
 
 
-def build_review_current(snapshots):
-    """Point-in-time review state from the latest snapshot that has a `reviews` block --
-    pending reviews by team (actual PRs, for a linkable triage table) and draft/idle counts,
-    rendered as current-state tables/tiles (like activity_windows), not a history chart.
+def build_pr_health_history(snapshots):
+    """Daily history of the four mutually-exclusive PR health counts (draft/idle/zero_review/
+    in_review), for the stacked-line "PR health over time" chart -- same discipline as
+    build_review_team_history(): NOT backfillable (point-in-time current state, like
+    repo.open_prs), so it starts sparse and builds up one real day of collection at a time.
     """
-    latest_reviews = next((s["reviews"] for s in reversed(snapshots) if s.get("reviews")), None)
-    if not latest_reviews:
-        return {"pending_reviews_by_team": {}, "draft_pr_count": 0, "idle_pr_count": 0}
+    history = []
+    for s in snapshots:
+        reviews = s.get("reviews")
+        if not reviews:
+            continue
+        history.append(
+            {
+                "date": s["date"],
+                "draft": reviews["draft_pr_count"],
+                "idle": len(reviews["idle_prs"]),
+                "zero_review": len(reviews["zero_review_prs"]),
+                "in_review": reviews["in_review_count"],
+            }
+        )
+    return history
+
+
+def build_review_current(snapshots):
+    """Point-in-time review state from the latest snapshot that has a `reviews` block -- pending
+    reviews by team (actual PRs, for a linkable triage table), and the mutually-exclusive PR
+    health breakdown (draft_pr_count, idle_prs, zero_review_prs, in_review_count) that feeds the
+    "current repo health" donut chart. Every non-draft open PR is classified into exactly one of
+    idle/zero_review/in_review by fetch_metrics.py, so these four counts always sum to the total
+    open PR count -- percentages are computed client-side from that total, not precomputed here.
+    Rendered as current-state tables/tiles (like activity_windows), not a history chart.
+    """
+    latest = next((s for s in reversed(snapshots) if s.get("reviews")), None)
+    if not latest:
+        return {
+            "pending_reviews_by_team": {},
+            "draft_pr_count": 0,
+            "idle_prs": [],
+            "zero_review_prs": [],
+            "in_review_count": 0,
+        }
+    reviews = latest["reviews"]
     return {
-        "pending_reviews_by_team": latest_reviews["pending_reviews_by_team"],
-        "draft_pr_count": latest_reviews["draft_pr_count"],
-        "idle_pr_count": latest_reviews["idle_pr_count"],
+        "pending_reviews_by_team": reviews["pending_reviews_by_team"],
+        "draft_pr_count": reviews["draft_pr_count"],
+        "idle_prs": reviews["idle_prs"],
+        "zero_review_prs": reviews["zero_review_prs"],
+        "in_review_count": reviews["in_review_count"],
     }
 
 
