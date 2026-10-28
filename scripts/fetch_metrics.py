@@ -274,17 +274,25 @@ def _first_review_latency_hours(pr):
     """Hours from the PR's review-ready baseline to its first review, or None if not yet reviewed.
 
     Baseline is the most recent ready-for-review event's timestamp when the PR was drafted at
-    some point, falling back to createdAt for PRs that were never drafted -- confirmed live
-    against this repo that formerly-draft PRs reliably carry a ReadyForReviewEvent and
-    never-drafted PRs reliably carry none.
+    some point, falling back to createdAt for PRs that were never drafted. But a review (often a
+    COMMENTED one) can land *before* that ready-for-review event -- GitHub lets reviewers
+    comment on a draft -- which would make the ready event a baseline later than the review it's
+    supposed to precede, producing a negative latency (confirmed live: 67 of 1200 backfilled
+    points were negative this way, e.g. PR #1965's 30 COMMENTED reviews, the earliest of which
+    predates its own ReadyForReviewEvent). createdAt is always a safe lower bound -- a review
+    can't be submitted before the PR exists -- so the ready event is only used as the baseline
+    when it's actually before the first review; otherwise this falls back to createdAt.
     """
     review_nodes = pr["reviews"]["nodes"]
     if not review_nodes:
         return None
-    ready_nodes = pr["timelineItems"]["nodes"]
-    baseline = ready_nodes[0]["createdAt"] if ready_nodes else pr["createdAt"]
-    baseline_dt = datetime.fromisoformat(baseline.replace("Z", "+00:00"))
     first_review_dt = datetime.fromisoformat(review_nodes[0]["submittedAt"].replace("Z", "+00:00"))
+    baseline_dt = datetime.fromisoformat(pr["createdAt"].replace("Z", "+00:00"))
+    ready_nodes = pr["timelineItems"]["nodes"]
+    if ready_nodes:
+        ready_dt = datetime.fromisoformat(ready_nodes[0]["createdAt"].replace("Z", "+00:00"))
+        if ready_dt <= first_review_dt:
+            baseline_dt = ready_dt
     return (first_review_dt - baseline_dt).total_seconds() / 3600
 
 

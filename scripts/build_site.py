@@ -122,6 +122,7 @@ def build_data(
     review_team_history = build_review_team_history(snapshots)
     pr_health_history = build_pr_health_history(snapshots)
     review_percentile_windows = build_review_percentile_windows(snapshots, review_backfill)
+    pr_size_vs_latency = build_pr_size_vs_latency(snapshots, review_backfill)
 
     # as_of_date, not views, is the real null signal here too (see the identical
     # comment above) -- without this, latest_traffic always resolves to the newest
@@ -145,6 +146,7 @@ def build_data(
         "review_team_history": review_team_history,
         "pr_health_history": pr_health_history,
         "review_percentile_windows": review_percentile_windows,
+        "pr_size_vs_latency": pr_size_vs_latency,
         "top_referrers": top_referrers,
         "top_paths": top_paths,
     }
@@ -450,6 +452,25 @@ def build_review_percentile_windows(snapshots, review_backfill):
             }
         )
     return windows
+
+
+def build_pr_size_vs_latency(snapshots, review_backfill):
+    """Pooled (size, first-review-latency) points for the scatter chart -- one point per PR,
+    deduped by PR number (live snapshots override a backfilled entry for the same PR, same
+    live-wins convention as every other merge in this file), not a running total that would
+    double-count a PR appearing in both sources.
+    """
+    by_number = {}
+    for w in review_backfill:
+        for pr in w.get("pr_sizes_vs_latency", []):
+            by_number[pr["number"]] = pr
+    for s in snapshots:
+        reviews = s.get("reviews")
+        if not reviews:
+            continue
+        for pr in reviews.get("pr_sizes_vs_latency", []):
+            by_number[pr["number"]] = pr
+    return sorted(by_number.values(), key=lambda pr: pr["number"])
 
 
 def build_review_team_history(snapshots):
