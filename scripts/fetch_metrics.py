@@ -215,6 +215,8 @@ def fetch_activity_metrics(today, token):
 _REVIEW_PR_FIELDS = """
     ... on PullRequest {
       number
+      title
+      url
       isDraft
       createdAt
       updatedAt
@@ -304,8 +306,12 @@ def fetch_review_metrics(today, token):
       contribute to the latency/size lists; a PR touched today for an unrelated reason (a push,
       a comment) with no review yet contributes only to the zero-review-nondraft denominator.
     - "currently open" (search `is:pr is:open`): point-in-time state, like `repo.open_prs` --
-      not reconstructable for a past date, only ever reflects "right now" (pending_review_requests
-      _by_team, draft_pr_count, idle_pr_count).
+      not reconstructable for a past date, only ever reflects "right now" (pending_reviews
+      _by_team, draft_pr_count, idle_pr_count). pending_reviews_by_team stores the actual PRs
+      (number/title/url), not just a count, so the dashboard can link straight to each one for
+      triage -- bounded by definition (it's a subset of currently-open PRs, same order of
+      magnitude as fetch_label_metrics' full open-item fetch, which this codebase already
+      accepts storing).
     """
     touched = _search_prs(f"repo:{REPO} is:pr updated:{today}", token)
 
@@ -335,7 +341,7 @@ def fetch_review_metrics(today, token):
 
     open_prs = _search_prs(f"repo:{REPO} is:pr is:open", token)
     now = datetime.now(timezone.utc)
-    pending_review_requests_by_team = {}
+    pending_reviews_by_team = {}
     draft_pr_count = 0
     idle_pr_count = 0
     for pr in open_prs:
@@ -348,16 +354,30 @@ def fetch_review_metrics(today, token):
         for review_request in pr["reviewRequests"]["nodes"]:
             team = _reviewer_team_name(review_request)
             if team:
-                pending_review_requests_by_team[team] = (
-                    pending_review_requests_by_team.get(team, 0) + 1
+                pending_reviews_by_team.setdefault(team, []).append(
+                    {
+                        "number": pr["number"],
+                        "title": pr["title"],
+                        "url": pr["url"],
+                        "updated_at": pr["updatedAt"],
+                    }
                 )
+
+    # Stalest (oldest updated_at) first, matching every other stale-triage list in this codebase
+    # (priority_issues_stale_top10 etc). updated_at is only used to order the list here, then
+    # dropped -- the stored shape is identical to before (number/title/url), so this adds zero
+    # bytes to the snapshot versus just sorting-and-not-storing-the-timestamp.
+    for prs in pending_reviews_by_team.values():
+        prs.sort(key=lambda pr: pr["updated_at"])
+        for pr in prs:
+            del pr["updated_at"]
 
     return {
         "first_review_latencies_hours": first_review_latencies_hours,
         "zero_review_nondraft_count": zero_review_nondraft_count,
         "nondraft_touched_count": nondraft_touched_count,
         "pr_sizes_vs_latency": pr_sizes_vs_latency,
-        "pending_review_requests_by_team": pending_review_requests_by_team,
+        "pending_reviews_by_team": pending_reviews_by_team,
         "draft_pr_count": draft_pr_count,
         "idle_pr_count": idle_pr_count,
     }
