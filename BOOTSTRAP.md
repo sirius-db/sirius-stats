@@ -45,7 +45,10 @@ That's expected, not a bug — it means one fork existed at some point and was l
 ## 3. Traffic token secret
 
 GitHub's traffic endpoints (`/traffic/views`, `/traffic/clones`) require push access to
-`sirius-db/sirius`, so they need a personal access token, not just an unauthenticated call:
+`sirius-db/sirius`, so they need a personal access token, not just an unauthenticated call. The
+same token also gates review-health collection (`fetch_review_metrics()`) -- GitHub's GraphQL
+endpoint rejects unauthenticated requests outright (`403`), unlike the REST endpoints this script
+otherwise uses, which just rate-limit lower without a token:
 
 1. Create a fine-grained PAT scoped to `sirius-db/sirius` with **Administration: read** (traffic
    stats live under repo administration) — or a classic PAT with `repo` scope if fine-grained
@@ -53,8 +56,9 @@ GitHub's traffic endpoints (`/traffic/views`, `/traffic/clones`) require push ac
 2. Add it as a repo secret in `sirius-stats` named `SIRIUS_TRAFFIC_TOKEN`
    (Settings → Secrets and variables → Actions → New repository secret).
 
-Until this secret exists, `fetch_metrics.py` skips traffic collection gracefully — every
-snapshot's `traffic` fields stay `null` and the site's traffic chart is omitted.
+Until this secret exists, `fetch_metrics.py` skips both traffic and review-metrics collection
+gracefully — every snapshot's `traffic` fields stay `null` and `reviews` itself is `null`, and
+the corresponding site sections are omitted.
 
 ## 4. Traffic history backfill
 
@@ -104,6 +108,12 @@ What's actually recoverable for a missed day, and why:
   one exception — `backfill_stars.py`/`backfill_forks.py` reconstruct those from event creation
   timestamps regardless of when you run them, so rerunning those two also repairs this gap for
   stars/forks specifically.
+- **`reviews`** — half recoverable. `first_review_latencies_hours`, `zero_review_nondraft_count`,
+  `nondraft_touched_count`, and `pr_sizes_vs_latency` are day-scoped (PRs touched/first-reviewed
+  that specific day), so `--date` reconstructs them correctly for the missed day, same as
+  `activity`. `pending_reviews_by_team`, `draft_pr_count`, `idle_prs`, `zero_review_prs`, and
+  `in_review_count` are point-in-time gauges over currently-open PRs — same limitation as `repo`,
+  not recoverable for the missed day specifically.
 
 ## 6. Branch protection on `main`
 
@@ -168,7 +178,42 @@ weekly activity" chart keeps extending on its own from daily collection going fo
 no need to re-export Pulse or hand-edit this file again unless you want to extend the seeded
 history further back than `2026-05-31`.
 
-## 8. Label tracking — no backfill exists, deliberately
+## 8. Review-health historical backfill
+
+Daily review-metric collection (`fetch_review_metrics()` in `fetch_metrics.py`) only starts
+capturing `reviews.*` from whenever it first ran. `data/review_backfill.json` is a one-time,
+weekly-aggregated seed covering the repo's entire PR history before that, built by paginating
+every PR via GraphQL:
+
+```bash
+export SIRIUS_TRAFFIC_TOKEN=...          # same token as the traffic backfills above
+uv run scripts/backfill_reviews.py       # writes data/review_backfill.json
+```
+
+Review the generated file, then commit it. `build_site.py`'s `build_review_weekly()` merges this
+with live-collected weeks, live winning on any overlapping week — same convention as
+`activity_backfill.json`.
+
+Fetches all PRs via independent per-calendar-month `search` queries, run concurrently (max 4 at
+once) and cached to `/tmp/sirius-stats-backfill-chunks` on success, so an interrupted or failed
+run only has to re-fetch the months that didn't complete — just rerun the same command. This
+replaced an earlier single long cursor-walk across the whole history, which hit repeated `502`s
+from GitHub's API partway through (confirmed live: the same PR range succeeds reliably at a
+smaller batch size, so it's a query-cost/timeout issue on GitHub's end, not bad data).
+
+Rate-limit math, confirmed live against the real API: a 50-PR batch with `reviews`+
+`timelineItems` nested costs ~1 GraphQL point, and the repo has ~1,750 PRs total (drifts slightly
+day to day as new PRs land) — well within the 5,000/hr budget for a PAT. A full run currently
+fetches ~1,750 PRs across 69 weeks in a few minutes.
+
+`draft_pr_count`/`idle_pr_count` are **not** backfillable here — they're point-in-time gauges
+("was this PR a draft as of week X") that aren't reconstructable from a PR's current state, same
+reasoning `DATA.md` gives for why `repo.*`/`labels.*` aren't `--date`-backfillable. Every
+backfilled week writes these as `null`; the live-overrides-backfill merge in `build_site.py`
+fills them in once real daily collection reaches that week. `pending_reviews_by_team` has no
+backfill at all, not even a `null` placeholder — see `DATA.md`'s known-limitations section.
+
+## 9. Label tracking — no backfill exists, deliberately
 
 Unlike every other metric above, issue/PR label tracking (priority and other) has no backfill
 step and never will, by design — see [DATA.md](DATA.md)'s "known limitations" section. GitHub

@@ -1,40 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-<p>Last collected: {{ last_collected }}</p>
-<canvas id="starsChart"></canvas>
-<canvas id="forksChart"></canvas>
-<h2>Traffic</h2>
-<p><em>Delayed ~1 day; gaps &ne; zero.</em></p>
-<canvas id="viewsChart"></canvas>
-<canvas id="clonesChart"></canvas>
 
-<h2>Activity</h2>
-<div id="activityWindows"></div>
+<nav id="toc">
+  {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
+  <h1>Sirius Stats</h1>
+  <p><em>Developer insights for<br/><a href="https://github.com/sirius-db/sirius">sirius-db/sirius</a></em></p>
+  <ul>
+    <li><a href="#review-backlog">Review backlog</a></li>
+    <li><a href="#priority-backlog">Priority backlog</a></li>
+    <li><a href="#other-backlog">Other backlog</a></li>
+    <li><a href="#review-daily-health">Review daily</a></li>
+    <li><a href="#review-weekly-health">Review weekly</a></li>
+    <li><a href="#activity">Activity</a></li>
+    <li><a href="#pulse">Pulse</a></li>
+    <li><a href="#traffic">Traffic</a></li>
+  </ul>
+  <p><em>Last collected:<br/>{{ last_collected }}</em></p>
+</nav>
 
-<h3>Top committers (last 7 days)</h3>
-<div id="topCommitters"></div>
+<h2 id="review-backlog">Review backlog</h2>
+<p>Daily snapshot of current PRs and review requests.</p>
+<h3>Pending review requests by team (current)</h3>
+<div id="pendingReviewsByTeamTable"></div>
 
-<h2>Historical weekly activity</h2>
-<p>Weekly totals, starting Sunday. Weeks before daily tracking began are a one-time seed; every
-week since is computed from daily collection -- see BOOTSTRAP.md.</p>
-<canvas id="weeklyCommitsChart"></canvas>
-<canvas id="weeklyLinesChart"></canvas>
+<h3>PR status (current)</h3>
+<p><em>Idle = non-draft and not updated in over 30 days.</em></p>
+<div id="prHealthTable"></div>
 
-<h2>Backlog priority</h2>
-<p>Tracks how many open issues/PRs carry each priority label over time (a Cumulative Flow
-Diagram, not a burndown -- there's no sprint deadline to burn down to). Collection is recent, so
-history builds up from here forward.</p>
-<label for="priorityWindow">Window: </label>
-<select id="priorityWindow">
-  <option value="7">last 7 snapshots</option>
-  <option value="30" selected>last 30 snapshots</option>
-  <option value="90">last 90 snapshots</option>
-</select>
-<h3>Open issues</h3>
-<canvas id="priorityIssuesChart"></canvas>
-<h3>Open PRs</h3>
-<canvas id="priorityPrsChart"></canvas>
-
+<h2 id="priority-backlog">Priority backlog</h2>
+<p>Daily tracking of issues/PRs with a priority label.</p>
 <h3>Priority backlog issues (oldest per level, P0 first)</h3>
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="priorityIssuesStale"></div>
@@ -43,10 +37,23 @@ history builds up from here forward.</p>
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="priorityPrsStale"></div>
 
-<h2>Other labels</h2>
-<p>Everything that isn't a priority label. <a href="labels.html">View all labels &rarr;</a></p>
-<h3>Top 10 labels</h3>
-<canvas id="otherTop10Chart"></canvas>
+<h3>Priority history</h3>
+<span class="window">
+  <label for="priorityWindow">Window: </label>
+  <select id="priorityWindow">
+    <option value="7">last 7 snapshots</option>
+    <option value="30" selected>last 30 snapshots</option>
+    <option value="90">last 90 snapshots</option>
+  </select>
+</span>
+<h3>Open issues</h3>
+<canvas id="priorityIssuesChart"></canvas>
+<h3>Open PRs</h3>
+<canvas id="priorityPrsChart"></canvas>
+
+<h2 id="other-backlog">Other backlog</h2>
+<p>Daily tracking of non-priority labels. <a href="labels.html">View all labels &rarr;</a></p>
+
 <h3>Most stale issues</h3>
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="otherIssuesStale"></div>
@@ -55,13 +62,152 @@ history builds up from here forward.</p>
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="otherPrsStale"></div>
 
-<h2>Top referrers (last 14 days)</h2>
+<h3>Other history</h3>
+<span class="window">
+  <label for="otherWindow">Window: </label>
+  <select id="otherWindow">
+    <option value="7">last 7 snapshots</option>
+    <option value="30" selected>last 30 snapshots</option>
+    <option value="90">last 90 snapshots</option>
+  </select>
+</span>
+<h3>Top 10 labels</h3>
+<canvas id="otherTop10Chart"></canvas>
+
+<h3>Untriaged</h3>
+<p>Open issues/PRs with zero labels; invisible to every chart above.
+View untriaged <a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20no%3Alabel%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">issues</a>
+&amp;
+<a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20no%3Alabel%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">PRs</a>
+</p>
+<canvas id="untriagedChart"></canvas>
+
+<h2 id="review-daily-health">Review daily</h2>
+<p>Daily review metrics to track current progress.</p>
+<span class="window">
+  <label for="reviewTeamWindow">Window: </label>
+  <select id="reviewTeamWindow">
+    <option value="7">last 7 snapshots</option>
+    <option value="30" selected>last 30 snapshots</option>
+    <option value="90">last 90 snapshots</option>
+  </select>
+</span>
+
+<h3>Pending review requests by team (history)</h3>
+<p>Not backfillable -- starts sparse and builds up one real day of collection at a time.</p>
+<canvas id="pendingReviewsByTeamHistoryChart"></canvas>
+
+<h3>PR health (history)</h3>
+<p>Every open PR, classified into exactly one category (idle takes priority over zero-review, so
+nothing is double-counted). Not backfillable, same as the chart above.</p>
+<canvas id="prHealthHistoryChart"></canvas>
+
+<h2 id="review-weekly-health">Review weekly</h2>
+<p>Weekly roll-ups of review data for trend analysis.</p>
+<span class="window">
+  <label for="reviewWindow">Window: </label>
+  <select id="reviewWindow">
+    <option value="4">last 4 weeks</option>
+    <option value="13" selected>last 13 weeks</option>
+    <option value="26">last 26 weeks</option>
+  </select>
+</span>
+
+<h3>Zero-review rate</h3>
+<p>Share of non-draft PRs touched that week that still have no review.</p>
+<canvas id="zeroReviewRateChart"></canvas>
+
+<h3>Time to first review history</h3>
+<p>p50/p90/p95 per week.</p>
+<canvas id="firstReviewChart"></canvas>
+
+<h3>Time to first review trends</h3>
+<p>p50/p90/p95 pooled across the last 1/4/13 complete weeks.</p>
+<canvas id="reviewPercentileChart"></canvas>
+
+<h3>PR size vs. review latency</h3>
+<p>One point per reviewed PR, size = additions + deletions. Backfilled from full project
+history.</p>
+<canvas id="prSizeVsLatencyChart"></canvas>
+
+<h2 id="activity">Activity</h2>
+<p>Weekly totals, starting Sunday and compiled daily.</p>
+<span class="window">
+  <label for="weeklyWindow">Window: </label>
+  <select id="weeklyWindow">
+    <option value="4">last 4 weeks</option>
+    <option value="13" selected>last 13 weeks</option>
+    <option value="26">last 26 weeks</option>
+  </select>
+</span>
+
+<h3>Weekly PRs</h3>
+<canvas id="weeklyPrFlowChart"></canvas>
+<canvas id="weeklyPrNetChangeChart"></canvas>
+
+<h3>Weekly Issues</h3>
+<canvas id="weeklyIssueFlowChart"></canvas>
+<canvas id="weeklyIssueNetChangeChart"></canvas>
+
+<h3>Code Activity</h3>
+<canvas id="weeklyCommitsChart"></canvas>
+<canvas id="weeklyLinesChart"></canvas>
+
+<h3>Repo Activity</h3>
+<div id="activityWindows"></div>
+
+<h3>Top committers (last 7 days)</h3>
+<div id="topCommitters"></div>
+
+<h2 id="pulse">Pulse</h2>
+<p>Daily updates for stars and forks.</p>
+<canvas id="starsChart"></canvas>
+<canvas id="forksChart"></canvas>
+
+<h2 id="traffic">Traffic</h2>
+<p>Daily updates, delayed ~1 day; gaps &ne; zero data.</p>
+<canvas id="viewsChart"></canvas>
+<canvas id="clonesChart"></canvas>
+
+<h3>Top referrers (last 14 days)</h3>
 <div id="topReferrers"></div>
 
-<h2>Popular content (last 14 days)</h2>
+<h3>Popular content (last 14 days)</h3>
 <div id="topPaths"></div>
 
 <script>
+// Scrollspy for the TOC -- bolds whichever section is currently in view as you scroll, not just
+// whichever link was last clicked (which would go stale the moment you scroll away from it).
+// Doesn't depend on data.json, so it runs independently of the fetch/render chain below.
+function initToc() {
+  const headings = [...document.querySelectorAll('h2[id]')];
+  const linksById = new Map(
+    [...document.querySelectorAll('#toc a')].map(a => [a.getAttribute('href').slice(1), a])
+  );
+  const visible = new Set();
+
+  // rootMargin trims the bottom 70% of the viewport off the observed area, so a section counts
+  // as "current" once its heading crosses into roughly the top third of the screen, rather than
+  // only while the whole section (which can be much taller than the viewport) is on screen.
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        visible.add(entry.target.id);
+      } else {
+        visible.delete(entry.target.id);
+      }
+    }
+    // Topmost visible heading wins when more than one qualifies at once (short sections).
+    const current = headings.find(h => visible.has(h.id));
+    if (!current) return;
+    linksById.forEach(a => a.classList.remove('active'));
+    linksById.get(current.id).classList.add('active');
+  }, { rootMargin: '0px 0px -70% 0px' });
+
+  headings.forEach(h => observer.observe(h));
+}
+initToc();
+
 fetch('data.json')
   .then(r => {
     if (!r.ok) throw new Error(`data.json returned ${r.status}`);
@@ -81,6 +227,10 @@ function render(data) {
     data: {
       labels: data.stars.map(p => p.date),
       datasets: [{ label: 'Stars', data: data.stars.map(p => p.value), borderColor: cssVar('--color-stars') }]
+    },
+    options: {
+      plugins: { title: chartTitle('Stars over time') },
+      scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Stars') } }
     }
   });
 
@@ -89,6 +239,10 @@ function render(data) {
     data: {
       labels: data.forks.map(p => p.date),
       datasets: [{ label: 'Forks', data: data.forks.map(p => p.value), borderColor: cssVar('--color-forks') }]
+    },
+    options: {
+      plugins: { title: chartTitle('Forks over time') },
+      scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Forks') } }
     }
   });
 
@@ -101,6 +255,10 @@ function render(data) {
           { label: 'Views', data: data.traffic.map(p => p.views), borderColor: cssVar('--color-views') },
           { label: 'Unique views', data: data.traffic.map(p => p.unique_views), borderColor: cssVar('--color-views'), borderDash: [5, 5] }
         ]
+      },
+      options: {
+        plugins: { title: chartTitle('Repository views (last 14 days)') },
+        scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Views') } }
       }
     });
 
@@ -112,6 +270,10 @@ function render(data) {
           { label: 'Clones', data: data.traffic.map(p => p.clones), borderColor: cssVar('--color-clones') },
           { label: 'Unique clones', data: data.traffic.map(p => p.unique_clones), borderColor: cssVar('--color-clones'), borderDash: [5, 5] }
         ]
+      },
+      options: {
+        plugins: { title: chartTitle('Repository clones (last 14 days)') },
+        scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Clones') } }
       }
     });
   } else {
@@ -119,32 +281,15 @@ function render(data) {
     document.getElementById('clonesChart').outerHTML = '';
   }
 
-  if (data.activity_weekly.length > 0) {
-    new Chart(document.getElementById('weeklyCommitsChart'), {
-      type: 'bar',
-      data: {
-        labels: data.activity_weekly.map(w => w.week_of),
-        datasets: [{ label: 'Commits per week', data: data.activity_weekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }]
-      }
-    });
-
-    new Chart(document.getElementById('weeklyLinesChart'), {
-      type: 'bar',
-      data: {
-        labels: data.activity_weekly.map(w => w.week_of),
-        datasets: [
-          { label: 'Additions', data: data.activity_weekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
-          { label: 'Deletions', data: data.activity_weekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
-        ]
-      }
-    });
-  } else {
-    document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
-    document.getElementById('weeklyLinesChart').outerHTML = '';
-  }
-
+  renderWeeklyCharts(data.activity_weekly);
+  renderReviewCharts(data.review_weekly);
+  renderReviewPercentileChart(data.review_percentile_windows);
+  renderPrSizeVsLatencyChart(data.pr_size_vs_latency);
+  renderPendingReviewsByTeam(data.review_team_history, data.review_current, data.pr_health_history);
+  renderPrHealth(data.review_current);
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
+  renderUntriagedChart(data.labels.untriaged_history);
   const labelColors = data.labels.label_colors;
   const labelCell = name => ({ text: name, dotColor: labelColorOf(labelColors, name) });
 
@@ -191,6 +336,411 @@ function cfdDatasets(history, labelColors) {
   });
 }
 
+// Shared by every windowed weekly chart: the visible x-axis range for the trailing `windowSize`
+// entries in `labels`.
+function windowBounds(labels, windowSize) {
+  return { min: labels[Math.max(0, labels.length - windowSize)], max: labels[labels.length - 1] };
+}
+
+// Chart hygiene baseline for every chart on this page: a title plus labeled, unit-bearing axes --
+// not just a bare grid of bars/lines with meaning only inferable from the surrounding <h3>/<p>,
+// which breaks the moment a chart is screenshotted or shared on its own.
+function axisTitle(text) {
+  return { display: true, text };
+}
+function chartTitle(text) {
+  return { display: true, text };
+}
+
+function renderWeeklyCharts(activityWeekly) {
+  if (activityWeekly.length === 0) {
+    document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
+    document.getElementById('weeklyLinesChart').outerHTML = '';
+    document.getElementById('weeklyPrFlowChart').outerHTML = '';
+    document.getElementById('weeklyPrNetChangeChart').outerHTML = '';
+    document.getElementById('weeklyIssueFlowChart').outerHTML = '';
+    document.getElementById('weeklyIssueNetChangeChart').outerHTML = '';
+    return;
+  }
+
+  // Explicit null check first -- `null >= 0` is true in JS (null coerces to 0), which would
+  // silently color an untracked week as "backlog grew" instead of just not drawing a bar.
+  const signColor = value => value === null ? 'transparent' : (value >= 0 ? cssVar('--color-merged') : cssVar('--color-closed'));
+  const labels = activityWeekly.map(w => w.week_of);
+  const initialWindow = parseInt(document.getElementById('weeklyWindow').value, 10);
+  const initialBounds = windowBounds(labels, initialWindow);
+
+  // Full history loads into every chart once; switching windows below only moves the x-axis
+  // min/max bounds, never re-slices data -- that's what lets Chart.js animate a real zoom
+  // (existing bars hold their place, more become visible) instead of re-indexing the whole
+  // dataset, which is what made the window switch look like current data sliding away. The
+  // initial bounds are set here, at construction, rather than via a dispatched 'change' event
+  // after creation -- that dispatch pattern made the chart visibly animate from "all history"
+  // down to the default window on every page load, which read as a strange unsolicited zoom.
+  const commitsChart = new Chart(document.getElementById('weeklyCommitsChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Commits per week', data: activityWeekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }
+    ] },
+    options: {
+      plugins: { title: chartTitle('Commits per week') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Commits') } }
+    }
+  });
+
+  const linesChart = new Chart(document.getElementById('weeklyLinesChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Additions', data: activityWeekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
+      { label: 'Deletions', data: activityWeekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
+    ] },
+    options: {
+      plugins: { title: chartTitle('Lines changed per week') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Lines (+/-)') } }
+    }
+  });
+
+  const prFlowChart = new Chart(document.getElementById('weeklyPrFlowChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Opened', data: activityWeekly.map(w => w.prs_opened), backgroundColor: cssVar('--color-opened') },
+      { label: 'Merged', data: activityWeekly.map(w => w.prs_merged), backgroundColor: cssVar('--color-merged') },
+      { label: 'Closed (not merged)', data: activityWeekly.map(w => w.prs_closed), backgroundColor: cssVar('--color-closed') }
+    ] },
+    options: {
+      plugins: { title: chartTitle('Weekly PR flow') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Pull requests') } }
+    }
+  });
+
+  const prNetValues = activityWeekly.map(w => w.pr_net_change);
+  const prNetChart = new Chart(document.getElementById('weeklyPrNetChangeChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{
+      label: 'PR backlog net change',
+      data: prNetValues,
+      backgroundColor: prNetValues.map(signColor)
+    }] },
+    options: {
+      plugins: { title: chartTitle('Weekly PR backlog net change') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Net change (PRs)') } }
+    }
+  });
+
+  const issueFlowChart = new Chart(document.getElementById('weeklyIssueFlowChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Opened', data: activityWeekly.map(w => w.issues_opened), backgroundColor: cssVar('--color-opened') },
+      { label: 'Closed', data: activityWeekly.map(w => w.issues_closed), backgroundColor: cssVar('--color-closed') }
+    ] },
+    options: {
+      plugins: { title: chartTitle('Weekly issue flow') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Issues') } }
+    }
+  });
+
+  const issueNetValues = activityWeekly.map(w => w.issue_net_change);
+  const issueNetChart = new Chart(document.getElementById('weeklyIssueNetChangeChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{
+      label: 'Issue backlog net change',
+      data: issueNetValues,
+      backgroundColor: issueNetValues.map(signColor)
+    }] },
+    options: {
+      plugins: { title: chartTitle('Weekly issue backlog net change') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Net change (issues)') } }
+    }
+  });
+
+  document.getElementById('weeklyWindow').addEventListener('change', e => {
+    const bounds = windowBounds(labels, parseInt(e.target.value, 10));
+
+    for (const chart of [commitsChart, linesChart, prFlowChart, prNetChart, issueFlowChart, issueNetChart]) {
+      chart.options.scales.x.min = bounds.min;
+      chart.options.scales.x.max = bounds.max;
+      chart.update();
+    }
+  });
+}
+
+function renderReviewCharts(reviewWeekly) {
+  if (reviewWeekly.length === 0) {
+    document.getElementById('zeroReviewRateChart').outerHTML = '<p>No review data collected yet.</p>';
+    document.getElementById('firstReviewChart').outerHTML = '';
+    return;
+  }
+
+  const labels = reviewWeekly.map(w => w.week_of);
+  const initialBounds = windowBounds(labels, parseInt(document.getElementById('reviewWindow').value, 10));
+
+  const zeroReviewRateChart = new Chart(document.getElementById('zeroReviewRateChart'), {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: 'Zero-review rate',
+      data: reviewWeekly.map(w => w.zero_review_rate === null ? null : w.zero_review_rate * 100),
+      borderColor: cssVar('--color-review-latency'),
+      backgroundColor: cssVar('--color-review-latency'),
+      spanGaps: true
+    }] },
+    options: {
+      plugins: { title: chartTitle('Zero-review rate per week') },
+      scales: {
+        x: { ...initialBounds, title: axisTitle('Week') },
+        y: { min: 0, max: 100, ticks: { callback: value => `${value}%` }, title: axisTitle('Non-draft PRs with no review (%)') }
+      }
+    }
+  });
+
+  const firstReviewChart = new Chart(document.getElementById('firstReviewChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      {
+        label: 'p50',
+        data: reviewWeekly.map(w => w.median_first_review_hours),
+        borderColor: cssVar('--color-review-latency'),
+        backgroundColor: cssVar('--color-review-latency'),
+        spanGaps: true
+      },
+      {
+        label: 'p90',
+        data: reviewWeekly.map(w => w.p90_first_review_hours),
+        borderColor: cssVar('--color-p90'),
+        backgroundColor: cssVar('--color-p90'),
+        spanGaps: true
+      },
+      {
+        label: 'p95',
+        data: reviewWeekly.map(w => w.p95_first_review_hours),
+        borderColor: cssVar('--color-closed'),
+        backgroundColor: cssVar('--color-closed'),
+        spanGaps: true
+      }
+    ] },
+    options: {
+      plugins: { title: chartTitle('Time to first review (p50 / p90 / p95)') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Hours') } }
+    }
+  });
+
+  document.getElementById('reviewWindow').addEventListener('change', e => {
+    const bounds = windowBounds(labels, parseInt(e.target.value, 10));
+
+    for (const chart of [zeroReviewRateChart, firstReviewChart]) {
+      chart.options.scales.x.min = bounds.min;
+      chart.options.scales.x.max = bounds.max;
+      chart.update();
+    }
+  });
+}
+
+function renderReviewPercentileChart(percentileWindows) {
+  if (percentileWindows.length === 0) {
+    document.getElementById('reviewPercentileChart').outerHTML = '<p>No review data collected yet.</p>';
+    return;
+  }
+
+  // build_site.py returns windows narrowest-first (1w/4w/13w/26w) -- natural ascending order for
+  // an API, and 26w is kept there since renderReviewCharts' baseline line reads it directly. This
+  // chart only displays 1w/4w/13w, reversed (13w first) so the x-axis reads as an actual timeline
+  // converging on "now" left-to-right, instead of "wider window = bigger bar" misreading as a
+  // worsening trend (a wider pooled window naturally picks up more tail outliers, which isn't
+  // the same thing as the metric getting worse over time).
+  const windows = percentileWindows.filter(w => w.window !== '26w').reverse();
+
+  // Grouped, not stacked -- p50/p90/p95 aren't components of a total, so stacking them would
+  // show a bar height of p50+p90+p95 added together, which isn't a meaningful number.
+  new Chart(document.getElementById('reviewPercentileChart'), {
+    type: 'bar',
+    data: {
+      labels: windows.map(w => `last ${w.window}`),
+      datasets: [
+        { label: 'p50', data: windows.map(w => w.p50), backgroundColor: cssVar('--color-review-latency') },
+        { label: 'p90', data: windows.map(w => w.p90), backgroundColor: cssVar('--color-p90') },
+        { label: 'p95', data: windows.map(w => w.p95), backgroundColor: cssVar('--color-closed') }
+      ]
+    },
+    options: {
+      plugins: { title: chartTitle('Time to first review trends') },
+      scales: { x: { title: axisTitle('Trailing window') }, y: { title: axisTitle('Hours') } }
+    }
+  });
+}
+
+function renderPrSizeVsLatencyChart(prSizeVsLatency) {
+  if (prSizeVsLatency.length === 0) {
+    document.getElementById('prSizeVsLatencyChart').outerHTML = '<p>No review data collected yet.</p>';
+    return;
+  }
+
+  // PR size spans several orders of magnitude (a handful of lines up to 1M+ in the real data),
+  // so a linear x-axis crams almost every PR into a sliver near zero. Log scale needs it, but
+  // log(0) is undefined -- the one PR with size 0 (a zero-line-change diff) is excluded rather
+  // than plotted, since it isn't a meaningful point for a size-vs-latency correlation anyway.
+  const sizedPrs = prSizeVsLatency.filter(pr => pr.size > 0);
+
+  new Chart(document.getElementById('prSizeVsLatencyChart'), {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'PRs',
+        data: sizedPrs.map(pr => ({ x: pr.size, y: pr.first_review_latency_hours })),
+        backgroundColor: cssVar('--color-review-latency')
+      }]
+    },
+    options: {
+      plugins: { title: chartTitle('PR size vs. review latency') },
+      scales: {
+        x: { type: 'logarithmic', title: axisTitle('Size (additions + deletions, log scale)') },
+        y: { title: axisTitle('Hours to first review') }
+      }
+    }
+  });
+}
+
+// Same shape as cfdDatasets above, generalized for a dynamic team list (not the fixed
+// PRIORITY_LABELS) -- reuses LABEL_PALETTE, same as renderOtherTop10Chart's label coloring.
+function teamDatasets(history, teams) {
+  return teams.map((team, i) => {
+    const color = LABEL_PALETTE[i % LABEL_PALETTE.length];
+    return {
+      label: team,
+      data: history.map(h => h[team] || 0),
+      backgroundColor: color + '99',
+      borderColor: color,
+      fill: true
+    };
+  });
+}
+
+function renderPendingReviewsByTeam(reviewTeamHistory, reviewCurrent, prHealthHistory) {
+  if (reviewTeamHistory.length === 0) {
+    document.getElementById('pendingReviewsByTeamHistoryChart').outerHTML = '<p>No review history collected yet.</p>';
+  } else {
+    // Every entry has every team (zero-filled server-side), so any entry's keys work here.
+    const teams = Object.keys(reviewTeamHistory[0]).filter(k => k !== 'date');
+
+    const historyChart = new Chart(document.getElementById('pendingReviewsByTeamHistoryChart'), {
+      type: 'line',
+      data: { labels: reviewTeamHistory.map(h => h.date), datasets: teamDatasets(reviewTeamHistory, teams) },
+      options: {
+        plugins: { title: chartTitle('Pending review requests by team (history)') },
+        scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Pending review requests') } }
+      }
+    });
+
+    document.getElementById('reviewTeamWindow').addEventListener('change', e => {
+      const windowed = reviewTeamHistory.slice(-parseInt(e.target.value, 10));
+      historyChart.data.labels = windowed.map(h => h.date);
+      historyChart.data.datasets = teamDatasets(windowed, teams);
+      historyChart.update();
+    });
+
+    // Apply the default 30-snapshot window on first render, same as the <select>'s default.
+    document.getElementById('reviewTeamWindow').dispatchEvent(new Event('change'));
+  }
+
+  renderPrHealthHistory(prHealthHistory);
+
+  const byTeam = reviewCurrent.pending_reviews_by_team;
+  const currentTeams = Object.keys(byTeam);
+
+  // Busiest team first -- same reasoning as the history chart above: this table exists
+  // specifically to surface review-load concentration (the sirius-core split discussion), so
+  // the most-loaded team should be the first thing read.
+  const sortedTeams = [...currentTeams].sort((a, b) => byTeam[b].length - byTeam[a].length);
+
+  // team-review-requested: (not review-requested:team:, which 422s) -- confirmed live against
+  // the search API and cross-checked against our own GraphQL-derived counts before wiring in.
+  const teamSearchUrl = team => `https://github.com/sirius-db/sirius/pulls?q=${encodeURIComponent(`is:open is:pr team-review-requested:sirius-db/${team}`)}`;
+
+  renderTable('pendingReviewsByTeamTable', ['Team', 'Pending PRs', 'PRs (Sorted by most stale first)'], sortedTeams.map(
+    team => [
+      { text: team, href: teamSearchUrl(team) },
+      byTeam[team].length,
+      byTeam[team].map(pr => ({ text: `#${pr.number} `, href: pr.url }))
+    ]
+  ));
+
+}
+
+// The four PR health categories, shared between the history chart and the current-state table --
+// every open PR lands in exactly one (enforced server-side in fetch_metrics.py: idle takes
+// priority over zero-review), so counts always sum to the total open PR count with no overlap.
+const PR_HEALTH_CATEGORIES = [
+  { key: 'draft', label: 'Draft', color: '--color-draft' },
+  { key: 'idle', label: 'Idle', color: '--color-closed' },
+  { key: 'zero_review', label: 'Zero reviews', color: '--color-p90' },
+  { key: 'in_review', label: 'In review', color: '--color-merged' }
+];
+
+function renderPrHealthHistory(prHealthHistory) {
+  if (prHealthHistory.length === 0) {
+    document.getElementById('prHealthHistoryChart').outerHTML = '<p>No PR health history collected yet.</p>';
+    return;
+  }
+
+  const datasets = PR_HEALTH_CATEGORIES.map(c => {
+    const color = cssVar(c.color);
+    return {
+      label: c.label,
+      data: prHealthHistory.map(h => h[c.key]),
+      backgroundColor: color + '99',
+      borderColor: color,
+      fill: true
+    };
+  });
+
+  const historyChart = new Chart(document.getElementById('prHealthHistoryChart'), {
+    type: 'line',
+    data: { labels: prHealthHistory.map(h => h.date), datasets },
+    options: {
+      plugins: { title: chartTitle('Open PR health over time') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Open PRs') } }
+    }
+  });
+
+  document.getElementById('reviewTeamWindow').addEventListener('change', e => {
+    const windowed = prHealthHistory.slice(-parseInt(e.target.value, 10));
+    historyChart.data.labels = windowed.map(h => h.date);
+    historyChart.data.datasets.forEach((ds, i) => {
+      ds.data = windowed.map(h => h[PR_HEALTH_CATEGORIES[i].key]);
+    });
+    historyChart.update();
+  });
+
+  // Apply the default 30-snapshot window on first render, same as the <select>'s default.
+  document.getElementById('reviewTeamWindow').dispatchEvent(new Event('change'));
+}
+
+// "Zero reviews" and "In review" don't link to a GH search -- verified live that GitHub's
+// review:none qualifier reflects review *decision* state (approved/changes-requested only), not
+// "has zero review submissions of any kind," so it misclassifies PRs with comment-only reviews
+// (confirmed against real data: #1965 has 30 COMMENTED reviews but shows as review:none). Rather
+// than link to a qualifier that doesn't match our definition, those two rows rely on their PR
+// list (4th column) for exact drill-down instead.
+function renderPrHealth(reviewCurrent) {
+  const draftSearchUrl = `https://github.com/sirius-db/sirius/pulls?q=${encodeURIComponent('is:open is:pr draft:true')}`;
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const idleSearchUrl = `https://github.com/sirius-db/sirius/pulls?q=${encodeURIComponent(`is:open is:pr draft:false updated:<${thirtyDaysAgo}`)}`;
+
+  const categoryData = {
+    draft: { count: reviewCurrent.draft_pr_count, href: draftSearchUrl, prs: null },
+    idle: { count: reviewCurrent.idle_prs.length, href: idleSearchUrl, prs: reviewCurrent.idle_prs },
+    zero_review: { count: reviewCurrent.zero_review_prs.length, href: null, prs: reviewCurrent.zero_review_prs },
+    in_review: { count: reviewCurrent.in_review_count, href: null, prs: null }
+  };
+  const categories = PR_HEALTH_CATEGORIES.map(c => ({ ...c, ...categoryData[c.key] }));
+  const total = categories.reduce((sum, c) => sum + c.count, 0);
+
+  renderTable('prHealthTable', ['Type', 'Count', 'Percent', 'PRs (Sorted by most stale first)'], categories.map(c => [
+    c.href ? { text: c.label, href: c.href } : c.label,
+    c.count,
+    total ? `${(c.count / total * 100).toFixed(1)}%` : 'n/a',
+    c.prs ? c.prs.map(pr => ({ text: `#${pr.number} `, href: pr.url })) : '--'
+  ]));
+}
+
 function renderPriorityCharts(labelsData) {
   const issuesHistory = labelsData.priority_issues_history;
   const prsHistory = labelsData.priority_prs_history;
@@ -205,13 +755,19 @@ function renderPriorityCharts(labelsData) {
   const issuesChart = new Chart(document.getElementById('priorityIssuesChart'), {
     type: 'line',
     data: { labels: issuesHistory.map(h => h.date), datasets: cfdDatasets(issuesHistory, labelColors) },
-    options: { scales: { y: { stacked: true } } }
+    options: {
+      plugins: { title: chartTitle('Open issues by priority (cumulative)') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Issues') } }
+    }
   });
 
   const prsChart = new Chart(document.getElementById('priorityPrsChart'), {
     type: 'line',
     data: { labels: prsHistory.map(h => h.date), datasets: cfdDatasets(prsHistory, labelColors) },
-    options: { scales: { y: { stacked: true } } }
+    options: {
+      plugins: { title: chartTitle('Open PRs by priority (cumulative)') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Pull requests') } }
+    }
   });
 
   document.getElementById('priorityWindow').addEventListener('change', e => {
@@ -243,19 +799,57 @@ function renderOtherTop10Chart(labelsData) {
     .filter(name => !PRIORITY_LABELS.includes(name))
     .slice(0, 10);
 
-  new Chart(document.getElementById('otherTop10Chart'), {
+  const otherDatasets = windowedHistory => topLabels.map((name, i) => ({
+    label: name,
+    data: windowedHistory.map(h => h[name] || 0),
+    backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+    borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+    fill: true
+  }));
+
+  const chart = new Chart(document.getElementById('otherTop10Chart'), {
+    type: 'line',
+    data: { labels: [], datasets: [] },
+    options: {
+      plugins: { title: chartTitle('Top 10 non-priority labels (cumulative)') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Issues + PRs') } }
+    }
+  });
+
+  document.getElementById('otherWindow').addEventListener('change', e => {
+    const windowed = history.slice(-parseInt(e.target.value, 10));
+    chart.data.labels = windowed.map(h => h.date);
+    chart.data.datasets = otherDatasets(windowed);
+    chart.update();
+  });
+
+  // Apply the default 30-snapshot window on first render, same as the <select>'s default.
+  document.getElementById('otherWindow').dispatchEvent(new Event('change'));
+}
+
+// Plain trend line, not a CFD like the chart above -- untriaged items don't move through
+// labeled stages the way priority/other backlog items do, so there's no flow to visualize,
+// just a count that goes up or down as labels get applied. No window selector either: this
+// is daily-only data (not backfillable), so there's no long history to need windowing yet.
+function renderUntriagedChart(history) {
+  if (history.length === 0) {
+    document.getElementById('untriagedChart').outerHTML = '<p>No label data collected yet.</p>';
+    return;
+  }
+
+  new Chart(document.getElementById('untriagedChart'), {
     type: 'line',
     data: {
       labels: history.map(h => h.date),
-      datasets: topLabels.map((name, i) => ({
-        label: name,
-        data: history.map(h => h[name] || 0),
-        backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
-        borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
-        fill: true
-      }))
+      datasets: [
+        { label: 'Issues', data: history.map(h => h.issues), borderColor: cssVar('--color-untriaged-issues') },
+        { label: 'PRs', data: history.map(h => h.prs), borderColor: cssVar('--color-untriaged-prs') }
+      ]
     },
-    options: { scales: { y: { stacked: true } } }
+    options: {
+      plugins: { title: chartTitle('Untriaged backlog (unlabeled, open)') },
+      scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Count') } }
+    }
   });
 }
 
@@ -271,11 +865,22 @@ const ACTIVITY_FIELD_LABELS = {
   deletions: 'Deletions'
 };
 
+// Keys match ACTIVITY_WINDOWS in build_site.py exactly -- only the display label changes here,
+// not the underlying key, which other code doesn't touch.
+const ACTIVITY_WINDOW_LABELS = {
+  '24h': 'Last 24 hours',
+  '3d': 'Last 3 days',
+  '7d': 'Last 7 days',
+  '1mo': 'Last 30 days'
+};
+
 function renderActivityWindows(windows) {
   const container = document.getElementById('activityWindows');
   const fields = Object.keys(ACTIVITY_FIELD_LABELS);
   const header = ['Window', ...fields.map(f => ACTIVITY_FIELD_LABELS[f])];
-  const rows = Object.entries(windows).map(([label, w]) => [label, ...fields.map(f => w[f])]);
+  const rows = Object.entries(windows).map(
+    ([label, w]) => [ACTIVITY_WINDOW_LABELS[label] || label, ...fields.map(f => w[f].toLocaleString())]
+  );
   container.appendChild(buildTable(header, rows));
 }
 

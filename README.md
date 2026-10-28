@@ -2,7 +2,9 @@
 
 Tracks how [sirius-db/sirius](https://github.com/sirius-db/sirius) evolves over time — stars,
 forks, traffic (including referrers and popular content), day-to-day issue/PR/commit activity,
-open issue/PR label trends (priority and other, with stale-item drill-down), and (eventually)
+open issue/PR label trends (priority and other, with stale-item drill-down, plus an untriaged
+backlog of unlabeled items), review-health metrics (time to first review, zero-review rate,
+pending reviews by team, draft/idle PR state, PR size vs. review latency), and (eventually)
 release download counts.
 
 GitHub's own Insights tab and traffic API only retain a rolling window (traffic data is dropped

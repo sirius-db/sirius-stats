@@ -9,6 +9,16 @@
   --color-commits: #9b59b6;
   --color-additions: #27ae60;
   --color-deletions: #c0392b;
+  --color-opened: #3a7bd5;
+  --color-merged: #27ae60;
+  --color-closed: #c0392b;
+  --color-review-latency: #16a085;
+  --color-p90: #e67e22;
+  --color-draft: #95a5a6;
+  --color-untriaged-issues: #8e44ad;
+  --color-untriaged-prs: #d35400;
+  --color-window-bg: #eef1f5;
+  --color-window-border: #d4d9e0;
 }
 
 select {
@@ -31,13 +41,63 @@ header {
   margin-bottom: 1.5rem;
 }
 
-header img.logo {
+canvas {
+  margin-bottom: 3rem;
+}
+
+.logo {
   height: 2rem;
   width: auto;
 }
 
-canvas {
-  margin-bottom: 3rem;
+#toc h1 {
+  font-size: 1rem;
+}
+
+#toc p {
+  font-size: 0.7rem;
+  color: #333;
+}
+
+#toc {
+  position: fixed;
+  top: 2rem;
+  left: 1rem;
+  width: 170px;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+#toc ul {
+  list-style: none;
+  margin: 2rem 0;
+  padding: 0;
+}
+
+#toc li {
+  margin-bottom: 0.5rem;
+}
+
+#toc a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+#toc a:hover {
+  text-decoration: underline;
+}
+
+#toc a.active {
+  font-weight: bold;
+}
+
+/* body is centered with max-width: 900px -- below this viewport width the fixed sidebar would
+   overlap the content column rather than sit in the margin beside it, so hide it instead. */
+@media (max-width: 1300px) {
+  #toc {
+    display: none;
+  }
 }
 
 table {
@@ -66,4 +126,30 @@ th, td {
   align-items: center;
   margin-right: 0.6rem;
   white-space: nowrap;
+}
+
+/* `align-items: center` alone does nothing on a bare <span> -- that property only applies to
+   flex/grid containers, which is why the label/select weren't lining up. `display: inline-flex`
+   is what actually makes it a flex container while staying inline with surrounding text. */
+.window {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  margin-bottom: 1rem;
+  background: var(--color-window-bg);
+  border: 1px solid var(--color-window-border);
+  border-radius: 999px;
+}
+
+.window label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Overrides the global `select { margin-bottom: 1rem }` -- that spacing is for a select sitting
+   alone in normal document flow; nested in the pill, it just adds dead space inside the border. */
+.window select {
+  margin-bottom: 0;
 }

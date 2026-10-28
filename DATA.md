@@ -45,21 +45,38 @@ it locally rather than looking for it in the repo.
     "priority_issues_history": [{"date": "...", "! - P0": 0, "! - P1": 0, "! - P2": 0, "! - P3": 0}],
     "priority_prs_history": [{"date": "...", "! - P0": 0, "! - P1": 0, "! - P2": 0, "! - P3": 0}],
     "other_history": [{"date": "...", "bug": 0, "...": "one key per non-priority label ever seen"}],
+    "untriaged_history": [{"date": "...", "issues": 0, "prs": 0}],
+    "untriaged_current": {"issues": 0, "prs": 0},
     "priority_issues_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P1"}],
     "priority_prs_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P1"}],
     "other_issues_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "labels": ["..."]}],
     "other_prs_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "labels": ["..."]}],
     "all_labels_current": {"bug": 0, "...": "every label -> current open count, sorted descending"},
     "label_colors": {"! - P0": "b60205", "bug": "d73a4a", "...": "every label -> GitHub's real hex color, no #"}
-  }
+  },
+  "review_weekly": [{"week_of": "...", "pr_count": 0, "zero_review_count": 0, "zero_review_rate": 0.0, "median_first_review_hours": 0.0, "p90_first_review_hours": null, "p95_first_review_hours": null}],
+  "review_percentile_windows": {"1": {"p50": 0.0, "p90": null, "p95": null}, "4": "...", "13": "...", "26": "..."},
+  "pr_size_vs_latency": [{"number": 0, "size": 0, "first_review_latency_hours": 0.0}],
+  "review_current": {
+    "pending_reviews_by_team": {"sirius-core": [{"number": 0, "title": "...", "url": "..."}]},
+    "draft_pr_count": 0, "idle_prs": [{"number": 0, "title": "...", "url": "..."}],
+    "zero_review_prs": [{"number": 0, "title": "...", "url": "..."}], "in_review_count": 0
+  },
+  "review_team_history": [{"date": "...", "sirius-core": 0, "...": "one key per team ever seen"}],
+  "pr_health_history": [{"date": "...", "draft": 0, "idle": 0, "zero_review": 0, "in_review": 0}]
 }
 ```
 
-`activity_windows`, `top_referrers`/`top_paths`, and everything under `labels` except the two
-`*_history` arrays are always the *latest* computed values, not history -- there's no historical
-time series of "what the 7d window looked like last week" or "who was in the stale top-10 a month
-ago." If you need that, you'd compute it yourself from the raw daily snapshots (below). The two
-`*_history` arrays (and `other_history`) are real day-by-day series, same as `stars`/`forks`.
+`activity_windows`, `top_referrers`/`top_paths`, `review_current`, and everything under `labels`
+except the `*_history` arrays are always the *latest* computed values, not history -- there's no
+historical time series of "what the 7d window looked like last week" or "who was in the stale
+top-10 a month ago." If you need that, you'd compute it yourself from the raw daily snapshots
+(below). The `*_history` arrays (`priority_issues_history`, `priority_prs_history`,
+`other_history`, `untriaged_history`, `review_team_history`, `pr_health_history`) are real
+day-by-day series, same as `stars`/`forks`. `review_weekly` and `review_percentile_windows` are
+real weekly series too, just weekly-grained rather than daily (same as `activity_weekly`).
+`pr_size_vs_latency` is pooled across the repo's entire PR history (backfill + live, deduped by
+PR number), not a time series at all -- it's scatter-chart data, one point per reviewed PR ever.
 
 ## Raw source files
 
@@ -93,10 +110,22 @@ backlog from a missed firing actually closes (see `.github/workflows/collect.yml
   "labels": {
     "priority_counts": {"! - P0": {"issues": 0, "prs": 3, "color": "b60205"}, "! - P1": "...", "! - P2": "...", "! - P3": "..."},
     "other_counts": {"dependencies": {"issues": 0, "prs": 5, "color": "0366d6"}, "...": "one key per non-priority label seen today"},
+    "untriaged_counts": {"issues": 24, "prs": 104},
     "priority_issues_stale_top10": [{"number": 727, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P2"}],
     "priority_prs_stale_top10": [{"number": 1548, "title": "...", "url": "...", "updated_at": "...", "priority_label": "! - P0"}],
     "other_issues_stale_top10": [{"number": 557, "title": "...", "url": "...", "updated_at": "...", "labels": ["duckdb"]}],
     "other_prs_stale_top10": [{"number": 0, "title": "...", "url": "...", "updated_at": "...", "labels": ["..."]}]
+  },
+  "reviews": {
+    "first_review_latencies_hours": [1.53, 11.96],
+    "zero_review_nondraft_count": 2,
+    "nondraft_touched_count": 9,
+    "pr_sizes_vs_latency": [{"number": 1965, "size": 42, "first_review_latency_hours": 1.53}],
+    "pending_reviews_by_team": {"sirius-core": [{"number": 2201, "title": "...", "url": "..."}]},
+    "draft_pr_count": 11,
+    "idle_prs": [{"number": 1877, "title": "...", "url": "..."}],
+    "zero_review_prs": [{"number": 2348, "title": "...", "url": "..."}],
+    "in_review_count": 37
   },
   "releases": []
 }
@@ -136,6 +165,20 @@ Field semantics that aren't obvious from the shape alone:
   so it stays correct if a label's color is ever changed on GitHub. Lives on the count bucket
   itself rather than a separate structure, matching how `priority_counts` and `other_counts` are
   otherwise shaped the same way.
+- **`untriaged_counts`** counts open issues/PRs with zero labels -- items every other `labels.*`
+  field silently excludes, since they only classify items that *have* a priority or other label.
+  Same point-in-time-forward-only treatment as the rest of `labels.*`.
+- **`reviews.*` is two different things stored side by side.** `first_review_latencies_hours`,
+  `zero_review_nondraft_count`, `nondraft_touched_count`, and `pr_sizes_vs_latency` are day-scoped
+  (only PRs *first-reviewed* that specific day, or touched that day with no review yet) --
+  reconstructable for any past date via `fetch_metrics.py --date`, same as `activity.*`.
+  `pending_reviews_by_team`, `draft_pr_count`, `idle_prs`, `zero_review_prs`, and
+  `in_review_count` are point-in-time gauges over currently-open PRs, same limitation as
+  `repo.*` -- a `--date`-backfilled snapshot's values for these five fields reflect whenever the
+  backfill was actually run, not the target date. See `fetch_review_metrics()`'s docstring in
+  `fetch_metrics.py` for the two-GraphQL-pass split this comes from. Every open PR is classified
+  into exactly one of idle/zero-review/in-review (idle takes priority on overlap), so those three
+  always sum to the non-draft open PR count with no double-counting.
 
 ### `data/stars_backfill.json`, `data/forks_backfill.json` -- one-time historical seed
 
@@ -177,6 +220,34 @@ daily snapshots by `build_site.py`'s `build_activity_weekly()`, which overrides 
 on any overlapping week. There's no script for extending this file -- it's a one-time manual
 export from GitHub's Pulse graph (see `BOOTSTRAP.md` §7 if you need to extend it further back).
 
+### `data/review_backfill.json` -- weekly, one-time historical seed, pre-aggregated
+
+```json
+[{
+  "week_of": "2024-12-22",
+  "pr_count": 3,
+  "zero_review_count": 1,
+  "median_first_review_hours": 4.25,
+  "first_review_latencies_hours": [1.53, 7.0],
+  "pr_sizes_vs_latency": [{"number": 1, "size": 12, "first_review_latency_hours": 1.53}],
+  "draft_pr_count": null,
+  "idle_pr_count": null
+}]
+```
+
+**Weekly, not daily** -- same granularity exception as `activity_backfill.json`. Built by
+`scripts/backfill_reviews.py` from every PR in the repo's full history (~1,750 as of this
+writing), fetched via independent per-calendar-month GraphQL `search` queries run concurrently
+and cached to `/tmp` so a failed run only re-fetches the months that failed (see the script's own
+docstring for why -- a single long cursor-walk over the full history hit repeated `502`s from
+GitHub's API partway through). Non-draft PRs only, matching `fetch_review_metrics()`'s live
+scope. `draft_pr_count`/`idle_pr_count` are always `null` here -- they're point-in-time gauges
+("was this PR a draft as of week X"), not reconstructable from a PR's current state, same
+reasoning as `repo.*`/`labels.*` not being `--date`-backfillable. `build_review_weekly()` in
+`build_site.py` merges this with live-collected weeks, live winning on any overlapping week.
+`pending_reviews_by_team` has no backfill at all (not even a null placeholder) -- it's entirely
+point-in-time-forward-only, same as `labels.*`.
+
 ## Known limitations for historical analysis
 
 - No historical data exists for `repo.*` fields (stars/forks/watchers/open issues/PRs/
@@ -197,3 +268,10 @@ export from GitHub's Pulse graph (see `BOOTSTRAP.md` §7 if you need to extend i
   no way to reconstruct past label states retroactively (unlike stars/forks, label changes aren't
   exposed via a creation-timestamp-style API without walking each issue/PR's Timeline API
   individually, which is a real N+1 cost -- see issue #5 for the tradeoff discussion).
+- `reviews.pending_reviews_by_team`/`draft_pr_count`/`idle_prs`/`zero_review_prs`/
+  `in_review_count` only exist from whenever `fetch_review_metrics()` shipped forward, same as
+  `labels.*` -- these are point-in-time gauges with no historical API, so `data/review_backfill.json`
+  stores `null` for the two of these it tracks (`draft_pr_count`/`idle_pr_count`) rather than a
+  reconstructed value. `reviews.first_review_latencies_hours`/`zero_review_nondraft_count`/
+  `pr_sizes_vs_latency` don't have this limitation -- they're fully backfilled across the repo's
+  entire PR history in `data/review_backfill.json`.

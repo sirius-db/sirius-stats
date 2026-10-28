@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}All labels -- sirius-db/sirius stats{% endblock %}
 {% block content %}
+<header>
+  {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
+  <p>Sirius Stats</p>
+</header>
+
 <p><a href="index.html">&larr; Back to dashboard</a></p>
 <h1>All labels</h1>
 <p>Every non-priority label seen on an open issue/PR, and how its count has changed since
