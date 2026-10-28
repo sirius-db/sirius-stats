@@ -520,11 +520,13 @@ def main():
     parser.add_argument(
         "--date",
         help=(
-            "Backfill a specific past date (YYYY-MM-DD) instead of today. Only "
-            "`activity` (issues/PRs/commits) and `traffic` (if still within GitHub's "
-            "14-day window) can be reconstructed for a past date -- `repo` and "
-            "`releases` are point-in-time and will reflect current values, not the "
-            "target date's."
+            "Backfill a specific past date (YYYY-MM-DD) instead of today. `activity` "
+            "(issues/PRs/commits), `traffic` (if still within GitHub's 14-day window), "
+            "and `reviews`' touched-that-day metrics (first_review_latencies_hours, "
+            "zero_review_nondraft_count, pr_sizes_vs_latency) can be reconstructed for "
+            "a past date -- `repo`, `releases`, and `reviews`' point-in-time fields "
+            "(pending_reviews_by_team, draft_pr_count, idle_prs, zero_review_prs, "
+            "in_review_count) will reflect current values, not the target date's."
         ),
     )
     args = parser.parse_args()
@@ -542,7 +544,10 @@ def main():
         "repo": fetch_repo_metrics(traffic_token),
         "activity": fetch_activity_metrics(target_date, traffic_token),
         "labels": fetch_label_metrics(traffic_token),
-        "reviews": fetch_review_metrics(target_date, traffic_token),
+        # GitHub's GraphQL endpoint rejects unauthenticated requests outright (403, unlike the
+        # REST endpoints above which just rate-limit lower) -- skip gracefully like traffic
+        # below rather than letting an unset token crash the whole run before anything's written.
+        "reviews": fetch_review_metrics(target_date, traffic_token) if traffic_token else None,
         "traffic": {
             "as_of_date": None,
             "views": None,
@@ -558,7 +563,7 @@ def main():
     if traffic_token:
         snapshot["traffic"] = fetch_traffic_metrics(traffic_token, target_date=args.date)
     else:
-        print("SIRIUS_TRAFFIC_TOKEN not set, skipping traffic collection")
+        print("SIRIUS_TRAFFIC_TOKEN not set, skipping traffic and review-metrics collection")
 
     SNAPSHOTS_DIR.mkdir(parents=True, exist_ok=True)
     out_path = SNAPSHOTS_DIR / f"{target_date}.json"
