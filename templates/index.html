@@ -36,7 +36,7 @@
 <canvas id="weeklyIssueNetChangeChart"></canvas>
 
 <h2>Review health</h2>
-<p>Weekly review metrics. History goes back to project start via a one-time backfill.</p>
+<p>Weekly review metrics.</p>
 <label for="reviewWindow">Window: </label>
 <select id="reviewWindow">
   <option value="4">last 4 weeks</option>
@@ -48,14 +48,12 @@
 <p>Share of non-draft PRs touched that week that still have no review.</p>
 <canvas id="zeroReviewRateChart"></canvas>
 
-<h3>Time to first review</h3>
-<p>p50/p90/p95 per week, plus a dashed reference line for the trailing-26-week p50.</p>
+<h3>Time to first review history</h3>
+<p>p50/p90/p95 per week.</p>
 <canvas id="firstReviewChart"></canvas>
 
-<h3>Time-to-first-review percentiles</h3>
-<p>p50/p90/p95 pooled across the trailing 1/4/13/26 complete weeks (not a per-week average --
-percentiles don't average meaningfully). A bar is omitted when the window doesn't have enough
-samples to make that percentile trustworthy.</p>
+<h3>Time to first review trends</h3>
+<p>p50/p90/p95 pooled across the last 1/4/13 complete weeks.</p>
 <canvas id="reviewPercentileChart"></canvas>
 
 <h2>Backlog priority</h2>
@@ -117,6 +115,10 @@ function render(data) {
     data: {
       labels: data.stars.map(p => p.date),
       datasets: [{ label: 'Stars', data: data.stars.map(p => p.value), borderColor: cssVar('--color-stars') }]
+    },
+    options: {
+      plugins: { title: chartTitle('Stars over time') },
+      scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Stars') } }
     }
   });
 
@@ -125,6 +127,10 @@ function render(data) {
     data: {
       labels: data.forks.map(p => p.date),
       datasets: [{ label: 'Forks', data: data.forks.map(p => p.value), borderColor: cssVar('--color-forks') }]
+    },
+    options: {
+      plugins: { title: chartTitle('Forks over time') },
+      scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Forks') } }
     }
   });
 
@@ -137,6 +143,10 @@ function render(data) {
           { label: 'Views', data: data.traffic.map(p => p.views), borderColor: cssVar('--color-views') },
           { label: 'Unique views', data: data.traffic.map(p => p.unique_views), borderColor: cssVar('--color-views'), borderDash: [5, 5] }
         ]
+      },
+      options: {
+        plugins: { title: chartTitle('Repository views (last 14 days)') },
+        scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Views') } }
       }
     });
 
@@ -148,6 +158,10 @@ function render(data) {
           { label: 'Clones', data: data.traffic.map(p => p.clones), borderColor: cssVar('--color-clones') },
           { label: 'Unique clones', data: data.traffic.map(p => p.unique_clones), borderColor: cssVar('--color-clones'), borderDash: [5, 5] }
         ]
+      },
+      options: {
+        plugins: { title: chartTitle('Repository clones (last 14 days)') },
+        scales: { x: { title: axisTitle('Date') }, y: { title: axisTitle('Clones') } }
       }
     });
   } else {
@@ -156,7 +170,7 @@ function render(data) {
   }
 
   renderWeeklyCharts(data.activity_weekly);
-  renderReviewCharts(data.review_weekly, data.review_percentile_windows);
+  renderReviewCharts(data.review_weekly);
   renderReviewPercentileChart(data.review_percentile_windows);
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
@@ -212,6 +226,16 @@ function windowBounds(labels, windowSize) {
   return { min: labels[Math.max(0, labels.length - windowSize)], max: labels[labels.length - 1] };
 }
 
+// Chart hygiene baseline for every chart on this page: a title plus labeled, unit-bearing axes --
+// not just a bare grid of bars/lines with meaning only inferable from the surrounding <h3>/<p>,
+// which breaks the moment a chart is screenshotted or shared on its own.
+function axisTitle(text) {
+  return { display: true, text };
+}
+function chartTitle(text) {
+  return { display: true, text };
+}
+
 function renderWeeklyCharts(activityWeekly) {
   if (activityWeekly.length === 0) {
     document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
@@ -242,7 +266,10 @@ function renderWeeklyCharts(activityWeekly) {
     data: { labels, datasets: [
       { label: 'Commits per week', data: activityWeekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }
     ] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Commits per week') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Commits') } }
+    }
   });
 
   const linesChart = new Chart(document.getElementById('weeklyLinesChart'), {
@@ -251,7 +278,10 @@ function renderWeeklyCharts(activityWeekly) {
       { label: 'Additions', data: activityWeekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
       { label: 'Deletions', data: activityWeekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
     ] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Lines changed per week') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Lines (+/-)') } }
+    }
   });
 
   const prFlowChart = new Chart(document.getElementById('weeklyPrFlowChart'), {
@@ -261,7 +291,10 @@ function renderWeeklyCharts(activityWeekly) {
       { label: 'Merged', data: activityWeekly.map(w => w.prs_merged), backgroundColor: cssVar('--color-merged') },
       { label: 'Closed (not merged)', data: activityWeekly.map(w => w.prs_closed), backgroundColor: cssVar('--color-closed') }
     ] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Weekly PR flow') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Pull requests') } }
+    }
   });
 
   const prNetValues = activityWeekly.map(w => w.pr_net_change);
@@ -272,7 +305,10 @@ function renderWeeklyCharts(activityWeekly) {
       data: prNetValues,
       backgroundColor: prNetValues.map(signColor)
     }] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Weekly PR backlog net change') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Net change (PRs)') } }
+    }
   });
 
   const issueFlowChart = new Chart(document.getElementById('weeklyIssueFlowChart'), {
@@ -281,7 +317,10 @@ function renderWeeklyCharts(activityWeekly) {
       { label: 'Opened', data: activityWeekly.map(w => w.issues_opened), backgroundColor: cssVar('--color-opened') },
       { label: 'Closed', data: activityWeekly.map(w => w.issues_closed), backgroundColor: cssVar('--color-closed') }
     ] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Weekly issue flow') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Issues') } }
+    }
   });
 
   const issueNetValues = activityWeekly.map(w => w.issue_net_change);
@@ -292,7 +331,10 @@ function renderWeeklyCharts(activityWeekly) {
       data: issueNetValues,
       backgroundColor: issueNetValues.map(signColor)
     }] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Weekly issue backlog net change') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Net change (issues)') } }
+    }
   });
 
   document.getElementById('weeklyWindow').addEventListener('change', e => {
@@ -306,7 +348,7 @@ function renderWeeklyCharts(activityWeekly) {
   });
 }
 
-function renderReviewCharts(reviewWeekly, percentileWindows) {
+function renderReviewCharts(reviewWeekly) {
   if (reviewWeekly.length === 0) {
     document.getElementById('zeroReviewRateChart').outerHTML = '<p>No review data collected yet.</p>';
     document.getElementById('firstReviewChart').outerHTML = '';
@@ -326,18 +368,13 @@ function renderReviewCharts(reviewWeekly, percentileWindows) {
       spanGaps: true
     }] },
     options: {
+      plugins: { title: chartTitle('Zero-review rate per week') },
       scales: {
-        x: { ...initialBounds },
-        y: { min: 0, max: 100, ticks: { callback: value => `${value}%` } }
+        x: { ...initialBounds, title: axisTitle('Week') },
+        y: { min: 0, max: 100, ticks: { callback: value => `${value}%` }, title: axisTitle('Non-draft PRs with no review (%)') }
       }
     }
   });
-
-  // The 26w baseline is the pooled trailing-26-week p50 from the same percentile-windows data
-  // the grouped bar chart below uses -- one source of truth, not a separately hand-maintained
-  // number. Null (not enough pooled samples yet) just means no baseline is drawn.
-  const baseline26w = percentileWindows.find(w => w.window === '26w');
-  const baselineValue = baseline26w ? baseline26w.p50 : null;
 
   const firstReviewChart = new Chart(document.getElementById('firstReviewChart'), {
     type: 'line',
@@ -362,17 +399,12 @@ function renderReviewCharts(reviewWeekly, percentileWindows) {
         borderColor: cssVar('--color-closed'),
         backgroundColor: cssVar('--color-closed'),
         spanGaps: true
-      },
-      {
-        label: baselineValue === null ? 'Baseline (not enough data yet)' : `Baseline (trailing 26w p50: ${baselineValue}h)`,
-        data: labels.map(() => baselineValue),
-        borderColor: cssVar('--color-review-baseline'),
-        borderDash: [5, 5],
-        pointRadius: 0,
-        spanGaps: true
       }
     ] },
-    options: { scales: { x: { ...initialBounds } } }
+    options: {
+      plugins: { title: chartTitle('Time to first review (p50 / p90 / p95)') },
+      scales: { x: { ...initialBounds, title: axisTitle('Week') }, y: { title: axisTitle('Hours') } }
+    }
   });
 
   document.getElementById('reviewWindow').addEventListener('change', e => {
@@ -411,6 +443,10 @@ function renderReviewPercentileChart(percentileWindows) {
         { label: 'p90', data: windows.map(w => w.p90), backgroundColor: cssVar('--color-p90') },
         { label: 'p95', data: windows.map(w => w.p95), backgroundColor: cssVar('--color-closed') }
       ]
+    },
+    options: {
+      plugins: { title: chartTitle('Time to first review trends') },
+      scales: { x: { title: axisTitle('Trailing window') }, y: { title: axisTitle('Hours') } }
     }
   });
 }
@@ -429,13 +465,19 @@ function renderPriorityCharts(labelsData) {
   const issuesChart = new Chart(document.getElementById('priorityIssuesChart'), {
     type: 'line',
     data: { labels: issuesHistory.map(h => h.date), datasets: cfdDatasets(issuesHistory, labelColors) },
-    options: { scales: { y: { stacked: true } } }
+    options: {
+      plugins: { title: chartTitle('Open issues by priority (cumulative)') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Issues') } }
+    }
   });
 
   const prsChart = new Chart(document.getElementById('priorityPrsChart'), {
     type: 'line',
     data: { labels: prsHistory.map(h => h.date), datasets: cfdDatasets(prsHistory, labelColors) },
-    options: { scales: { y: { stacked: true } } }
+    options: {
+      plugins: { title: chartTitle('Open PRs by priority (cumulative)') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Pull requests') } }
+    }
   });
 
   document.getElementById('priorityWindow').addEventListener('change', e => {
@@ -479,7 +521,10 @@ function renderOtherTop10Chart(labelsData) {
         fill: true
       }))
     },
-    options: { scales: { y: { stacked: true } } }
+    options: {
+      plugins: { title: chartTitle('Top 10 non-priority labels (cumulative)') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Issues + PRs') } }
+    }
   });
 }
 
