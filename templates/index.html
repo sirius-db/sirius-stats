@@ -5,64 +5,99 @@
   {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
   <h1>sirius-db/sirius stats</h1>
   <ul>
+    <li><a href="#open-reviews">Review status</a></li>
+    <li><a href="#backlog-priority">Priority backlog</a></li>
+    <li><a href="#other-labels">Other backlog</a></li>
+    <li><a href="#review-health">Review health</a></li>
+    <li><a href="#activity">Activity</a></li>
     <li><a href="#pulse">Pulse</a></li>
     <li><a href="#traffic">Traffic</a></li>
-    <li><a href="#activity">Activity</a></li>
-    <li><a href="#historical-weekly-activity">Historical weekly activity</a></li>
-    <li><a href="#review-health">Review health</a></li>
-    <li><a href="#open-reviews">Open reviews</a></li>
-    <li><a href="#backlog-priority">Backlog priority</a></li>
-    <li><a href="#other-labels">Other labels</a></li>
-    <li><a href="#top-referrers">Top referrers</a></li>
-    <li><a href="#popular-content">Popular content</a></li>
   </ul>
   <p><em>Last collected:<br/>{{ last_collected }}</em></p>
 </nav>
 
-<h2 id="pulse">Pulse</h2>
-<canvas id="starsChart"></canvas>
-<canvas id="forksChart"></canvas>
+<h2 id="open-reviews">Review status</h2>
+<h3>Pending review requests by team (current)</h3>
+<div id="pendingReviewsByTeamTable"></div>
 
-<h2 id="traffic">Traffic</h2>
-<p><em>Delayed ~1 day; gaps &ne; zero.</em></p>
-<canvas id="viewsChart"></canvas>
-<canvas id="clonesChart"></canvas>
+<h3>PR health (current)</h3>
+<p><em>Idle = non-draft and not updated in over 30 days.</em></p>
+<div id="prHealthTable"></div>
 
-<h2 id="activity">Activity</h2>
-<div id="activityWindows"></div>
+<h2 id="backlog-priority">Priority backlog</h2>
+<p>Tracks how many open issues/PRs carry each priority label over time.</p>
+<h3>Priority backlog issues (oldest per level, P0 first)</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="priorityIssuesStale"></div>
 
-<h3>Top committers (last 7 days)</h3>
-<div id="topCommitters"></div>
+<h3>Priority backlog PRs (oldest per level, P0 first)</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="priorityPrsStale"></div>
 
-<h2 id="historical-weekly-activity">Historical weekly activity</h2>
-<p>Weekly totals, starting Sunday and compiled daily.</p>
-<label for="weeklyWindow">Window: </label>
-<select id="weeklyWindow">
-  <option value="4">last 4 weeks</option>
-  <option value="13" selected>last 13 weeks</option>
-  <option value="26">last 26 weeks</option>
-</select>
+<span class="window">
+  <label for="priorityWindow">Window: </label>
+  <select id="priorityWindow">
+    <option value="7">last 7 snapshots</option>
+    <option value="30" selected>last 30 snapshots</option>
+    <option value="90">last 90 snapshots</option>
+  </select>
+</span>
+<h3>Open issues</h3>
+<canvas id="priorityIssuesChart"></canvas>
+<h3>Open PRs</h3>
+<canvas id="priorityPrsChart"></canvas>
 
-<h3>Code Activity</h3>
-<canvas id="weeklyCommitsChart"></canvas>
-<canvas id="weeklyLinesChart"></canvas>
+<h2 id="other-labels">Other backlog</h2>
+<p>Everything that isn't a priority label. <a href="labels.html">View all labels &rarr;</a></p>
 
-<h3>Weekly PRs</h3>
-<canvas id="weeklyPrFlowChart"></canvas>
-<canvas id="weeklyPrNetChangeChart"></canvas>
+<h3>Most stale issues</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="otherIssuesStale"></div>
 
-<h3>Weekly Issues</h3>
-<canvas id="weeklyIssueFlowChart"></canvas>
-<canvas id="weeklyIssueNetChangeChart"></canvas>
+<h3>Most stale PRs</h3>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<div id="otherPrsStale"></div>
+
+<span class="window">
+  <label for="otherWindow">Window: </label>
+  <select id="otherWindow">
+    <option value="7">last 7 snapshots</option>
+    <option value="30" selected>last 30 snapshots</option>
+    <option value="90">last 90 snapshots</option>
+  </select>
+</span>
+<h3>Top 10 labels</h3>
+<canvas id="otherTop10Chart"></canvas>
 
 <h2 id="review-health">Review health</h2>
-<p>Weekly review metrics.</p>
-<label for="reviewWindow">Window: </label>
-<select id="reviewWindow">
-  <option value="4">last 4 weeks</option>
-  <option value="13" selected>last 13 weeks</option>
-  <option value="26">last 26 weeks</option>
-</select>
+
+<h3>Pending review requests by team (history)</h3>
+<p>Not backfillable -- this starts sparse and builds up one real day of collection at a time,
+unlike the metrics below.</p>
+<span class="window">
+  <label for="reviewTeamWindow">Window: </label>
+  <select id="reviewTeamWindow">
+    <option value="7">last 7 snapshots</option>
+    <option value="30" selected>last 30 snapshots</option>
+    <option value="90">last 90 snapshots</option>
+  </select>
+</span>
+<canvas id="pendingReviewsByTeamHistoryChart"></canvas>
+
+<h3>PR health (history)</h3>
+<p>Every open PR, classified into exactly one category (idle takes priority over zero-review, so
+nothing is double-counted). Same "Window" selector above. Not backfillable, same as the team
+chart above it.</p>
+<canvas id="prHealthHistoryChart"></canvas>
+
+<span class="window">
+  <label for="reviewWindow">Window: </label>
+  <select id="reviewWindow">
+    <option value="4">last 4 weeks</option>
+    <option value="13" selected>last 13 weeks</option>
+    <option value="26">last 26 weeks</option>
+  </select>
+</span>
 
 <h3>Zero-review rate</h3>
 <p>Share of non-draft PRs touched that week that still have no review.</p>
@@ -76,58 +111,48 @@
 <p>p50/p90/p95 pooled across the last 1/4/13 complete weeks.</p>
 <canvas id="reviewPercentileChart"></canvas>
 
-<h2 id="open-reviews">Open reviews</h2>
-<h3>Pending review requests by team (history)</h3>
-<p>Not backfillable -- this starts sparse and builds up one real day of collection at a time,
-unlike the metrics above.</p>
-<label for="reviewTeamWindow">Window: </label>
-<select id="reviewTeamWindow">
-  <option value="7">last 7 snapshots</option>
-  <option value="30" selected>last 30 snapshots</option>
-  <option value="90">last 90 snapshots</option>
-</select>
-<canvas id="pendingReviewsByTeamHistoryChart"></canvas>
+<h2 id="activity">Activity</h2>
+<p>Weekly totals, starting Sunday and compiled daily.</p>
+<span class="window">
+  <label for="weeklyWindow">Window: </label>
+  <select id="weeklyWindow">
+    <option value="4">last 4 weeks</option>
+    <option value="13" selected>last 13 weeks</option>
+    <option value="26">last 26 weeks</option>
+  </select>
+</span>
 
-<h3>Pending review requests by team (current, EOD)</h3>
-<div id="pendingReviewsByTeamTable"></div>
+<h3>Weekly PRs</h3>
+<canvas id="weeklyPrFlowChart"></canvas>
+<canvas id="weeklyPrNetChangeChart"></canvas>
 
-<h2 id="backlog-priority">Backlog priority</h2>
-<p>Tracks how many open issues/PRs carry each priority label over time.</p>
-<label for="priorityWindow">Window: </label>
-<select id="priorityWindow">
-  <option value="7">last 7 snapshots</option>
-  <option value="30" selected>last 30 snapshots</option>
-  <option value="90">last 90 snapshots</option>
-</select>
-<h3>Open issues</h3>
-<canvas id="priorityIssuesChart"></canvas>
-<h3>Open PRs</h3>
-<canvas id="priorityPrsChart"></canvas>
+<h3>Weekly Issues</h3>
+<canvas id="weeklyIssueFlowChart"></canvas>
+<canvas id="weeklyIssueNetChangeChart"></canvas>
 
-<h3>Priority backlog issues (oldest per level, P0 first)</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
-<div id="priorityIssuesStale"></div>
+<h3>Code Activity</h3>
+<canvas id="weeklyCommitsChart"></canvas>
+<canvas id="weeklyLinesChart"></canvas>
 
-<h3>Priority backlog PRs (oldest per level, P0 first)</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
-<div id="priorityPrsStale"></div>
+<h3>Repo Activity</h3>
+<div id="activityWindows"></div>
 
-<h2 id="other-labels">Other labels</h2>
-<p>Everything that isn't a priority label. <a href="labels.html">View all labels &rarr;</a></p>
-<h3>Top 10 labels</h3>
-<canvas id="otherTop10Chart"></canvas>
-<h3>Most stale issues</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
-<div id="otherIssuesStale"></div>
+<h3>Top committers (last 7 days)</h3>
+<div id="topCommitters"></div>
 
-<h3>Most stale PRs</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
-<div id="otherPrsStale"></div>
+<h2 id="pulse">Pulse</h2>
+<canvas id="starsChart"></canvas>
+<canvas id="forksChart"></canvas>
 
-<h2 id="top-referrers">Top referrers (last 14 days)</h2>
+<h2 id="traffic">Traffic</h2>
+<p><em>Delayed ~1 day; gaps &ne; zero.</em></p>
+<canvas id="viewsChart"></canvas>
+<canvas id="clonesChart"></canvas>
+
+<h3>Top referrers (last 14 days)</h3>
 <div id="topReferrers"></div>
 
-<h2 id="popular-content">Popular content (last 14 days)</h2>
+<h3>Popular content (last 14 days)</h3>
 <div id="topPaths"></div>
 
 <script>
@@ -239,7 +264,8 @@ function render(data) {
   renderWeeklyCharts(data.activity_weekly);
   renderReviewCharts(data.review_weekly);
   renderReviewPercentileChart(data.review_percentile_windows);
-  renderPendingReviewsByTeam(data.review_team_history, data.review_current);
+  renderPendingReviewsByTeam(data.review_team_history, data.review_current, data.pr_health_history);
+  renderPrHealth(data.review_current);
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
   const labelColors = data.labels.label_colors;
@@ -534,7 +560,7 @@ function teamDatasets(history, teams) {
   });
 }
 
-function renderPendingReviewsByTeam(reviewTeamHistory, reviewCurrent) {
+function renderPendingReviewsByTeam(reviewTeamHistory, reviewCurrent, prHealthHistory) {
   if (reviewTeamHistory.length === 0) {
     document.getElementById('pendingReviewsByTeamHistoryChart').outerHTML = '<p>No review history collected yet.</p>';
   } else {
@@ -561,6 +587,8 @@ function renderPendingReviewsByTeam(reviewTeamHistory, reviewCurrent) {
     document.getElementById('reviewTeamWindow').dispatchEvent(new Event('change'));
   }
 
+  renderPrHealthHistory(prHealthHistory);
+
   const byTeam = reviewCurrent.pending_reviews_by_team;
   const currentTeams = Object.keys(byTeam);
 
@@ -580,6 +608,84 @@ function renderPendingReviewsByTeam(reviewTeamHistory, reviewCurrent) {
       byTeam[team].map(pr => ({ text: `#${pr.number} `, href: pr.url }))
     ]
   ));
+
+}
+
+// The four PR health categories, shared between the history chart and the current-state table --
+// every open PR lands in exactly one (enforced server-side in fetch_metrics.py: idle takes
+// priority over zero-review), so counts always sum to the total open PR count with no overlap.
+const PR_HEALTH_CATEGORIES = [
+  { key: 'draft', label: 'Draft', color: '--color-draft' },
+  { key: 'idle', label: 'Idle', color: '--color-closed' },
+  { key: 'zero_review', label: 'Zero reviews', color: '--color-p90' },
+  { key: 'in_review', label: 'In review', color: '--color-merged' }
+];
+
+function renderPrHealthHistory(prHealthHistory) {
+  if (prHealthHistory.length === 0) {
+    document.getElementById('prHealthHistoryChart').outerHTML = '<p>No PR health history collected yet.</p>';
+    return;
+  }
+
+  const datasets = PR_HEALTH_CATEGORIES.map(c => {
+    const color = cssVar(c.color);
+    return {
+      label: c.label,
+      data: prHealthHistory.map(h => h[c.key]),
+      backgroundColor: color + '99',
+      borderColor: color,
+      fill: true
+    };
+  });
+
+  const historyChart = new Chart(document.getElementById('prHealthHistoryChart'), {
+    type: 'line',
+    data: { labels: prHealthHistory.map(h => h.date), datasets },
+    options: {
+      plugins: { title: chartTitle('Open PR health over time') },
+      scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Open PRs') } }
+    }
+  });
+
+  document.getElementById('reviewTeamWindow').addEventListener('change', e => {
+    const windowed = prHealthHistory.slice(-parseInt(e.target.value, 10));
+    historyChart.data.labels = windowed.map(h => h.date);
+    historyChart.data.datasets.forEach((ds, i) => {
+      ds.data = windowed.map(h => h[PR_HEALTH_CATEGORIES[i].key]);
+    });
+    historyChart.update();
+  });
+
+  // Apply the default 30-snapshot window on first render, same as the <select>'s default.
+  document.getElementById('reviewTeamWindow').dispatchEvent(new Event('change'));
+}
+
+// "Zero reviews" and "In review" don't link to a GH search -- verified live that GitHub's
+// review:none qualifier reflects review *decision* state (approved/changes-requested only), not
+// "has zero review submissions of any kind," so it misclassifies PRs with comment-only reviews
+// (confirmed against real data: #1965 has 30 COMMENTED reviews but shows as review:none). Rather
+// than link to a qualifier that doesn't match our definition, those two rows rely on their PR
+// list (4th column) for exact drill-down instead.
+function renderPrHealth(reviewCurrent) {
+  const draftSearchUrl = `https://github.com/sirius-db/sirius/pulls?q=${encodeURIComponent('is:open is:pr draft:true')}`;
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const idleSearchUrl = `https://github.com/sirius-db/sirius/pulls?q=${encodeURIComponent(`is:open is:pr draft:false updated:<${thirtyDaysAgo}`)}`;
+
+  const categoryData = {
+    draft: { count: reviewCurrent.draft_pr_count, href: draftSearchUrl, prs: null },
+    idle: { count: reviewCurrent.idle_prs.length, href: idleSearchUrl, prs: reviewCurrent.idle_prs },
+    zero_review: { count: reviewCurrent.zero_review_prs.length, href: null, prs: reviewCurrent.zero_review_prs },
+    in_review: { count: reviewCurrent.in_review_count, href: null, prs: null }
+  };
+  const categories = PR_HEALTH_CATEGORIES.map(c => ({ ...c, ...categoryData[c.key] }));
+  const total = categories.reduce((sum, c) => sum + c.count, 0);
+
+  renderTable('prHealthTable', ['Type', 'Count', 'Percent', 'PRs (Sorted by most stale first)'], categories.map(c => [
+    c.href ? { text: c.label, href: c.href } : c.label,
+    c.count,
+    total ? `${(c.count / total * 100).toFixed(1)}%` : 'n/a',
+    c.prs ? c.prs.map(pr => ({ text: `#${pr.number} `, href: pr.url })) : '--'
+  ]));
 }
 
 function renderPriorityCharts(labelsData) {
@@ -640,23 +746,32 @@ function renderOtherTop10Chart(labelsData) {
     .filter(name => !PRIORITY_LABELS.includes(name))
     .slice(0, 10);
 
-  new Chart(document.getElementById('otherTop10Chart'), {
+  const otherDatasets = windowedHistory => topLabels.map((name, i) => ({
+    label: name,
+    data: windowedHistory.map(h => h[name] || 0),
+    backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+    borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
+    fill: true
+  }));
+
+  const chart = new Chart(document.getElementById('otherTop10Chart'), {
     type: 'line',
-    data: {
-      labels: history.map(h => h.date),
-      datasets: topLabels.map((name, i) => ({
-        label: name,
-        data: history.map(h => h[name] || 0),
-        backgroundColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
-        borderColor: LABEL_PALETTE[i % LABEL_PALETTE.length],
-        fill: true
-      }))
-    },
+    data: { labels: [], datasets: [] },
     options: {
       plugins: { title: chartTitle('Top 10 non-priority labels (cumulative)') },
       scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Issues + PRs') } }
     }
   });
+
+  document.getElementById('otherWindow').addEventListener('change', e => {
+    const windowed = history.slice(-parseInt(e.target.value, 10));
+    chart.data.labels = windowed.map(h => h.date);
+    chart.data.datasets = otherDatasets(windowed);
+    chart.update();
+  });
+
+  // Apply the default 30-snapshot window on first render, same as the <select>'s default.
+  document.getElementById('otherWindow').dispatchEvent(new Event('change'));
 }
 
 const ACTIVITY_FIELD_LABELS = {
