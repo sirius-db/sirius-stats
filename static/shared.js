@@ -41,9 +41,13 @@ function buildTable(header, rows) {
     for (const cell of row) {
       const td = document.createElement('td');
       const items = Array.isArray(cell) ? cell : [cell];
-      for (const item of items) {
+      // Separator space is its own plain text node, not baked into an item's own link text --
+      // otherwise a trailing space inside an <a>'s textContent picks up the link's color and
+      // underline too, showing as a visible colored gap between consecutive links in a cell.
+      items.forEach((item, i) => {
+        if (i > 0) td.appendChild(document.createTextNode(' '));
         td.appendChild(buildCellItem(item));
-      }
+      });
       tr.appendChild(td);
     }
     tbody.appendChild(tr);

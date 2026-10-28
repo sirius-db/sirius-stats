@@ -68,6 +68,17 @@ over a local HTTP server sidesteps that; `python3 -m http.server` needs no extra
 
 No deploy and no merge to `main` is needed to see the result — do this on your PR branch.
 
+For faster iteration, `scripts/dev_server.py` combines both commands above and rebuilds
+automatically whenever a file that affects the build changes:
+
+```bash
+uv run scripts/dev_server.py   # serves http://localhost:8000, rebuilds on any relevant change
+```
+
+It polls `templates/`, `static/`, `data/`, and `build_site.py` itself every 0.5s (stdlib only, no
+new dependency, matching this repo's one-dependency-total convention) — edit a template or CSS
+file and refresh the browser to see it live, no manual rebuild step.
+
 ## Customizing the UI
 
 `build_site.py` renders the page from Jinja2 templates rather than building HTML in Python

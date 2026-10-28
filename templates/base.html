@@ -3,6 +3,21 @@
 <head>
 <meta charset="utf-8">
 <title>{% block title %}sirius-db/sirius stats{% endblock %}</title>
+<meta name="description" content="{% block description %}Tracks sirius-db/sirius's stars, forks, traffic, activity, and review-health metrics over time.{% endblock %}">
+
+<!-- OpenGraph/Twitter card tags so sharing a link (Slack, etc.) renders a preview instead of a
+     bare URL. og:image/og:url need absolute URLs -- relative ones are silently ignored by
+     unfurlers, unlike the relative static/style.css link above which only needs to resolve
+     within the browser that's already on this page. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sirius Stats">
+<meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+<meta property="og:description" content="{{ self.description() }}">
+<meta property="og:url" content="{% block og_url %}https://www.sirius-db.com/sirius-stats/{% endblock %}">
+{% if logo_path %}
+<meta property="og:image" content="https://www.sirius-db.com/sirius-stats/{{ logo_path }}">
+<meta name="twitter:card" content="summary">
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
         integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
         crossorigin="anonymous"></script>
@@ -10,8 +25,6 @@
 <script src="static/shared.js"></script>
 </head>
 <body>
-<header>
-</header>
 {% block content %}{% endblock %}
 </body>
 </html>
