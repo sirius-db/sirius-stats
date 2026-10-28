@@ -293,19 +293,21 @@ def build_activity_weekly(snapshots, activity_backfill):
     return [weekly_by_date[d] for d in sorted(weekly_by_date)]
 
 
-def _current_incomplete_review_week(snapshots):
-    """The week_of bucket that's still accumulating live data as of the latest snapshot -- not
-    a finished week yet, so its own aggregate is a partial sample, not a real data point. This
-    also matters because the live-overrides-backfill merge replaces a backfilled week's full
-    sample wholesale the moment even one live snapshot lands in it -- while that week is still in
-    progress, "live" can mean "1 day," which is a worse sample than the backfill it replaced.
-    Excluding the in-progress week sidesteps that; once a week is actually complete, it will have
-    been fully live-collected day by day with no backfill involved at all.
+def _current_incomplete_review_week():
+    """The week_of bucket that's still in progress as of right now -- not a finished week yet,
+    so its own aggregate is a partial sample, not a real data point. This also matters because
+    the live-overrides-backfill merge replaces a backfilled week's full sample wholesale the
+    moment even one live snapshot lands in it -- while that week is still in progress, "live" can
+    mean "1 day," which is a worse sample than the backfill it replaced. Excluding the in-progress
+    week sidesteps that; once a week is actually complete, it will have been fully live-collected
+    day by day with no backfill involved at all.
+
+    Anchored on the real current date, not on whether a live snapshot happens to exist for today
+    -- collect.yml not having run yet today (or this script simply being run standalone, without
+    a fresh fetch_metrics.py pass first) must not make the exclusion silently no-op and let a
+    backfilled row for the in-progress week show through as if it were a finished week.
     """
-    dated = [s["date"] for s in snapshots if s.get("reviews")]
-    if not dated:
-        return None
-    return week_start(date.fromisoformat(max(dated))).isoformat()
+    return week_start(date.today()).isoformat()
 
 
 def build_review_weekly(snapshots, review_backfill):
@@ -357,7 +359,7 @@ def build_review_weekly(snapshots, review_backfill):
         # Live-computed data wins over the static backfill on an overlapping week.
         weekly_by_date[week_of] = {"week_of": week_of, **bucket}
 
-    weekly_by_date.pop(_current_incomplete_review_week(snapshots), None)
+    weekly_by_date.pop(_current_incomplete_review_week(), None)
 
     for entry in weekly_by_date.values():
         latencies = entry.get("first_review_latencies_hours", [])
@@ -407,7 +409,7 @@ def _review_latencies_by_week(snapshots, review_backfill):
         key = week_start(date.fromisoformat(s["date"])).isoformat()
         live_weeks.setdefault(key, []).extend(reviews.get("first_review_latencies_hours", []))
     by_week.update(live_weeks)
-    by_week.pop(_current_incomplete_review_week(snapshots), None)
+    by_week.pop(_current_incomplete_review_week(), None)
     return by_week
 
 
