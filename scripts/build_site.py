@@ -119,6 +119,7 @@ def build_data(
     labels = build_label_data(snapshots)
     review_weekly = build_review_weekly(snapshots, review_backfill)
     review_current = build_review_current(snapshots)
+    review_team_history = build_review_team_history(snapshots)
     review_percentile_windows = build_review_percentile_windows(snapshots, review_backfill)
 
     # as_of_date, not views, is the real null signal here too (see the identical
@@ -140,6 +141,7 @@ def build_data(
         "labels": labels,
         "review_weekly": review_weekly,
         "review_current": review_current,
+        "review_team_history": review_team_history,
         "review_percentile_windows": review_percentile_windows,
         "top_referrers": top_referrers,
         "top_paths": top_paths,
@@ -446,16 +448,40 @@ def build_review_percentile_windows(snapshots, review_backfill):
     return windows
 
 
+def build_review_team_history(snapshots):
+    """Daily history of pending review requests by team, for the historical stacked-line chart
+    (same shape/zero-fill treatment as build_label_data()'s other_history).
+
+    NOT backfillable -- pending_reviews_by_team is point-in-time current state (like
+    repo.open_prs), so there's no way to reconstruct "which team had a pending request on day X"
+    after the fact. Starts sparse and builds up one real day of collection at a time.
+    """
+    counts_by_date = {}
+    for s in snapshots:
+        reviews = s.get("reviews")
+        if not reviews:
+            continue
+        counts_by_date[s["date"]] = {
+            team: len(prs) for team, prs in reviews.get("pending_reviews_by_team", {}).items()
+        }
+
+    all_teams = sorted({team for counts in counts_by_date.values() for team in counts})
+    return [
+        {"date": d, **{team: counts_by_date[d].get(team, 0) for team in all_teams}}
+        for d in sorted(counts_by_date)
+    ]
+
+
 def build_review_current(snapshots):
     """Point-in-time review state from the latest snapshot that has a `reviews` block --
-    pending review requests by team and draft/idle counts, rendered as current-state stat
-    tiles/bars (like activity_windows), not a history chart.
+    pending reviews by team (actual PRs, for a linkable triage table) and draft/idle counts,
+    rendered as current-state tables/tiles (like activity_windows), not a history chart.
     """
     latest_reviews = next((s["reviews"] for s in reversed(snapshots) if s.get("reviews")), None)
     if not latest_reviews:
-        return {"pending_review_requests_by_team": {}, "draft_pr_count": 0, "idle_pr_count": 0}
+        return {"pending_reviews_by_team": {}, "draft_pr_count": 0, "idle_pr_count": 0}
     return {
-        "pending_review_requests_by_team": latest_reviews["pending_review_requests_by_team"],
+        "pending_reviews_by_team": latest_reviews["pending_reviews_by_team"],
         "draft_pr_count": latest_reviews["draft_pr_count"],
         "idle_pr_count": latest_reviews["idle_pr_count"],
     }
