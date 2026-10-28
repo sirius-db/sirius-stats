@@ -19,6 +19,9 @@
   --color-untriaged-prs: #d35400;
   --color-window-bg: #eef1f5;
   --color-window-border: #d4d9e0;
+  /* Same blue as --color-forks/--color-opened (not a new color) -- close to GitHub's own link
+     blue, and reusing it keeps the palette from growing a near-duplicate shade. */
+  --color-link: #3a7bd5;
 }
 
 select {
@@ -32,6 +35,13 @@ body {
   padding: 0 1rem;
   background: var(--color-bg);
   color: var(--color-text);
+}
+
+/* One consistent link color site-wide -- without this, content links (tagline, "View on GH",
+   table entries) fell back to the browser's default blue while nav links were deliberately
+   de-colored to match body text (see #toc a below), making them hard to spot as clickable. */
+a {
+  color: var(--color-link);
 }
 
 header {
@@ -66,11 +76,12 @@ canvas {
   font-size: 0.8rem;
 }
 
-.toc-gh-link a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: var(--color-text);
+/* No inline-flex/gap here -- that was for when the icon lived inside each link; now it's a
+   single shared icon before the sentence (see templates/index.html), so these are plain
+   text-flow links like any other. #toc p.toc-gh-link a, not #toc p a, so this doesn't also
+   catch the tagline link above (templates/index.html:17), which has nothing to do with this. */
+#toc p.toc-gh-link a {
+  color: var(--color-link);
   text-decoration: none;
 }
 
@@ -103,8 +114,14 @@ canvas {
 }
 
 #toc a {
-  color: var(--color-text);
   text-decoration: none;
+}
+
+/* Section nav links stay body-text colored, not link-blue -- they're page navigation, not
+   external/content links, so they keep the #toc a default here while the tagline and
+   .toc-gh-link links (plain <p>s, outside this <ul>) fall through to the global `a` link color. */
+#toc ul a {
+  color: var(--color-text);
 }
 
 #toc a:hover {
@@ -230,6 +247,14 @@ canvas {
   #toc.open a {
     display: block;
     padding: 1rem 0.25rem;
+  }
+
+  #toc.open .toc-gh-link {
+    padding: 1rem 0.25rem;
+  }
+
+  #toc.open .toc-gh-link a {
+    display: inline;
   }
 
   #tocClose {
