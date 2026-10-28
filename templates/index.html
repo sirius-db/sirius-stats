@@ -15,15 +15,51 @@
 <div id="topCommitters"></div>
 
 <h2>Historical weekly activity</h2>
-<p>Weekly totals, starting Sunday. Weeks before daily tracking began are a one-time seed; every
-week since is computed from daily collection -- see BOOTSTRAP.md.</p>
+<p>Weekly totals, starting Sunday and compiled daily.</p>
+<label for="weeklyWindow">Window: </label>
+<select id="weeklyWindow">
+  <option value="4">last 4 weeks</option>
+  <option value="13" selected>last 13 weeks</option>
+  <option value="26">last 26 weeks</option>
+</select>
+
+<h3>Code Activity</h3>
 <canvas id="weeklyCommitsChart"></canvas>
 <canvas id="weeklyLinesChart"></canvas>
 
+<h3>Weekly PRs</h3>
+<canvas id="weeklyPrFlowChart"></canvas>
+<canvas id="weeklyPrNetChangeChart"></canvas>
+
+<h3>Weekly Issues</h3>
+<canvas id="weeklyIssueFlowChart"></canvas>
+<canvas id="weeklyIssueNetChangeChart"></canvas>
+
+<h2>Review health</h2>
+<p>Weekly review metrics. History goes back to project start via a one-time backfill.</p>
+<label for="reviewWindow">Window: </label>
+<select id="reviewWindow">
+  <option value="4">last 4 weeks</option>
+  <option value="13">last 13 weeks</option>
+  <option value="26" selected>last 26 weeks</option>
+</select>
+
+<h3>Zero-review rate</h3>
+<p>Share of non-draft PRs touched that week that still have no review.</p>
+<canvas id="zeroReviewRateChart"></canvas>
+
+<h3>Time to first review</h3>
+<p>p50/p90/p95 per week, plus a dashed reference line for the trailing-26-week p50.</p>
+<canvas id="firstReviewChart"></canvas>
+
+<h3>Time-to-first-review percentiles</h3>
+<p>p50/p90/p95 pooled across the trailing 1/4/13/26 complete weeks (not a per-week average --
+percentiles don't average meaningfully). A bar is omitted when the window doesn't have enough
+samples to make that percentile trustworthy.</p>
+<canvas id="reviewPercentileChart"></canvas>
+
 <h2>Backlog priority</h2>
-<p>Tracks how many open issues/PRs carry each priority label over time (a Cumulative Flow
-Diagram, not a burndown -- there's no sprint deadline to burn down to). Collection is recent, so
-history builds up from here forward.</p>
+<p>Tracks how many open issues/PRs carry each priority label over time.</p>
 <label for="priorityWindow">Window: </label>
 <select id="priorityWindow">
   <option value="7">last 7 snapshots</option>
@@ -119,30 +155,9 @@ function render(data) {
     document.getElementById('clonesChart').outerHTML = '';
   }
 
-  if (data.activity_weekly.length > 0) {
-    new Chart(document.getElementById('weeklyCommitsChart'), {
-      type: 'bar',
-      data: {
-        labels: data.activity_weekly.map(w => w.week_of),
-        datasets: [{ label: 'Commits per week', data: data.activity_weekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }]
-      }
-    });
-
-    new Chart(document.getElementById('weeklyLinesChart'), {
-      type: 'bar',
-      data: {
-        labels: data.activity_weekly.map(w => w.week_of),
-        datasets: [
-          { label: 'Additions', data: data.activity_weekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
-          { label: 'Deletions', data: data.activity_weekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
-        ]
-      }
-    });
-  } else {
-    document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
-    document.getElementById('weeklyLinesChart').outerHTML = '';
-  }
-
+  renderWeeklyCharts(data.activity_weekly);
+  renderReviewCharts(data.review_weekly, data.review_percentile_windows);
+  renderReviewPercentileChart(data.review_percentile_windows);
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
   const labelColors = data.labels.label_colors;
@@ -188,6 +203,215 @@ function cfdDatasets(history, labelColors) {
       borderColor: color,
       fill: true
     };
+  });
+}
+
+// Shared by every windowed weekly chart: the visible x-axis range for the trailing `windowSize`
+// entries in `labels`.
+function windowBounds(labels, windowSize) {
+  return { min: labels[Math.max(0, labels.length - windowSize)], max: labels[labels.length - 1] };
+}
+
+function renderWeeklyCharts(activityWeekly) {
+  if (activityWeekly.length === 0) {
+    document.getElementById('weeklyCommitsChart').outerHTML = '<p>No historical weekly data seeded yet.</p>';
+    document.getElementById('weeklyLinesChart').outerHTML = '';
+    document.getElementById('weeklyPrFlowChart').outerHTML = '';
+    document.getElementById('weeklyPrNetChangeChart').outerHTML = '';
+    document.getElementById('weeklyIssueFlowChart').outerHTML = '';
+    document.getElementById('weeklyIssueNetChangeChart').outerHTML = '';
+    return;
+  }
+
+  // Explicit null check first -- `null >= 0` is true in JS (null coerces to 0), which would
+  // silently color an untracked week as "backlog grew" instead of just not drawing a bar.
+  const signColor = value => value === null ? 'transparent' : (value >= 0 ? cssVar('--color-merged') : cssVar('--color-closed'));
+  const labels = activityWeekly.map(w => w.week_of);
+  const initialWindow = parseInt(document.getElementById('weeklyWindow').value, 10);
+  const initialBounds = windowBounds(labels, initialWindow);
+
+  // Full history loads into every chart once; switching windows below only moves the x-axis
+  // min/max bounds, never re-slices data -- that's what lets Chart.js animate a real zoom
+  // (existing bars hold their place, more become visible) instead of re-indexing the whole
+  // dataset, which is what made the window switch look like current data sliding away. The
+  // initial bounds are set here, at construction, rather than via a dispatched 'change' event
+  // after creation -- that dispatch pattern made the chart visibly animate from "all history"
+  // down to the default window on every page load, which read as a strange unsolicited zoom.
+  const commitsChart = new Chart(document.getElementById('weeklyCommitsChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Commits per week', data: activityWeekly.map(w => w.commits), backgroundColor: cssVar('--color-commits') }
+    ] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  const linesChart = new Chart(document.getElementById('weeklyLinesChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Additions', data: activityWeekly.map(w => w.additions), backgroundColor: cssVar('--color-additions') },
+      { label: 'Deletions', data: activityWeekly.map(w => -w.deletions), backgroundColor: cssVar('--color-deletions') }
+    ] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  const prFlowChart = new Chart(document.getElementById('weeklyPrFlowChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Opened', data: activityWeekly.map(w => w.prs_opened), backgroundColor: cssVar('--color-opened') },
+      { label: 'Merged', data: activityWeekly.map(w => w.prs_merged), backgroundColor: cssVar('--color-merged') },
+      { label: 'Closed (not merged)', data: activityWeekly.map(w => w.prs_closed), backgroundColor: cssVar('--color-closed') }
+    ] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  const prNetValues = activityWeekly.map(w => w.pr_net_change);
+  const prNetChart = new Chart(document.getElementById('weeklyPrNetChangeChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{
+      label: 'PR backlog net change',
+      data: prNetValues,
+      backgroundColor: prNetValues.map(signColor)
+    }] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  const issueFlowChart = new Chart(document.getElementById('weeklyIssueFlowChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Opened', data: activityWeekly.map(w => w.issues_opened), backgroundColor: cssVar('--color-opened') },
+      { label: 'Closed', data: activityWeekly.map(w => w.issues_closed), backgroundColor: cssVar('--color-closed') }
+    ] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  const issueNetValues = activityWeekly.map(w => w.issue_net_change);
+  const issueNetChart = new Chart(document.getElementById('weeklyIssueNetChangeChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{
+      label: 'Issue backlog net change',
+      data: issueNetValues,
+      backgroundColor: issueNetValues.map(signColor)
+    }] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  document.getElementById('weeklyWindow').addEventListener('change', e => {
+    const bounds = windowBounds(labels, parseInt(e.target.value, 10));
+
+    for (const chart of [commitsChart, linesChart, prFlowChart, prNetChart, issueFlowChart, issueNetChart]) {
+      chart.options.scales.x.min = bounds.min;
+      chart.options.scales.x.max = bounds.max;
+      chart.update();
+    }
+  });
+}
+
+function renderReviewCharts(reviewWeekly, percentileWindows) {
+  if (reviewWeekly.length === 0) {
+    document.getElementById('zeroReviewRateChart').outerHTML = '<p>No review data collected yet.</p>';
+    document.getElementById('firstReviewChart').outerHTML = '';
+    return;
+  }
+
+  const labels = reviewWeekly.map(w => w.week_of);
+  const initialBounds = windowBounds(labels, parseInt(document.getElementById('reviewWindow').value, 10));
+
+  const zeroReviewRateChart = new Chart(document.getElementById('zeroReviewRateChart'), {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: 'Zero-review rate',
+      data: reviewWeekly.map(w => w.zero_review_rate === null ? null : w.zero_review_rate * 100),
+      borderColor: cssVar('--color-review-latency'),
+      backgroundColor: cssVar('--color-review-latency'),
+      spanGaps: true
+    }] },
+    options: {
+      scales: {
+        x: { ...initialBounds },
+        y: { min: 0, max: 100, ticks: { callback: value => `${value}%` } }
+      }
+    }
+  });
+
+  // The 26w baseline is the pooled trailing-26-week p50 from the same percentile-windows data
+  // the grouped bar chart below uses -- one source of truth, not a separately hand-maintained
+  // number. Null (not enough pooled samples yet) just means no baseline is drawn.
+  const baseline26w = percentileWindows.find(w => w.window === '26w');
+  const baselineValue = baseline26w ? baseline26w.p50 : null;
+
+  const firstReviewChart = new Chart(document.getElementById('firstReviewChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      {
+        label: 'p50',
+        data: reviewWeekly.map(w => w.median_first_review_hours),
+        borderColor: cssVar('--color-review-latency'),
+        backgroundColor: cssVar('--color-review-latency'),
+        spanGaps: true
+      },
+      {
+        label: 'p90',
+        data: reviewWeekly.map(w => w.p90_first_review_hours),
+        borderColor: cssVar('--color-p90'),
+        backgroundColor: cssVar('--color-p90'),
+        spanGaps: true
+      },
+      {
+        label: 'p95',
+        data: reviewWeekly.map(w => w.p95_first_review_hours),
+        borderColor: cssVar('--color-closed'),
+        backgroundColor: cssVar('--color-closed'),
+        spanGaps: true
+      },
+      {
+        label: baselineValue === null ? 'Baseline (not enough data yet)' : `Baseline (trailing 26w p50: ${baselineValue}h)`,
+        data: labels.map(() => baselineValue),
+        borderColor: cssVar('--color-review-baseline'),
+        borderDash: [5, 5],
+        pointRadius: 0,
+        spanGaps: true
+      }
+    ] },
+    options: { scales: { x: { ...initialBounds } } }
+  });
+
+  document.getElementById('reviewWindow').addEventListener('change', e => {
+    const bounds = windowBounds(labels, parseInt(e.target.value, 10));
+
+    for (const chart of [zeroReviewRateChart, firstReviewChart]) {
+      chart.options.scales.x.min = bounds.min;
+      chart.options.scales.x.max = bounds.max;
+      chart.update();
+    }
+  });
+}
+
+function renderReviewPercentileChart(percentileWindows) {
+  if (percentileWindows.length === 0) {
+    document.getElementById('reviewPercentileChart').outerHTML = '<p>No review data collected yet.</p>';
+    return;
+  }
+
+  // build_site.py returns windows narrowest-first (1w/4w/13w/26w) -- natural ascending order for
+  // an API, and 26w is kept there since renderReviewCharts' baseline line reads it directly. This
+  // chart only displays 1w/4w/13w, reversed (13w first) so the x-axis reads as an actual timeline
+  // converging on "now" left-to-right, instead of "wider window = bigger bar" misreading as a
+  // worsening trend (a wider pooled window naturally picks up more tail outliers, which isn't
+  // the same thing as the metric getting worse over time).
+  const windows = percentileWindows.filter(w => w.window !== '26w').reverse();
+
+  // Grouped, not stacked -- p50/p90/p95 aren't components of a total, so stacking them would
+  // show a bar height of p50+p90+p95 added together, which isn't a meaningful number.
+  new Chart(document.getElementById('reviewPercentileChart'), {
+    type: 'bar',
+    data: {
+      labels: windows.map(w => `last ${w.window}`),
+      datasets: [
+        { label: 'p50', data: windows.map(w => w.p50), backgroundColor: cssVar('--color-review-latency') },
+        { label: 'p90', data: windows.map(w => w.p90), backgroundColor: cssVar('--color-p90') },
+        { label: 'p95', data: windows.map(w => w.p95), backgroundColor: cssVar('--color-closed') }
+      ]
+    }
   });
 }
 
