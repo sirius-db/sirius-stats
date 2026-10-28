@@ -36,13 +36,63 @@ header {
   margin-bottom: 1.5rem;
 }
 
-header img.logo {
+canvas {
+  margin-bottom: 3rem;
+}
+
+.logo {
   height: 2rem;
   width: auto;
 }
 
-canvas {
-  margin-bottom: 3rem;
+#toc h1 {
+  font-size: 1rem;
+}
+
+#toc p {
+  font-size: 0.7rem;
+  color: #333;
+}
+
+#toc {
+  position: fixed;
+  top: 2rem;
+  left: 1rem;
+  width: 170px;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+#toc ul {
+  list-style: none;
+  margin: 2rem 0;
+  padding: 0;
+}
+
+#toc li {
+  margin-bottom: 0.5rem;
+}
+
+#toc a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+#toc a:hover {
+  text-decoration: underline;
+}
+
+#toc a.active {
+  font-weight: bold;
+}
+
+/* body is centered with max-width: 900px -- below this viewport width the fixed sidebar would
+   overlap the content column rather than sit in the margin beside it, so hide it instead. */
+@media (max-width: 1300px) {
+  #toc {
+    display: none;
+  }
 }
 
 table {

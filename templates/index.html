@@ -1,20 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
-<p>Last collected: {{ last_collected }}</p>
+
+<nav id="toc">
+  {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
+  <h1>sirius-db/sirius stats</h1>
+  <ul>
+    <li><a href="#pulse">Pulse</a></li>
+    <li><a href="#traffic">Traffic</a></li>
+    <li><a href="#activity">Activity</a></li>
+    <li><a href="#historical-weekly-activity">Historical weekly activity</a></li>
+    <li><a href="#review-health">Review health</a></li>
+    <li><a href="#open-reviews">Open reviews</a></li>
+    <li><a href="#backlog-priority">Backlog priority</a></li>
+    <li><a href="#other-labels">Other labels</a></li>
+    <li><a href="#top-referrers">Top referrers</a></li>
+    <li><a href="#popular-content">Popular content</a></li>
+  </ul>
+  <p><em>Last collected:<br/>{{ last_collected }}</em></p>
+</nav>
+
+<h2 id="pulse">Pulse</h2>
 <canvas id="starsChart"></canvas>
 <canvas id="forksChart"></canvas>
-<h2>Traffic</h2>
+
+<h2 id="traffic">Traffic</h2>
 <p><em>Delayed ~1 day; gaps &ne; zero.</em></p>
 <canvas id="viewsChart"></canvas>
 <canvas id="clonesChart"></canvas>
 
-<h2>Activity</h2>
+<h2 id="activity">Activity</h2>
 <div id="activityWindows"></div>
 
 <h3>Top committers (last 7 days)</h3>
 <div id="topCommitters"></div>
 
-<h2>Historical weekly activity</h2>
+<h2 id="historical-weekly-activity">Historical weekly activity</h2>
 <p>Weekly totals, starting Sunday and compiled daily.</p>
 <label for="weeklyWindow">Window: </label>
 <select id="weeklyWindow">
@@ -35,13 +55,13 @@
 <canvas id="weeklyIssueFlowChart"></canvas>
 <canvas id="weeklyIssueNetChangeChart"></canvas>
 
-<h2>Review health</h2>
+<h2 id="review-health">Review health</h2>
 <p>Weekly review metrics.</p>
 <label for="reviewWindow">Window: </label>
 <select id="reviewWindow">
   <option value="4">last 4 weeks</option>
-  <option value="13">last 13 weeks</option>
-  <option value="26" selected>last 26 weeks</option>
+  <option value="13" selected>last 13 weeks</option>
+  <option value="26">last 26 weeks</option>
 </select>
 
 <h3>Zero-review rate</h3>
@@ -56,7 +76,22 @@
 <p>p50/p90/p95 pooled across the last 1/4/13 complete weeks.</p>
 <canvas id="reviewPercentileChart"></canvas>
 
-<h2>Backlog priority</h2>
+<h2 id="open-reviews">Open reviews</h2>
+<h3>Pending review requests by team (history)</h3>
+<p>Not backfillable -- this starts sparse and builds up one real day of collection at a time,
+unlike the metrics above.</p>
+<label for="reviewTeamWindow">Window: </label>
+<select id="reviewTeamWindow">
+  <option value="7">last 7 snapshots</option>
+  <option value="30" selected>last 30 snapshots</option>
+  <option value="90">last 90 snapshots</option>
+</select>
+<canvas id="pendingReviewsByTeamHistoryChart"></canvas>
+
+<h3>Pending review requests by team (current, EOD)</h3>
+<div id="pendingReviewsByTeamTable"></div>
+
+<h2 id="backlog-priority">Backlog priority</h2>
 <p>Tracks how many open issues/PRs carry each priority label over time.</p>
 <label for="priorityWindow">Window: </label>
 <select id="priorityWindow">
@@ -77,7 +112,7 @@
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="priorityPrsStale"></div>
 
-<h2>Other labels</h2>
+<h2 id="other-labels">Other labels</h2>
 <p>Everything that isn't a priority label. <a href="labels.html">View all labels &rarr;</a></p>
 <h3>Top 10 labels</h3>
 <canvas id="otherTop10Chart"></canvas>
@@ -89,13 +124,45 @@
 <p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
 <div id="otherPrsStale"></div>
 
-<h2>Top referrers (last 14 days)</h2>
+<h2 id="top-referrers">Top referrers (last 14 days)</h2>
 <div id="topReferrers"></div>
 
-<h2>Popular content (last 14 days)</h2>
+<h2 id="popular-content">Popular content (last 14 days)</h2>
 <div id="topPaths"></div>
 
 <script>
+// Scrollspy for the TOC -- bolds whichever section is currently in view as you scroll, not just
+// whichever link was last clicked (which would go stale the moment you scroll away from it).
+// Doesn't depend on data.json, so it runs independently of the fetch/render chain below.
+function initToc() {
+  const headings = [...document.querySelectorAll('h2[id]')];
+  const linksById = new Map(
+    [...document.querySelectorAll('#toc a')].map(a => [a.getAttribute('href').slice(1), a])
+  );
+  const visible = new Set();
+
+  // rootMargin trims the bottom 70% of the viewport off the observed area, so a section counts
+  // as "current" once its heading crosses into roughly the top third of the screen, rather than
+  // only while the whole section (which can be much taller than the viewport) is on screen.
+  const observer = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        visible.add(entry.target.id);
+      } else {
+        visible.delete(entry.target.id);
+      }
+    }
+    // Topmost visible heading wins when more than one qualifies at once (short sections).
+    const current = headings.find(h => visible.has(h.id));
+    if (!current) return;
+    linksById.forEach(a => a.classList.remove('active'));
+    linksById.get(current.id).classList.add('active');
+  }, { rootMargin: '0px 0px -70% 0px' });
+
+  headings.forEach(h => observer.observe(h));
+}
+initToc();
+
 fetch('data.json')
   .then(r => {
     if (!r.ok) throw new Error(`data.json returned ${r.status}`);
@@ -172,6 +239,7 @@ function render(data) {
   renderWeeklyCharts(data.activity_weekly);
   renderReviewCharts(data.review_weekly);
   renderReviewPercentileChart(data.review_percentile_windows);
+  renderPendingReviewsByTeam(data.review_team_history, data.review_current);
   renderPriorityCharts(data.labels);
   renderOtherTop10Chart(data.labels);
   const labelColors = data.labels.label_colors;
@@ -451,6 +519,69 @@ function renderReviewPercentileChart(percentileWindows) {
   });
 }
 
+// Same shape as cfdDatasets above, generalized for a dynamic team list (not the fixed
+// PRIORITY_LABELS) -- reuses LABEL_PALETTE, same as renderOtherTop10Chart's label coloring.
+function teamDatasets(history, teams) {
+  return teams.map((team, i) => {
+    const color = LABEL_PALETTE[i % LABEL_PALETTE.length];
+    return {
+      label: team,
+      data: history.map(h => h[team] || 0),
+      backgroundColor: color + '99',
+      borderColor: color,
+      fill: true
+    };
+  });
+}
+
+function renderPendingReviewsByTeam(reviewTeamHistory, reviewCurrent) {
+  if (reviewTeamHistory.length === 0) {
+    document.getElementById('pendingReviewsByTeamHistoryChart').outerHTML = '<p>No review history collected yet.</p>';
+  } else {
+    // Every entry has every team (zero-filled server-side), so any entry's keys work here.
+    const teams = Object.keys(reviewTeamHistory[0]).filter(k => k !== 'date');
+
+    const historyChart = new Chart(document.getElementById('pendingReviewsByTeamHistoryChart'), {
+      type: 'line',
+      data: { labels: reviewTeamHistory.map(h => h.date), datasets: teamDatasets(reviewTeamHistory, teams) },
+      options: {
+        plugins: { title: chartTitle('Pending review requests by team (history)') },
+        scales: { x: { title: axisTitle('Date') }, y: { stacked: true, title: axisTitle('Pending review requests') } }
+      }
+    });
+
+    document.getElementById('reviewTeamWindow').addEventListener('change', e => {
+      const windowed = reviewTeamHistory.slice(-parseInt(e.target.value, 10));
+      historyChart.data.labels = windowed.map(h => h.date);
+      historyChart.data.datasets = teamDatasets(windowed, teams);
+      historyChart.update();
+    });
+
+    // Apply the default 30-snapshot window on first render, same as the <select>'s default.
+    document.getElementById('reviewTeamWindow').dispatchEvent(new Event('change'));
+  }
+
+  const byTeam = reviewCurrent.pending_reviews_by_team;
+  const currentTeams = Object.keys(byTeam);
+
+  // Busiest team first -- same reasoning as the history chart above: this table exists
+  // specifically to surface review-load concentration (the sirius-core split discussion), so
+  // the most-loaded team should be the first thing read.
+  const sortedTeams = [...currentTeams].sort((a, b) => byTeam[b].length - byTeam[a].length);
+
+  // team-review-requested: (not review-requested:team:, which 422s) -- confirmed live against
+  // the search API and cross-checked against our own GraphQL-derived counts before wiring in.
+  const teamSearchUrl = team => `https://github.com/sirius-db/sirius/pulls?q=${encodeURIComponent(`is:open is:pr team-review-requested:sirius-db/${team}`)}`;
+
+  renderTable('pendingReviewsByTeamTable', ['Team', 'Pending PRs', 'PRs (Sorted by most stale first)'], sortedTeams.map(
+    team => [
+      { text: team, href: teamSearchUrl(team) },
+      byTeam[team].length,
+      byTeam[team].map(pr => ({ text: `#${pr.number} `, href: pr.url }))
+    ]
+  ));
+}
+
 function renderPriorityCharts(labelsData) {
   const issuesHistory = labelsData.priority_issues_history;
   const prsHistory = labelsData.priority_prs_history;
@@ -544,7 +675,9 @@ function renderActivityWindows(windows) {
   const container = document.getElementById('activityWindows');
   const fields = Object.keys(ACTIVITY_FIELD_LABELS);
   const header = ['Window', ...fields.map(f => ACTIVITY_FIELD_LABELS[f])];
-  const rows = Object.entries(windows).map(([label, w]) => [label, ...fields.map(f => w[f])]);
+  const rows = Object.entries(windows).map(
+    ([label, w]) => [label, ...fields.map(f => w[f].toLocaleString())]
+  );
   container.appendChild(buildTable(header, rows));
 }
 
