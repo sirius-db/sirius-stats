@@ -107,9 +107,15 @@ canvas {
   color: var(--color-text);
 }
 
-/* Hidden everywhere except the mobile overlay below -- on desktop #toc is always visible, so
+/* Hidden everywhere except the mobile drawer below -- on desktop #toc is always visible, so
    there's nothing to close. */
 #tocClose {
+  display: none;
+}
+
+/* Dimmed scrim behind the mobile drawer -- gives a third way to dismiss it (tap outside) beyond
+   the close button and picking a link, and signals the rest of the page is temporarily inert. */
+#tocBackdrop {
   display: none;
 }
 
@@ -128,17 +134,27 @@ canvas {
     display: none;
   }
 
+  #tocBackdrop.open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+  }
+
   /* #toc's base rules (width: 170px, font-size: 0.85rem, etc.) are sized for a narrow fixed
-     desktop sidebar -- the overlay needs its own larger scale, not that shrunk-down version,
-     and bigger tap targets per link since this is the touch-driven nav entry point. */
+     desktop sidebar -- the drawer needs its own larger scale, not that shrunk-down version, and
+     bigger tap targets per link since this is the touch-driven nav entry point. A fixed width
+     rather than the full viewport, since content is left-aligned -- a full-screen overlay would
+     leave the right half blank with nothing to anchor against. */
   #toc.open {
     display: flex;
     flex-direction: column;
     position: fixed;
-    inset: 0;
     top: 0;
     left: 0;
-    width: auto;
+    bottom: 0;
+    width: min(85vw, 320px);
     max-height: 100vh;
     background: var(--color-bg);
     padding: 4rem 1.5rem 1.5rem;
@@ -146,9 +162,21 @@ canvas {
     z-index: 100;
     overflow-y: auto;
     font-size: 1.1rem;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.2);
   }
 
-  #toc.open h1 {
+  /* Row layout for logo+title specifically, scoped to the drawer -- the desktop sidebar keeps
+     its existing stacked layout untouched. Also fixes the logo being stretched full-width: that
+     was flex-column's default align-items: stretch acting on the logo's width: auto when it was
+     a direct child of #toc.open; as a row's cross-axis (height) target instead, with its own
+     explicit height, it's no longer eligible to stretch. */
+  #toc.open .toc-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  #toc.open .toc-brand h1 {
     font-size: 1.4rem;
   }
 
@@ -163,6 +191,12 @@ canvas {
   #toc.open li {
     margin-bottom: 0;
     border-bottom: 1px solid var(--color-border);
+  }
+
+  /* No trailing line below the last link (Traffic) -- the border above exists to separate links
+     from each other, not to cap off the list. */
+  #toc.open li:last-child {
+    border-bottom: none;
   }
 
   #toc.open a {

@@ -7,10 +7,13 @@
   <h1>Sirius Stats</h1>
 </header>
 
+<div id="tocBackdrop"></div>
 <nav id="toc">
   <button id="tocClose" aria-label="Close navigation">&times;</button>
-  {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
-  <h1>Sirius Stats</h1>
+  <div class="toc-brand">
+    {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
+    <h1>Sirius Stats</h1>
+  </div>
   <p><em>Developer insights for<br/><a href="https://github.com/sirius-db/sirius">sirius-db/sirius</a></em></p>
   <ul>
     <li><a href="#review-backlog">Review backlog</a></li>
@@ -37,11 +40,11 @@
 <h2 id="priority-backlog">Priority backlog</h2>
 <p>Daily tracking of issues/PRs with a priority label.</p>
 <h3>Priority backlog issues (oldest per level, P0 first)</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View on GH &rarr;</a></p>
 <div id="priorityIssuesStale"></div>
 
 <h3>Priority backlog PRs (oldest per level, P0 first)</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20label%3A%22%21%20-%20P0%22%2C%22%21%20-%20P1%22%2C%22%21%20-%20P2%22%2C%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View on GH &rarr;</a></p>
 <div id="priorityPrsStale"></div>
 
 <h3>Priority history</h3>
@@ -59,14 +62,14 @@
 <canvas id="priorityPrsChart"></canvas>
 
 <h2 id="other-backlog">Other backlog</h2>
-<p>Daily tracking of non-priority labels. <a href="labels.html">View all labels &rarr;</a></p>
+<p>Daily tracking of non-priority labels. <a href="labels.html">View on GH labels &rarr;</a></p>
 
 <h3>Most stale issues</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Aissue%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View on GH &rarr;</a></p>
 <div id="otherIssuesStale"></div>
 
 <h3>Most stale PRs</h3>
-<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View all &rarr;</a></p>
+<p><a href="https://github.com/sirius-db/sirius/issues?q=is%3Aopen%20is%3Apr%20-no%3Alabel%20-label%3A%22%21%20-%20P0%22%20-label%3A%22%21%20-%20P1%22%20-label%3A%22%21%20-%20P2%22%20-label%3A%22%21%20-%20P3%22%20sort%3Aupdated-asc" target="_blank" rel="noopener noreferrer">View on GH &rarr;</a></p>
 <div id="otherPrsStale"></div>
 
 <h3>Other history</h3>
@@ -224,15 +227,18 @@ function initMobileNav() {
   const toggle = document.getElementById('tocToggle');
   const close = document.getElementById('tocClose');
   const toc = document.getElementById('toc');
+  const backdrop = document.getElementById('tocBackdrop');
   if (!toggle || !toc) return;
 
   const setOpen = open => {
     toc.classList.toggle('open', open);
+    backdrop.classList.toggle('open', open);
     toggle.setAttribute('aria-expanded', String(open));
   };
 
   toggle.addEventListener('click', () => setOpen(!toc.classList.contains('open')));
   close.addEventListener('click', () => setOpen(false));
+  backdrop.addEventListener('click', () => setOpen(false));
   toc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
 }
 initMobileNav();
