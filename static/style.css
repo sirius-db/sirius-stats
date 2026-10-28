@@ -59,6 +59,29 @@ canvas {
   color: #333;
 }
 
+/* #toc p's 0.7rem is sized for the plain "Last collected" caption text -- these need to read as
+   clickable links, so override back up with a selector specific enough to beat it. */
+#toc p.toc-gh-link {
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.toc-gh-link a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.toc-gh-link a:hover {
+  text-decoration: underline;
+}
+
+.gh-icon {
+  flex-shrink: 0;
+}
+
 #toc {
   position: fixed;
   top: 2rem;
@@ -132,7 +155,6 @@ canvas {
     top: 0;
     z-index: 90;
     background: var(--color-bg);
-    padding: 0.75rem 0;
     border-bottom: 1px solid var(--color-border);
   }
 
