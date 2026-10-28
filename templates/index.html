@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 
+<header id="mobileHeader">
+  {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
+  <h1>Sirius Stats</h1>
+  <button id="tocToggle" aria-label="Toggle navigation" aria-controls="toc" aria-expanded="false">&#9776;</button>
+</header>
+
 <nav id="toc">
   {% if logo_path %}<img class="logo" src="{{ logo_path }}" alt="">{% endif %}
   <h1>Sirius Stats</h1>
@@ -207,6 +213,26 @@ function initToc() {
   headings.forEach(h => observer.observe(h));
 }
 initToc();
+
+// Below the breakpoint where #toc's fixed sidebar is hidden (see style.css), this is the only
+// way to reach it -- mobileHeader's hamburger button toggles it open as a full-screen overlay.
+// Closing on link click matters here specifically: unlike the desktop sidebar (always visible,
+// so clicking a link just scrolls), on mobile the open overlay would otherwise sit on top of
+// the section the user just navigated to.
+function initMobileNav() {
+  const toggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  if (!toggle || !toc) return;
+
+  const setOpen = open => {
+    toc.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  };
+
+  toggle.addEventListener('click', () => setOpen(!toc.classList.contains('open')));
+  toc.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+}
+initMobileNav();
 
 fetch('data.json')
   .then(r => {
