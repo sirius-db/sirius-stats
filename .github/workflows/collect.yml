@@ -13,6 +13,13 @@ name: Collect metrics
 # in one firing (not just the oldest), so a backlog can actually close instead of
 # staying permanently one day behind. See #14 and the linked PR for the incident this
 # design replaced.
+#
+# Every snapshot records which event triggered it ("trigger": "schedule" /
+# "workflow_dispatch" / "manual", see fetch_metrics.py). The Gate step uses this to
+# decide whether an existing day's file is still eligible to be superseded -- a real
+# scheduled collection (or anything predating this field) is trusted and left alone;
+# anything else (a manual/local run committed by hand, e.g. #27's incident) isn't, so
+# the next scheduled firing quietly fixes it on its own. See #13.
 
 on:
   schedule:
@@ -22,6 +29,11 @@ on:
       date:
         description: "Force-(re)collect a specific date (YYYY-MM-DD). Leave blank for the normal catch-up scan."
         required: false
+      override:
+        description: "Required to replace a date that's already tagged trigger=schedule -- protects trusted data from an accidental re-run."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -47,18 +59,33 @@ jobs:
 
       - name: Gate
         id: gate
-        # A manual dispatch with a `date` input always force-collects exactly that
-        # date. Otherwise: scan the last 7 days for every currently-missing snapshot
-        # (not just the oldest -- one-per-firing can never close a backlog once
-        # behind, since a new day becomes due every day at the same rate as
+        # A manual dispatch with a `date` input force-collects exactly that date --
+        # unless a file for it already exists and is tagged (or defaults to)
+        # trigger=schedule, in which case `override: true` is required too, so a
+        # trusted day's irreplaceable point-in-time fields (repo/labels/reviews'
+        # point-in-time subset -- see DATA.md) can't be clobbered by an accidental
+        # re-run. Otherwise: scan the last 7 days for every day that's either
+        # missing a file or whose existing file isn't trigger=schedule (not just
+        # the oldest missing day -- one-per-firing can never close a backlog
+        # once behind, since a new day becomes due every day at the same rate as
         # recovery) and collect all of them in this one firing. Also checks one day
         # past the lookback boundary so data that's about to become permanently
         # unrecoverable by this automated path is loudly flagged, not silently
         # dropped.
         env:
           DISPATCH_DATE: ${{ github.event.inputs.date }}
+          OVERRIDE: ${{ github.event.inputs.override }}
         run: |
           if [ -n "$DISPATCH_DATE" ]; then
+            target_file="data/snapshots/${DISPATCH_DATE}.json"
+            if [ -f "$target_file" ]; then
+              existing_trigger="$(jq -r '.trigger // "schedule"' "$target_file")"
+              if [ "$existing_trigger" = "schedule" ] && [ "$OVERRIDE" != "true" ]; then
+                echo "::error::${target_file} is tagged trigger=schedule (or predates trigger tracking) -- re-run with override=true to force-replace it"
+                echo "run=false" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+            fi
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "targets=${DISPATCH_DATE}" >> "$GITHUB_OUTPUT"
             exit 0
@@ -67,9 +94,12 @@ jobs:
           targets=""
           for i in 7 6 5 4 3 2 1; do
             d="$(date -u -d "$i days ago" +%Y-%m-%d)"
-            if [ ! -f "data/snapshots/${d}.json" ]; then
-              targets="${targets}${d} "
+            f="data/snapshots/${d}.json"
+            if [ -f "$f" ]; then
+              existing_trigger="$(jq -r '.trigger // "schedule"' "$f")"
+              [ "$existing_trigger" = "schedule" ] && continue
             fi
+            targets="${targets}${d} "
           done
 
           aged_out="$(date -u -d "8 days ago" +%Y-%m-%d)"
@@ -99,9 +129,10 @@ jobs:
         env:
           SIRIUS_TRAFFIC_TOKEN: ${{ secrets.SIRIUS_TRAFFIC_TOKEN }}
           TARGETS: ${{ steps.gate.outputs.targets }}
+          TRIGGER: ${{ github.event_name }}
         run: |
           for d in $TARGETS; do
-            uv run scripts/fetch_metrics.py --date "$d"
+            uv run scripts/fetch_metrics.py --date "$d" --trigger "$TRIGGER"
           done
 
       - name: Refresh traffic

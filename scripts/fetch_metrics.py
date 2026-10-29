@@ -7,6 +7,10 @@ recovering a missed day). collect.yml always passes --date -- it only ever final
 already fully-elapsed days, never today; the no-argument default here is for manual/
 local use. Note: --date backfilling doesn't apply to `labels` -- like `repo`, it's a
 point-in-time snapshot of currently-open items, not reconstructable for a past date.
+
+Every snapshot also records --trigger (default 'manual'), so collect.yml's Gate step can
+tell a real scheduled collection apart from a manual/local one when deciding whether a
+day's file is still eligible to be superseded -- see DATA.md and collect.yml.
 """
 
 import argparse
@@ -529,6 +533,18 @@ def main():
             "in_review_count) will reflect current values, not the target date's."
         ),
     )
+    parser.add_argument(
+        "--trigger",
+        default="manual",
+        help=(
+            "How this run was invoked -- 'schedule' or 'workflow_dispatch' when collect.yml "
+            "passes github.event_name, defaulting to 'manual' for a bare local run (e.g. this "
+            "exact default is what should be in a snapshot you generated and committed by hand). "
+            "Recorded in the snapshot so collect.yml's Gate step can tell a real scheduled "
+            "collection apart from anything else when deciding whether a day's file is still "
+            "eligible to be superseded -- see DATA.md."
+        ),
+    )
     args = parser.parse_args()
 
     traffic_token = os.environ.get("SIRIUS_TRAFFIC_TOKEN")
@@ -541,6 +557,7 @@ def main():
     snapshot = {
         "date": target_date,
         "collected_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "trigger": args.trigger,
         "repo": fetch_repo_metrics(traffic_token),
         "activity": fetch_activity_metrics(target_date, traffic_token),
         "labels": fetch_label_metrics(traffic_token),

@@ -91,6 +91,7 @@ backlog from a missed firing actually closes (see `.github/workflows/collect.yml
 {
   "date": "2026-08-31",
   "collected_at": "2026-09-01T14:30:32Z",
+  "trigger": "schedule",
   "repo": {
     "stars": 1056, "forks": 121, "watchers": 13,
     "open_issues": 112, "open_prs": 107, "contributors": 43
@@ -133,6 +134,17 @@ backlog from a missed firing actually closes (see `.github/workflows/collect.yml
 
 Field semantics that aren't obvious from the shape alone:
 
+- **`trigger`** records how this snapshot was invoked: `"schedule"` (the real `collect.yml` cron
+  firing), `"workflow_dispatch"` (a manual run of that workflow), or `"manual"` (a bare local run
+  of `fetch_metrics.py` with no `--trigger` flag -- e.g. generated and committed by hand). Used by
+  `collect.yml`'s Gate step to decide whether an existing day's file is still eligible to be
+  superseded: a file tagged `"schedule"`, or one with no `trigger` field at all (every snapshot
+  collected before this field existed), is trusted and left alone; anything else is fair game for
+  the next scheduled firing to quietly redo. **Protect-by-default, not supersede-by-default** --
+  treating a missing field as untrusted would make every pre-existing snapshot in the 7-day
+  catch-up window eligible for overwrite on the very next firing, silently destroying point-in-time
+  fields (`repo.*`, `labels.*`, `releases`, `reviews`' non-day-scoped fields) that can never be
+  reconstructed for a past date once lost.
 - **`repo.*`** is a point-in-time gauge as of `collected_at` -- there's no historical API for
   these fields, so a snapshot's `repo` values can never be reconstructed for a date other than
   when it was actually collected. This is why a missed collection day is only partially
