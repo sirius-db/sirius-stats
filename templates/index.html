@@ -27,7 +27,7 @@
   </ul>
   {% set github_icon %}<svg class="gh-icon" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="currentColor"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path></svg>{% endset %}
   <p class="toc-gh-link">{{ github_icon|safe }} View <a href="https://github.com/sirius-db/sirius-stats" target="_blank" rel="noopener noreferrer">code</a> or <a href="https://github.com/sirius-db/sirius-stats/issues" target="_blank" rel="noopener noreferrer">issues</a></p>
-  <p><em>Last collected:<br/>{{ last_collected }}</em></p>
+  <p><em>Last collected: <span id="lastCollected">{{ last_collected }}</span></em></p>
 </nav>
 
 <h2 id="review-backlog">Review backlog</h2>
@@ -219,6 +219,40 @@ function initToc() {
   headings.forEach(h => observer.observe(h));
 }
 initToc();
+
+// "X ago" reads faster at a glance than parsing an ISO timestamp -- the exact absolute time is
+// still available on hover via the title attribute. Computed once at page load, not live-
+// ticking, matching the rest of this page (nothing else here updates without a reload). Silently
+// leaves the raw text in place if it isn't a parseable date (e.g. "never", when no snapshot has
+// been collected yet).
+function initLastCollected() {
+  const el = document.getElementById('lastCollected');
+  const date = new Date(el.textContent);
+  if (isNaN(date)) return;
+
+  const seconds = Math.round((Date.now() - date.getTime()) / 1000);
+  const units = [
+    ['year', 31536000], ['month', 2592000], ['week', 604800],
+    ['day', 86400], ['hour', 3600], ['minute', 60]
+  ];
+  let relative = 'just now';
+  for (const [unit, secondsInUnit] of units) {
+    const count = Math.floor(seconds / secondsInUnit);
+    if (count >= 1) {
+      relative = `${count} ${unit}${count > 1 ? 's' : ''} ago`;
+      break;
+    }
+  }
+
+  // dateStyle/timeStyle can't be combined with timeZoneName (Intl.DateTimeFormat disallows
+  // mixing the style shorthands with individual date-time component options) -- spell out the
+  // components instead so the tooltip can still include the viewer's own timezone abbreviation.
+  el.title = date.toLocaleString(undefined, {
+    year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'
+  });
+  el.textContent = relative;
+}
+initLastCollected();
 
 // Below the breakpoint where #toc's fixed sidebar is hidden (see style.css), this is the only
 // way to reach it -- mobileHeader's hamburger button toggles it open as a full-screen overlay.
