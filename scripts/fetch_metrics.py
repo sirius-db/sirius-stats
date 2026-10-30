@@ -245,7 +245,7 @@ _REVIEW_PR_FIELDS = """
 _GRAPHQL_SEARCH_PRS = (
     """
 query($searchQuery: String!, $cursor: String) {
-  search(query: $searchQuery, type: ISSUE, first: 100, after: $cursor) {
+  search(query: $searchQuery, type: ISSUE, first: 50, after: $cursor) {
     nodes {
 """
     + _REVIEW_PR_FIELDS
@@ -259,7 +259,13 @@ query($searchQuery: String!, $cursor: String) {
 
 
 def _search_prs(search_query, token):
-    """Page through a GitHub search query via GraphQL, returning every matching PR node."""
+    """Page through a GitHub search query via GraphQL, returning every matching PR node.
+
+    Batch size (see _GRAPHQL_SEARCH_PRS) is 50, not 100 -- the heavier page size hit repeated
+    502s from GitHub's API on this same nested reviews/timelineItems/reviewRequests query shape
+    (confirmed live, recurring on real PR #32's verify run), matching the fix already applied to
+    backfill_reviews.py's identical query for the same reason.
+    """
     prs = []
     cursor = None
     while True:
