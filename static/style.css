@@ -22,6 +22,28 @@
   /* Same blue as --color-forks/--color-opened (not a new color) -- close to GitHub's own link
      blue, and reusing it keeps the palette from growing a near-duplicate shade. */
   --color-link: #3a7bd5;
+  --color-muted: #333;
+}
+
+/* OS-preference dark mode only -- no toggle. Charts read these variables via cssVar()
+   (static/shared.js) at the moment each chart is constructed, which happens after the browser
+   has already resolved this media query, so no JS/template changes are needed for charts to
+   pick up the right colors. Only the structural UI variables are overridden here -- the ~15
+   chart-series colors (--color-stars, --color-forks, etc.) stay the same hue in both themes,
+   since they're saturated enough to already read fine on a dark background and a given series
+   should stay recognizable regardless of which theme is active. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0d1117;
+    --color-text: #e6edf3;
+    --color-border: #30363d;
+    --color-window-bg: #21262d;
+    --color-window-border: #3d444d;
+    /* Brighter than the light-mode #3a7bd5 -- that shade is too muted against #0d1117 to read
+       clearly as a link. */
+    --color-link: #58a6ff;
+    --color-muted: #9198a1;
+  }
 }
 
 select {
@@ -66,7 +88,7 @@ canvas {
 
 #toc p {
   font-size: 0.7rem;
-  color: #333;
+  color: var(--color-muted);
 }
 
 /* #toc p's 0.7rem is sized for the plain "Last collected" caption text -- these need to read as
