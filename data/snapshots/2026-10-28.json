@@ -1,13 +1,13 @@
 {
   "date": "2026-10-28",
-  "collected_at": "2026-10-30T06:17:25Z",
-  "trigger": "schedule",
+  "collected_at": "2026-10-29T19:13:28Z",
+  "trigger": "workflow_dispatch",
   "repo": {
     "stars": 1101,
-    "forks": 145,
+    "forks": 146,
     "watchers": 15,
     "open_issues": 215,
-    "open_prs": 136,
+    "open_prs": 135,
     "contributors": 55
   },
   "activity": {
@@ -51,7 +51,7 @@
         "color": "b60205"
       },
       "! - P1": {
-        "issues": 44,
+        "issues": 43,
         "prs": 8,
         "color": "d93f0b"
       },
@@ -67,25 +67,30 @@
       }
     },
     "other_counts": {
+      "feat": {
+        "issues": 65,
+        "prs": 1,
+        "color": "a2eeef"
+      },
+      "perf": {
+        "issues": 8,
+        "prs": 1,
+        "color": "044b1c"
+      },
       "ci": {
         "issues": 7,
         "prs": 1,
         "color": "e7ce1d"
       },
-      "chore": {
-        "issues": 5,
-        "prs": 0,
-        "color": "1abc4b"
+      "benchmarking": {
+        "issues": 2,
+        "prs": 1,
+        "color": "08d901"
       },
-      "distributed-sirius": {
-        "issues": 11,
-        "prs": 0,
-        "color": "1d76db"
-      },
-      "feat": {
-        "issues": 65,
-        "prs": 0,
-        "color": "a2eeef"
+      "! - DO NOT MERGE": {
+        "issues": 0,
+        "prs": 2,
+        "color": "df3028"
       },
       "quent": {
         "issues": 4,
@@ -102,10 +107,10 @@
         "prs": 0,
         "color": "aaaaaa"
       },
-      "perf": {
-        "issues": 8,
+      "distributed-sirius": {
+        "issues": 10,
         "prs": 0,
-        "color": "044b1c"
+        "color": "1d76db"
       },
       "IO": {
         "issues": 10,
@@ -122,11 +127,6 @@
         "prs": 0,
         "color": "cb8bd3"
       },
-      "benchmarking": {
-        "issues": 2,
-        "prs": 0,
-        "color": "08d901"
-      },
       "test": {
         "issues": 3,
         "prs": 0,
@@ -137,8 +137,13 @@
         "prs": 1,
         "color": "1d76db"
       },
+      "chore": {
+        "issues": 4,
+        "prs": 0,
+        "color": "1abc4b"
+      },
       "bug": {
-        "issues": 22,
+        "issues": 23,
         "prs": 0,
         "color": "d73a4a"
       },
@@ -146,11 +151,6 @@
         "issues": 1,
         "prs": 0,
         "color": "7057ff"
-      },
-      "! - DO NOT MERGE": {
-        "issues": 0,
-        "prs": 1,
-        "color": "df3028"
       },
       "starrocks": {
         "issues": 17,
@@ -431,6 +431,27 @@
         ]
       },
       {
+        "number": 2394,
+        "title": "fix(aggregate): return HUGEINT sums from the GPU as DECIMAL128",
+        "url": "https://github.com/sirius-db/sirius/pull/2394",
+        "updated_at": "2026-10-29T17:08:07Z",
+        "labels": [
+          "feat",
+          "perf"
+        ]
+      },
+      {
+        "number": 2382,
+        "title": "ci: add non-blocking TPC-DS SF10 snapshot to Test workflow",
+        "url": "https://github.com/sirius-db/sirius/pull/2382",
+        "updated_at": "2026-10-29T18:21:32Z",
+        "labels": [
+          "ci",
+          "benchmarking",
+          "! - DO NOT MERGE"
+        ]
+      },
+      {
         "number": 2349,
         "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
         "url": "https://github.com/sirius-db/sirius/pull/2349",
@@ -438,20 +459,11 @@
         "labels": [
           "dynamic-filters"
         ]
-      },
-      {
-        "number": 2408,
-        "title": "ci: add concurrency to Check workflow",
-        "url": "https://github.com/sirius-db/sirius/pull/2408",
-        "updated_at": "2026-10-30T05:52:40Z",
-        "labels": [
-          "ci"
-        ]
       }
     ],
     "untriaged_counts": {
       "issues": 23,
-      "prs": 110
+      "prs": 108
     }
   },
   "reviews": {
@@ -515,6 +527,11 @@
           "url": "https://github.com/sirius-db/sirius/pull/2157"
         },
         {
+          "number": 2175,
+          "title": "fix(planner): resolve host scan references from the static symbol table",
+          "url": "https://github.com/sirius-db/sirius/pull/2175"
+        },
+        {
           "number": 2107,
           "title": "fix(substrait): read FetchRel count_expr and offset_expr",
           "url": "https://github.com/sirius-db/sirius/pull/2107"
@@ -570,19 +587,14 @@
           "url": "https://github.com/sirius-db/sirius/pull/2337"
         },
         {
-          "number": 2349,
-          "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
-          "url": "https://github.com/sirius-db/sirius/pull/2349"
-        },
-        {
-          "number": 2175,
-          "title": "fix(planner): resolve host scan references from the static symbol table",
-          "url": "https://github.com/sirius-db/sirius/pull/2175"
-        },
-        {
           "number": 2401,
           "title": "feat(aggregate): run count(DISTINCT) with a FILTER clause on the GPU",
           "url": "https://github.com/sirius-db/sirius/pull/2401"
+        },
+        {
+          "number": 2349,
+          "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
+          "url": "https://github.com/sirius-db/sirius/pull/2349"
         }
       ],
       "sirius-io": [
@@ -612,14 +624,19 @@
           "url": "https://github.com/sirius-db/sirius/pull/2337"
         },
         {
-          "number": 2349,
-          "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
-          "url": "https://github.com/sirius-db/sirius/pull/2349"
-        },
-        {
           "number": 2348,
           "title": "feat(ffi): object-store configuration snapshot for Context",
           "url": "https://github.com/sirius-db/sirius/pull/2348"
+        },
+        {
+          "number": 2394,
+          "title": "fix(aggregate): return HUGEINT sums from the GPU as DECIMAL128",
+          "url": "https://github.com/sirius-db/sirius/pull/2394"
+        },
+        {
+          "number": 2349,
+          "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
+          "url": "https://github.com/sirius-db/sirius/pull/2349"
         }
       ],
       "sirius-integrations": [
@@ -657,9 +674,16 @@
           "title": "fix(planner): resolve host scan references from the static symbol table",
           "url": "https://github.com/sirius-db/sirius/pull/2175"
         }
+      ],
+      "sirius-build": [
+        {
+          "number": 2175,
+          "title": "fix(planner): resolve host scan references from the static symbol table",
+          "url": "https://github.com/sirius-db/sirius/pull/2175"
+        }
       ]
     },
-    "draft_pr_count": 97,
+    "draft_pr_count": 98,
     "idle_prs": [
       {
         "number": 1685,
@@ -669,9 +693,19 @@
     ],
     "zero_review_prs": [
       {
+        "number": 1677,
+        "title": "feat(bench): validate throughput streams against a refresh-state knowledge base",
+        "url": "https://github.com/sirius-db/sirius/pull/1677"
+      },
+      {
         "number": 2080,
         "title": "feat(s3): add CPU fallback for S3 (not enable by default yet)",
         "url": "https://github.com/sirius-db/sirius/pull/2080"
+      },
+      {
+        "number": 2100,
+        "title": "fix(starrocks): use the shared descriptor table in batch dispatch",
+        "url": "https://github.com/sirius-db/sirius/pull/2100"
       },
       {
         "number": 2101,
@@ -744,27 +778,17 @@
         "url": "https://github.com/sirius-db/sirius/pull/2337"
       },
       {
-        "number": 2349,
-        "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
-        "url": "https://github.com/sirius-db/sirius/pull/2349"
-      },
-      {
-        "number": 2100,
-        "title": "fix(starrocks): use the shared descriptor table in batch dispatch",
-        "url": "https://github.com/sirius-db/sirius/pull/2100"
-      },
-      {
         "number": 2401,
         "title": "feat(aggregate): run count(DISTINCT) with a FILTER clause on the GPU",
         "url": "https://github.com/sirius-db/sirius/pull/2401"
       },
       {
-        "number": 2388,
-        "title": "fix(aggregate): reserve scalar state memory for empty input",
-        "url": "https://github.com/sirius-db/sirius/pull/2388"
+        "number": 2349,
+        "title": "feat(dynamic filter): add bounded HOST fallback for accumulated Bloom publication (S4)",
+        "url": "https://github.com/sirius-db/sirius/pull/2349"
       }
     ],
-    "in_review_count": 19
+    "in_review_count": 17
   },
   "traffic": {
     "as_of_date": "2026-10-28",
@@ -896,7 +920,7 @@
     {
       "tag": "latest",
       "asset": "sirius-linux_amd64-cuda13.duckdb_extension.gz",
-      "download_count": 5
+      "download_count": 0
     },
     {
       "tag": "latest",

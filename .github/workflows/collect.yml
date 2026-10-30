@@ -64,14 +64,18 @@ jobs:
         # trigger=schedule, in which case `override: true` is required too, so a
         # trusted day's irreplaceable point-in-time fields (repo/labels/reviews'
         # point-in-time subset -- see DATA.md) can't be clobbered by an accidental
-        # re-run. Otherwise: scan the last 7 days for every day that's either
-        # missing a file or whose existing file isn't trigger=schedule (not just
-        # the oldest missing day -- one-per-firing can never close a backlog
-        # once behind, since a new day becomes due every day at the same rate as
-        # recovery) and collect all of them in this one firing. Also checks one day
-        # past the lookback boundary so data that's about to become permanently
-        # unrecoverable by this automated path is loudly flagged, not silently
-        # dropped.
+        # re-run. Otherwise: scan the last 7 days for every genuinely-missing file
+        # (not just the oldest -- one-per-firing can never close a backlog once
+        # behind, since a new day becomes due every day at the same rate as
+        # recovery) and collect all of them in this one firing. Only when nothing is
+        # missing does it also check for a non-schedule-tagged existing file to
+        # supersede -- capped to at most one per firing, and never bundled with a
+        # missing day, since two days collected seconds apart in the same firing end
+        # up with near-identical point-in-time fields, which reads as a flat/
+        # duplicate data point on any chart built from them (see the trigger-tagging
+        # note above for the full reasoning). Also checks one day past the lookback
+        # boundary so data that's about to become permanently unrecoverable by this
+        # automated path is loudly flagged, not silently dropped.
         env:
           DISPATCH_DATE: ${{ github.event.inputs.date }}
           OVERRIDE: ${{ github.event.inputs.override }}
@@ -91,16 +95,34 @@ jobs:
             exit 0
           fi
 
-          targets=""
+          # Genuinely-missing days always take priority and are never capped -- unchanged from
+          # before. Superseding a non-schedule-tagged *existing* file is lower priority: capped
+          # to at most one per firing, and only attempted when nothing is genuinely missing this
+          # firing. Bundling a supersession target with a missing day (or with another
+          # supersession target) in the same firing means both get collected seconds apart and
+          # end up with near-identical point-in-time fields (repo/labels/reviews' point-in-time
+          # subset) -- misleading on any chart built from them, even though neither value is
+          # individually wrong. See the trigger-supersession design note above for why this
+          # exists at all.
+          missing=""
           for i in 7 6 5 4 3 2 1; do
             d="$(date -u -d "$i days ago" +%Y-%m-%d)"
-            f="data/snapshots/${d}.json"
-            if [ -f "$f" ]; then
-              existing_trigger="$(jq -r '.trigger // "schedule"' "$f")"
-              [ "$existing_trigger" = "schedule" ] && continue
-            fi
-            targets="${targets}${d} "
+            [ -f "data/snapshots/${d}.json" ] || missing="${missing}${d} "
           done
+
+          if [ -n "$missing" ]; then
+            targets="$missing"
+          else
+            targets=""
+            for i in 7 6 5 4 3 2 1; do
+              d="$(date -u -d "$i days ago" +%Y-%m-%d)"
+              existing_trigger="$(jq -r '.trigger // "schedule"' "data/snapshots/${d}.json")"
+              if [ "$existing_trigger" != "schedule" ]; then
+                targets="${d} "
+                break
+              fi
+            done
+          fi
 
           aged_out="$(date -u -d "8 days ago" +%Y-%m-%d)"
           if [ ! -f "data/snapshots/${aged_out}.json" ]; then
