@@ -752,11 +752,11 @@
     "in_review_count": 19
   },
   "traffic": {
-    "as_of_date": null,
-    "views": 0,
-    "unique_views": 0,
-    "clones": 0,
-    "unique_clones": 0,
+    "as_of_date": "2026-11-03",
+    "views": 546,
+    "unique_views": 55,
+    "clones": 1528,
+    "unique_clones": 122,
     "top_referrers": [
       {
         "referrer": "aocr.org",
