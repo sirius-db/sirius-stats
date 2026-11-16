@@ -622,11 +622,11 @@
     "in_review_count": 9
   },
   "traffic": {
-    "as_of_date": null,
-    "views": 0,
-    "unique_views": 0,
-    "clones": 0,
-    "unique_clones": 0,
+    "as_of_date": "2026-11-14",
+    "views": 192,
+    "unique_views": 29,
+    "clones": 635,
+    "unique_clones": 214,
     "top_referrers": [
       {
         "referrer": "github.com",
