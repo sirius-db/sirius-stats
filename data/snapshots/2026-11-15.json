@@ -600,11 +600,11 @@
     "in_review_count": 10
   },
   "traffic": {
-    "as_of_date": null,
-    "views": 0,
-    "unique_views": 0,
-    "clones": 0,
-    "unique_clones": 0,
+    "as_of_date": "2026-11-15",
+    "views": 106,
+    "unique_views": 25,
+    "clones": 1047,
+    "unique_clones": 154,
     "top_referrers": [
       {
         "referrer": "github.com",
